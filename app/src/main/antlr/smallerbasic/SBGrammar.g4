@@ -8,6 +8,12 @@ literal : Number
         | Bool
         ;
 
+expression : expression ('/' | '*') expression
+           | expression ('+' | '-') expression
+           | '(' expression ')'
+           | literal
+           ;
+
 fragment DIGIT : [0-9] ;
 fragment PRINTABLE : ~["] ;
 WS : [ \r\t\n]+ -> skip ;
