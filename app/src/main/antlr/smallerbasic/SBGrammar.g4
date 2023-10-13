@@ -3,25 +3,25 @@ grammar SBGrammar;
 package smallerbasic;
 }
 
-literal : Number
-        | String
-        | Bool
-        ;
+assignmentStmt : Ident '=' arithExpression
+               | Ident '=' booleanExpression
+               | Ident '=' Ident
+               ;
 
-booleanExpression : expression ('<='|'='|'<>'|'<'|'>'|'>=') expression
+booleanExpression : arithExpression ('<='|'='|'<>'|'<'|'>'|'>=') arithExpression
                   | booleanExpression ('And'|'Or') booleanExpression
                   | '(' booleanExpression ')'
                   | Bool
                   | Ident
                   ;
 
-expression : expression ('/' | '*') expression
-           | expression ('+' | '-') expression
-           | '(' expression ')'
-           | String
-           | Number
-           | Ident
-           ;
+arithExpression : arithExpression ('/' | '*') arithExpression
+                | arithExpression ('+' | '-') arithExpression
+                | '(' arithExpression ')'
+                | String
+                | Number
+                | Ident
+                ;
 
 fragment DIGIT : [0-9] ;
 fragment PRINTABLE : ~["] ;
