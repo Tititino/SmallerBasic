@@ -25,10 +25,10 @@ ifStmt : 'If' '(' booleanExpression ')' 'Then' statement* 'EndIf'
        ;
 
 forStmt : 'For' Ident '=' arithExpression 'To' arithExpression statement* 'EndFor'
-        | 'For' Ident '=' arithExpression 'To' arithExpression 'Step' statement* 'EndFor'
+        | 'For' Ident '=' arithExpression 'To' arithExpression 'Step' arithExpression statement* 'EndFor'
         ;
 
-whileStmt : 'While' '(' booleanExpression ')' statement* 'EndFor' ;
+whileStmt : 'While' '(' booleanExpression ')' statement* 'EndWhile' ;
 
 gotoStmt  : 'Goto' Ident ;
 

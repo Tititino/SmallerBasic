@@ -12,15 +12,25 @@ public class ParserTest {
 
     /**
      * Basically halt anc catch fire when it encounters any error.
+     * Could be done in a prettier way with an ANTLRErrorListener.
      */
     static class ExceptionErrorHandler extends DefaultErrorStrategy {
         @Override
         public void reportError(Parser recognizer, RecognitionException e) {
             throw e;
         }
+        @Override
+        protected void reportUnwantedToken(Parser recognizer) {
+            throw new RuntimeException();
+        }
+
+        @Override
+        protected void reportMissingToken(Parser recognizer) {
+            throw new RuntimeException();
+        }
     }
 
-    static final ANTLRErrorStrategy errorHandler = new ExceptionErrorHandler();
+    static final ExceptionErrorHandler errorHandler = new ExceptionErrorHandler();
 
     @ParameterizedTest
     @CsvSource({
@@ -84,6 +94,22 @@ public class ParserTest {
                         fine:
                         D = 4"""
         ));
+        SBGrammarParser parser = new SBGrammarParser(new CommonTokenStream(lexer));
+        parser.setErrorHandler(errorHandler);
+
+        assertThatNoException().isThrownBy(parser::program);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "If (true) Then Else EndIf",
+            "If (false) Then EndIf",
+            "While (true) EndWhile",
+            "For I = 2 To 10 EndFor",
+            "For I = 2 To 20 Step 10 EndFor"
+    })
+    void emptyStatementTest(String test) {
+        SBGrammarLexer lexer = new SBGrammarLexer(CharStreams.fromString(test));
         SBGrammarParser parser = new SBGrammarParser(new CommonTokenStream(lexer));
         parser.setErrorHandler(errorHandler);
 
