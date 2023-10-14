@@ -3,22 +3,33 @@ grammar SBGrammar;
 package smallerbasic;
 }
 
-assignmentStmt : Ident '=' arithExpression
-               | Ident '=' booleanExpression
+program : ( statement | subroutineDecl NL )* ;
+
+assignmentStmt : Ident '=' expression
                | Ident '=' Ident
                ;
 
 label : Ident ':';
 
-program : statement* ;
-
-statement : assignmentStmt
-          | ifStmt
-          | forStmt
-          | whileStmt
-          | gotoStmt
-          | label
+statement : assignmentStmt  NL
+          | ifStmt          NL
+          | forStmt         NL
+          | whileStmt       NL
+          | gotoStmt        NL
+          | expression      NL
+          | label           NL
           ;
+
+callRoutine : FunctionCall ')'
+            | ExternalFunctionCall expression? (',' expression)* ')'
+            ;
+
+subroutineDecl : 'Sub' Ident statement* 'EndSub' ;
+
+expression : callRoutine
+           | arithExpression
+           | booleanExpression
+           ;
 
 ifStmt : 'If' '(' booleanExpression ')' 'Then' statement* 'EndIf'
        | 'If' '(' booleanExpression ')' 'Then' statement* 'Else' statement* 'EndIf'
@@ -36,6 +47,7 @@ booleanExpression : arithExpression ('<='|'='|'<>'|'<'|'>'|'>=') arithExpression
                   | booleanExpression ('And'|'Or') booleanExpression
                   | '(' booleanExpression ')'
                   | Bool
+                  | callRoutine
                   | Ident
                   ;
 
@@ -44,6 +56,7 @@ arithExpression : arithExpression ('/' | '*') arithExpression
                 | '(' arithExpression ')'
                 | String
                 | Number
+                | callRoutine
                 | Ident
                 ;
 
@@ -51,7 +64,10 @@ fragment DIGIT : [0-9] ;
 fragment PRINTABLE : ~["] ;
 
 Ident  : [A-Za-z_][A-Za-z0-9_]* ;
-WS     : [ \r\t\n]+ -> skip ;
+WS     : [ \t]+ -> skip ;
+NL     : '\r'? '\n' ;     // return newlines to parser (is end-statement signal)
 Number : [+-]?(DIGIT+('.'DIGIT*)?|'.'DIGIT+)([eE][-+]?DIGIT+)? ;
 String : '"'PRINTABLE*'"' ;
+FunctionCall : Ident'(' ;
+ExternalFunctionCall : Ident'.'Ident'(' ;   // no spaces between tokens
 Bool   : 'true' | 'false' ;

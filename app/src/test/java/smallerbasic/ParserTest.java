@@ -115,4 +115,5 @@ public class ParserTest {
 
         assertThatNoException().isThrownBy(parser::program);
     }
+
 }
