@@ -1,15 +1,26 @@
 package smallerbasic;
 
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
 public class ParserTest {
+
+    /**
+     * Basically halt anc catch fire when it encounters any error.
+     */
+    static class ExceptionErrorHandler extends DefaultErrorStrategy {
+        @Override
+        public void reportError(Parser recognizer, RecognitionException e) {
+            throw e;
+        }
+    }
+
+    static final ANTLRErrorStrategy errorHandler = new ExceptionErrorHandler();
 
     @ParameterizedTest
     @CsvSource({
@@ -19,8 +30,8 @@ public class ParserTest {
     void arithExprTest(String expr, String expected) {
         SBGrammarLexer lexer = new SBGrammarLexer(CharStreams.fromString(expr));
         SBGrammarParser parser = new SBGrammarParser(new CommonTokenStream(lexer));
-
         ParserRuleContext tree = parser.arithExpression();
+
         assertThat(tree.toStringTree(parser)).isEqualTo(expected);
     }
 
@@ -28,8 +39,8 @@ public class ParserTest {
     void compExprTest() {
         SBGrammarLexer lexer = new SBGrammarLexer(CharStreams.fromString("1 + 2 <= 3 * 4"));
         SBGrammarParser parser = new SBGrammarParser(new CommonTokenStream(lexer));
-
         ParserRuleContext tree = parser.booleanExpression();
+
         assertThat(tree.toStringTree(parser))
                 .isEqualTo("(booleanExpression (arithExpression (arithExpression 1) + (arithExpression 2)) <= (arithExpression (arithExpression 3) * (arithExpression 4)))");
     }
@@ -57,5 +68,25 @@ public class ParserTest {
                 .isEqualTo(
                         "(assignmentStmt a = (arithExpression 10))"
                 );
+    }
+
+    @Test
+    void statementsTest() {
+        SBGrammarLexer lexer = new SBGrammarLexer(CharStreams.fromString(
+                """
+                        For A = 1 To 10
+                          For B = 1 To 10
+                            C = 3 * 4
+                            Goto fine
+                          EndFor
+                        EndFor
+                        B = 1 + 2
+                        fine:
+                        D = 4"""
+        ));
+        SBGrammarParser parser = new SBGrammarParser(new CommonTokenStream(lexer));
+        parser.setErrorHandler(errorHandler);
+
+        assertThatNoException().isThrownBy(parser::program);
     }
 }
