@@ -3,25 +3,49 @@ grammar SBGrammar;
 package smallerbasic;
 }
 
-literal : Number
-        | String
-        | Bool
+assignmentStmt : Ident '=' arithExpression
+               | Ident '=' booleanExpression
+               | Ident '=' Ident
+               ;
+
+label : Ident ':';
+
+program : statement* ;
+
+statement : assignmentStmt
+          | ifStmt
+          | forStmt
+          | whileStmt
+          | gotoStmt
+          | label
+          ;
+
+ifStmt : 'If' '(' booleanExpression ')' 'Then' statement* 'EndIf'
+       | 'If' '(' booleanExpression ')' 'Then' statement* 'Else' statement* 'EndIf'
+       ;
+
+forStmt : 'For' Ident '=' arithExpression 'To' arithExpression statement* 'EndFor'
+        | 'For' Ident '=' arithExpression 'To' arithExpression 'Step' arithExpression statement* 'EndFor'
         ;
 
-booleanExpression : expression ('<='|'='|'<>'|'<'|'>'|'>=') expression
+whileStmt : 'While' '(' booleanExpression ')' statement* 'EndWhile' ;
+
+gotoStmt  : 'Goto' Ident ;
+
+booleanExpression : arithExpression ('<='|'='|'<>'|'<'|'>'|'>=') arithExpression
                   | booleanExpression ('And'|'Or') booleanExpression
                   | '(' booleanExpression ')'
                   | Bool
                   | Ident
                   ;
 
-expression : expression ('/' | '*') expression
-           | expression ('+' | '-') expression
-           | '(' expression ')'
-           | String
-           | Number
-           | Ident
-           ;
+arithExpression : arithExpression ('/' | '*') arithExpression
+                | arithExpression ('+' | '-') arithExpression
+                | '(' arithExpression ')'
+                | String
+                | Number
+                | Ident
+                ;
 
 fragment DIGIT : [0-9] ;
 fragment PRINTABLE : ~["] ;
