@@ -20,13 +20,9 @@ statement : assignmentStmt
           | label
           ;
 
-ifStmt : 'If' '(' booleanExpression ')' 'Then' statement* 'EndIf'
-       | 'If' '(' booleanExpression ')' 'Then' statement* 'Else' statement* 'EndIf'
-       ;
+ifStmt : 'If' '(' booleanExpression ')' 'Then' statement* ('Else' statement*)? 'EndIf' ;
 
-forStmt : 'For' Ident '=' arithExpression 'To' arithExpression statement* 'EndFor'
-        | 'For' Ident '=' arithExpression 'To' arithExpression 'Step' arithExpression statement* 'EndFor'
-        ;
+forStmt : 'For' Ident '=' arithExpression 'To' arithExpression ('Step' arithExpression)? statement* 'EndFor' ;
 
 whileStmt : 'While' '(' booleanExpression ')' statement* 'EndWhile' ;
 
