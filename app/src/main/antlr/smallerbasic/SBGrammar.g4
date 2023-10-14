@@ -3,7 +3,7 @@ grammar SBGrammar;
 package smallerbasic;
 }
 
-program : ( statement | subroutineDecl NL )* ;
+program : ( statement | subroutineDecl )* ;
 
 assignmentStmt : Ident '=' expression
                | Ident '=' Ident
@@ -16,46 +16,44 @@ statement : assignmentStmt  NL
           | forStmt         NL
           | whileStmt       NL
           | gotoStmt        NL
-          | expression      NL
+          | callRoutine     NL
           | label           NL
           ;
 
 callRoutine : FunctionCall ')'
-            | ExternalFunctionCall expression? (',' expression)* ')'
+            | ExternalFunctionCall args+=expression? (',' args+=expression)* ')'
             ;
 
-subroutineDecl : 'Sub' Ident statement* 'EndSub' ;
+subroutineDecl : 'Sub' name=Ident body=statement* 'EndSub' NL ;
 
-expression : callRoutine
-           | arithExpression
+expression : arithExpression
            | booleanExpression
            ;
 
-ifStmt : 'If' '(' booleanExpression ')' 'Then' statement* 'EndIf'
-       | 'If' '(' booleanExpression ')' 'Then' statement* 'Else' statement* 'EndIf'
+ifStmt : 'If' '(' cond=booleanExpression ')' 'Then' bodyTrue=statement* ('Else' bodyFalse=statement*)? 'EndIf'
        ;
 
-forStmt : 'For' Ident '=' arithExpression 'To' arithExpression ('Step' arithExpression)? statement* 'EndFor' ;
+forStmt : 'For' var=Ident '=' from=arithExpression 'To' to=arithExpression ('Step' step=arithExpression)? body=statement* 'EndFor' ;
 
-whileStmt : 'While' '(' booleanExpression ')' statement* 'EndWhile' ;
+whileStmt : 'While' '(' cond=booleanExpression ')' body=statement* 'EndWhile'
+          ;
 
-gotoStmt  : 'Goto' Ident ;
+gotoStmt  : 'Goto' lbl=Ident
+          ;
 
-booleanExpression : arithExpression ('<='|'='|'<>'|'<'|'>'|'>=') arithExpression
-                  | booleanExpression ('And'|'Or') booleanExpression
-                  | '(' booleanExpression ')'
-                  | Bool
-                  | callRoutine
-                  | Ident
+booleanExpression : arithExpression relop=('<='|'='|'<>'|'<'|'>'|'>=') arithExpression  # Comparison
+                  | booleanExpression binop=('And'|'Or') booleanExpression              # Boolean
+                  | '(' booleanExpression ')'                                           # BParens
+                  | Bool                                                                # BoolLiteral
+                  | Ident                                                               # BIdentifier
                   ;
 
-arithExpression : arithExpression ('/' | '*') arithExpression
-                | arithExpression ('+' | '-') arithExpression
-                | '(' arithExpression ')'
-                | String
-                | Number
-                | callRoutine
-                | Ident
+arithExpression : arithExpression op=('/' | '*') arithExpression    # MulDiv
+                | arithExpression op=('+' | '-') arithExpression    # PlusMinus
+                | '(' arithExpression ')'                           # AParens
+                | String                                            # StringLiteral
+                | Number                                            # NumberLiteral
+                | Ident                                             # AIdentifier
                 ;
 
 fragment DIGIT : [0-9] ;
@@ -63,7 +61,7 @@ fragment PRINTABLE : ~["] ;
 
 Ident  : [A-Za-z_][A-Za-z0-9_]* ;
 WS     : [ \t]+ -> skip ;
-NL     : '\r'? '\n' ;     // return newlines to parser (is end-statement signal)
+NL     : '\r'? '\n' ;
 Number : [+-]?(DIGIT+('.'DIGIT*)?|'.'DIGIT+)([eE][-+]?DIGIT+)? ;
 String : '"'PRINTABLE*'"' ;
 FunctionCall : Ident'(' ;
