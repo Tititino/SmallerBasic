@@ -7,7 +7,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.nodes.*;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
@@ -16,6 +15,9 @@ import java.util.stream.IntStream;
  * This will make heavy use of class casting
  */
 class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
+
+    static final int IF_WITHOUT_ELSE_NUMBERS_OF_TOKENS = 8;
+    static final int FOR_WITHOUT_STEP_NUMBER_OF_TOKENS = 9;
 
     private @NotNull List<StatementASTNode> childrenToAST(@NotNull List<SBGrammarParser.StatementContext> ctxs) {
         return ctxs.stream()
@@ -56,7 +58,7 @@ class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
     public @NotNull ASTNode visitIfStmt(SBGrammarParser.@NotNull IfStmtContext ctx) {
         ExpressionASTNode condition = (ExpressionASTNode) visitBooleanExpression(ctx.cond);
         List<StatementASTNode> trueBody = childrenToAST(ctx.bodyTrue);
-        if (ctx.getChildCount() == 2)
+        if (ctx.getChildCount() == IF_WITHOUT_ELSE_NUMBERS_OF_TOKENS)
             return new IfThenASTNode(condition, trueBody);
         else
             return new IfThenASTNode(condition, trueBody, childrenToAST(ctx.bodyFalse));
@@ -68,7 +70,7 @@ class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
         ExpressionASTNode from = (ExpressionASTNode) visitArithExpression(ctx.from);
         ExpressionASTNode to   = (ExpressionASTNode) visitArithExpression(ctx.to);
         List<StatementASTNode> body = childrenToAST(ctx.body);
-        if (ctx.getChildCount() == 4)
+        if (ctx.getChildCount() == FOR_WITHOUT_STEP_NUMBER_OF_TOKENS)
             return new ForLoopASTNode(varName, from, to, body);
         else
             return new ForLoopASTNode(varName, from, to,
@@ -110,6 +112,11 @@ class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
     }
 
     @Override
+    public ASTNode visitBoolReturningFunc(SBGrammarParser.BoolReturningFuncContext ctx) {
+        return visitCallExternalFunction(ctx.callExternalFunction());
+    }
+
+    @Override
     public @NotNull ASTNode visitNumberComparison(SBGrammarParser.@NotNull NumberComparisonContext ctx) {
         return new BinOpASTNode(
                 BinOpASTNode.BinOp.parse(ctx.relop.getText()),
@@ -139,6 +146,11 @@ class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
                 (ExpressionASTNode) visitStringExpression(ctx.left),
                 (ExpressionASTNode) visitStringExpression(ctx.right)
         );
+    }
+
+    @Override
+    public ASTNode visitStrReturningFunc(SBGrammarParser.StrReturningFuncContext ctx) {
+        return visitCallExternalFunction(ctx.callExternalFunction());
     }
 
     @Override
@@ -186,13 +198,31 @@ class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
     }
 
     @Override
+    public ASTNode visitNumberReturningFunc(SBGrammarParser.NumberReturningFuncContext ctx) {
+        return visitCallExternalFunction(ctx.callExternalFunction());
+    }
+
+    @Override
     public @NotNull ASTNode visitNumberLiteral(SBGrammarParser.@NotNull NumberLiteralContext ctx) {
         return NumberLiteralASTNode.parse(ctx.Number().getText());
     }
 
     @Override
     public @NotNull ASTNode visitCallRoutine(SBGrammarParser.@NotNull CallRoutineContext ctx) {
-        return new RoutineCallASTNode("", ctx.FunctionCall().getText(), Collections.emptyList());
+        String funcName = ctx.FunctionCall().getText();
+        return new RoutineCallASTNode(funcName.replaceAll("\\([\\t ]*\\)", ""));
+    }
+
+    @Override
+    public ASTNode visitCallExternalFunction(SBGrammarParser.CallExternalFunctionContext ctx) {
+        String[] funcCall = ctx.name.getText().split("\\.");
+        return new ExternalFunctionCallASTNode(
+                funcCall[0],
+                funcCall[1].substring(0, funcCall[1].length() - 1),
+                ctx.args.stream()
+                        .map(x -> (ExpressionASTNode) visitExpression(x))
+                        .toList()
+        );
     }
 
     public @NotNull ASTNode visitStatement(SBGrammarParser.@NotNull StatementContext ctx) {
@@ -223,6 +253,10 @@ class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
         SBGrammarParser.LabelContext label = ctx.label();
         if (!Objects.isNull(label))
             return visitLabel(ctx.label());
+
+        SBGrammarParser.CallExternalFunctionContext callExt = ctx.callExternalFunction();
+        if (!Objects.isNull(callExt))
+            return visitCallExternalFunction(callExt);
 
         throw new IllegalArgumentException();
     }
@@ -260,6 +294,8 @@ class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
             return visitBParens(bParens);
         else if (ctx instanceof SBGrammarParser.BoolLiteralContext bLit)
             return visitBoolLiteral(bLit);
+        else if (ctx instanceof SBGrammarParser.BoolReturningFuncContext callExt)
+            return visitBoolReturningFunc(callExt);
         else
             return visitBoolIdent((SBGrammarParser.BoolIdentContext) ctx);
     }
@@ -271,6 +307,8 @@ class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
             return visitSParens(sParens);
         else if (ctx instanceof SBGrammarParser.StringLiteralContext sLit)
             return visitStringLiteral(sLit);
+        else if (ctx instanceof SBGrammarParser.StrReturningFuncContext callExt)
+            return visitStrReturningFunc(callExt);
         else
             return visitStringIdent((SBGrammarParser.StringIdentContext) ctx);
     }
@@ -286,6 +324,8 @@ class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
             return visitNumberLiteral(nLit);
         else if (ctx instanceof SBGrammarParser.NumberIdentContext nIdent)
             return visitNumberIdent(nIdent);
+        else if (ctx instanceof SBGrammarParser.NumberReturningFuncContext callExt)
+            return visitNumberReturningFunc(callExt);
         else
             throw new IllegalArgumentException("arith expression");
     }

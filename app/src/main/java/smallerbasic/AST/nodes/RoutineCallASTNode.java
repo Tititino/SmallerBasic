@@ -1,20 +1,14 @@
 package smallerbasic.AST.nodes;
 
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Objects;
 
 public class RoutineCallASTNode implements StatementASTNode {
-    private final String module;
-    private final String function;
-    private final List<ExpressionASTNode> args;
-
-    public RoutineCallASTNode(String module, String function, List<ExpressionASTNode> args) {
-        Objects.requireNonNull(module);
+    private final @NotNull String function;
+    public RoutineCallASTNode(@NotNull String function) {
         Objects.requireNonNull(function);
-        Objects.requireNonNull(args);
-        this.module = module;
         this.function = function;
-        this.args = args;
     }
 
     @Override
@@ -22,20 +16,18 @@ public class RoutineCallASTNode implements StatementASTNode {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RoutineCallASTNode that = (RoutineCallASTNode) o;
-        return module.equals(that.module) && function.equals(that.function) && args.equals(that.args);
+        return function.equals(that.function);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(module, function, args);
+        return Objects.hash(function);
     }
 
     @Override
     public String toString() {
         return "RoutineCallASTNode{" +
-                "module='" + module + '\'' +
-                ", function='" + function + '\'' +
-                ", args=" + args +
+                "function='" + function + '\'' +
                 '}';
     }
 }
