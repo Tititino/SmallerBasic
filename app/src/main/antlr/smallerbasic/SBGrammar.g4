@@ -3,9 +3,7 @@ grammar SBGrammar;
 package smallerbasic;
 }
 
-program : statement program         # StatementBody
-        | subroutineDecl program    # RoutineDecl
-        | EOF                       # Empty
+program : (statement* | subroutineDecl*)
         ;
 
 assignmentStmt : Ident '=' expression
@@ -34,13 +32,22 @@ expression : arithExpression
            | booleanExpression
            ;
 
-ifStmt : 'If' '(' cond=booleanExpression ')' 'Then' NL bodyTrue=statement* ('Else' NL bodyFalse=statement*)? 'EndIf'
+ifStmt : 'If' '(' cond=booleanExpression ')' 'Then' NL
+            bodyTrue=statement*
+          ('Else' NL
+            bodyFalse=statement*
+          )?
+          'EndIf'
        ;
 
-forStmt : 'For' var=Ident '=' from=arithExpression 'To' to=arithExpression ('Step' arithExpression)? NL body=statement* 'EndFor'
+forStmt : 'For' var=Ident '=' from=arithExpression 'To' to=arithExpression ('Step' arithExpression)? NL
+            body=statement*
+          'EndFor'
         ;
 
-whileStmt : 'While' '(' cond=booleanExpression ')' NL body=statement* 'EndWhile'
+whileStmt : 'While' '(' cond=booleanExpression ')' NL
+                body=statement*
+            'EndWhile'
           ;
 
 gotoStmt  : 'Goto' lbl=Ident
