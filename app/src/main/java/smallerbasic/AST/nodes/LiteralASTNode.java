@@ -1,3 +1,3 @@
-package smallerbasic.AST;
+package smallerbasic.AST.nodes;
 
 public interface LiteralASTNode extends ExpressionASTNode { }

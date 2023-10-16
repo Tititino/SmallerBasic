@@ -1,4 +1,4 @@
-package smallerbasic.AST;
+package smallerbasic.AST.nodes;
 
 public class LabelDeclASTNode implements StatementASTNode {
     private final String name;

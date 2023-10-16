@@ -1,9 +1,9 @@
-package smallerbasic.AST;
+package smallerbasic.AST.nodes;
 
 import java.util.List;
 import java.util.Objects;
 
-public class ProgramASTNode {
+public class ProgramASTNode implements ASTNode {
 
     private final List<DeclOrStmtASTNode> contents;
 

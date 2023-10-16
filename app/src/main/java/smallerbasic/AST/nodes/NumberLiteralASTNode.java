@@ -1,4 +1,4 @@
-package smallerbasic.AST;
+package smallerbasic.AST.nodes;
 
 public class NumberLiteralASTNode implements LiteralASTNode {
     private final double value;

@@ -1,4 +1,4 @@
-package smallerbasic.AST;
+package smallerbasic.AST.nodes;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 

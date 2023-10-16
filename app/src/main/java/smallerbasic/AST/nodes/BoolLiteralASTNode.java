@@ -1,4 +1,4 @@
-package smallerbasic.AST;
+package smallerbasic.AST.nodes;
 
 public class BoolLiteralASTNode implements LiteralASTNode {
     private final boolean value;

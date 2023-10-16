@@ -1,9 +1,9 @@
-package smallerbasic.AST;
+package smallerbasic.AST.nodes;
 
 import java.util.List;
 import java.util.Objects;
 
-public class RoutineCallASTNode {
+public class RoutineCallASTNode implements StatementASTNode {
     private final String module;
     private final String function;
     private final List<ExpressionASTNode> args;

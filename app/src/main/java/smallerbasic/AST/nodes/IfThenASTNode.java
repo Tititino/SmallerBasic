@@ -1,4 +1,4 @@
-package smallerbasic.AST;
+package smallerbasic.AST.nodes;
 
 import java.util.List;
 import java.util.Objects;

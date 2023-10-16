@@ -1,4 +1,4 @@
-package smallerbasic.AST;
+package smallerbasic.AST.nodes;
 
 public class GotoStmtASTNode implements StatementASTNode {
     private final String label;

@@ -1,4 +1,4 @@
-package smallerbasic.AST;
+package smallerbasic.AST.nodes;
 
 public class StringLiteralASTNode implements LiteralASTNode {
     private final String value;

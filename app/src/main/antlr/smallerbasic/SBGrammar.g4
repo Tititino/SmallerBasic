@@ -12,20 +12,20 @@ assignmentStmt : Ident '=' expression
 
 label : Ident ':';
 
-statement : assignmentStmt  NL  # AssignmentStatment
-          | ifStmt          NL  # IfStatement
-          | forStmt         NL  # ForStatement
-          | whileStmt       NL  # WhileStatement
-          | gotoStmt        NL  # GotoStatement
-          | callRoutine     NL  # CallRoutineStatement
-          | label           NL  # LabelStatement
+statement : assignmentStmt  NL
+          | ifStmt          NL
+          | forStmt         NL
+          | whileStmt       NL
+          | gotoStmt        NL
+          | callRoutine     NL
+          | label           NL
           ;
 
 callRoutine : FunctionCall ')'
             | ExternalFunctionCall args+=expression? (',' args+=expression)* ')'
             ;
 
-subroutineDecl : 'Sub' name=Ident body=statement* 'EndSub' NL ;
+subroutineDecl : 'Sub' name=Ident body+=statement* 'EndSub' NL ;
 
 expression : arithExpression
            | stringExpression
@@ -33,45 +33,45 @@ expression : arithExpression
            ;
 
 ifStmt : 'If' '(' cond=booleanExpression ')' 'Then' NL
-            bodyTrue=statement*
+            bodyTrue+=statement*
           ('Else' NL
-            bodyFalse=statement*
+            bodyFalse+=statement*
           )?
           'EndIf'
        ;
 
-forStmt : 'For' var=Ident '=' from=arithExpression 'To' to=arithExpression ('Step' arithExpression)? NL
-            body=statement*
+forStmt : 'For' var=Ident '=' from=arithExpression 'To' to=arithExpression ('Step' step=arithExpression)? NL
+            body+=statement*
           'EndFor'
         ;
 
 whileStmt : 'While' '(' cond=booleanExpression ')' NL
-                body=statement*
+                body+=statement*
             'EndWhile'
           ;
 
 gotoStmt  : 'Goto' lbl=Ident
           ;
 
-booleanExpression : arithExpression relop=('<='|'='|'<>'|'<'|'>'|'>=') arithExpression      # NumberComparison
-                  | stringExpression relop=('<='|'='|'<>'|'<'|'>'|'>=') stringExpression    # StringComparison
-                  | booleanExpression binop=('And'|'Or') booleanExpression                  # Boolean
-                  | '(' booleanExpression ')'                                               # BParens
-                  | Bool                                                                    # BoolLiteral
-                  | Ident                                                                   # BoolIdentifier
+booleanExpression : arithExpression relop=('<='|'='|'<>'|'<'|'>'|'>=') arithExpression
+                  | stringExpression relop=('<='|'='|'<>'|'<'|'>'|'>=') stringExpression
+                  | booleanExpression binop=('And'|'Or') booleanExpression
+                  | '(' booleanExpression ')'
+                  | Bool
+                  | Ident
                   ;
 
-stringExpression : stringExpression '+' stringExpression                                    # ConcatExpr
-                 | '(' stringExpression ')'                                                 # SParen
-                 | String                                                                   # StrLiteral
-                 | Ident                                                                    # StrIdentifier
+stringExpression : stringExpression '+' stringExpression
+                 | '(' stringExpression ')'
+                 | String
+                 | Ident
                  ;
 
-arithExpression : arithExpression op=('/' | '*') arithExpression    # MulDiv
-                | arithExpression op=('+' | '-') arithExpression    # PlusMinus
-                | '(' arithExpression ')'                           # AParens
-                | Number                                            # NumberLiteral
-                | Ident                                             # NumIdentifier
+arithExpression : arithExpression op=('/' | '*') arithExpression
+                | arithExpression op=('+' | '-') arithExpression
+                | '(' arithExpression ')'
+                | Number
+                | Ident
                 ;
 
 fragment DIGIT : [0-9] ;
