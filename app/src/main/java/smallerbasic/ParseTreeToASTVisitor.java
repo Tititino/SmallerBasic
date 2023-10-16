@@ -1,6 +1,5 @@
 package smallerbasic;
 
-import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
@@ -91,11 +90,109 @@ class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
     }
 
     @Override
+    public ASTNode visitBParens(SBGrammarParser.BParensContext ctx) {
+        return visitBooleanExpression(ctx.expr);
+    }
+
+    @Override
+    public ASTNode visitStringComparison(SBGrammarParser.StringComparisonContext ctx) {
+        return new BinOpASTNode(
+                BinOpASTNode.BinOp.parse(ctx.relop.getText()),
+                (ExpressionASTNode) visitStringExpression(ctx.left),
+                (ExpressionASTNode) visitStringExpression(ctx.right)
+        );
+    }
+
+    @Override
+    public ASTNode visitBoolLiteral(SBGrammarParser.BoolLiteralContext ctx) {
+        return BoolLiteralASTNode.parse(ctx.Bool().getText());
+    }
+
+    @Override
+    public ASTNode visitNumberComparison(SBGrammarParser.NumberComparisonContext ctx) {
+        return new BinOpASTNode(
+                BinOpASTNode.BinOp.parse(ctx.relop.getText()),
+                (ExpressionASTNode) visitArithExpression(ctx.left),
+                (ExpressionASTNode) visitArithExpression(ctx.right)
+        );
+    }
+
+    @Override
+    public ASTNode visitBoolOp(SBGrammarParser.BoolOpContext ctx) {
+        return new BinOpASTNode(
+                BinOpASTNode.BinOp.parse(ctx.binop.getText()),
+                (ExpressionASTNode) visitBooleanExpression(ctx.left),
+                (ExpressionASTNode) visitBooleanExpression(ctx.right)
+        );
+    }
+
+    @Override
+    public ASTNode visitBoolIdent(SBGrammarParser.BoolIdentContext ctx) {
+        return new IdentifierASTNode(ctx.Ident().getText());
+    }
+
+    @Override
+    public ASTNode visitStringConcat(SBGrammarParser.StringConcatContext ctx) {
+        return new BinOpASTNode(
+                BinOpASTNode.BinOp.CONCAT,
+                (ExpressionASTNode) visitStringExpression(ctx.left),
+                (ExpressionASTNode) visitStringExpression(ctx.right)
+        );
+    }
+
+    @Override
+    public ASTNode visitStringLiteral(SBGrammarParser.StringLiteralContext ctx) {
+        String str = ctx.getText();
+        return new StringLiteralASTNode(str.substring(1, str.length() - 1));
+    }
+
+    @Override
+    public ASTNode visitSParens(SBGrammarParser.SParensContext ctx) {
+        return visitStringExpression(ctx.expr);
+    }
+
+    @Override
+    public ASTNode visitStringIdent(SBGrammarParser.StringIdentContext ctx) {
+        return new IdentifierASTNode(ctx.Ident().getText());
+    }
+
+    @Override
+    public ASTNode visitNumberIdent(SBGrammarParser.NumberIdentContext ctx) {
+        return new IdentifierASTNode(ctx.Ident().getText());
+    }
+
+    @Override
+    public ASTNode visitNParens(SBGrammarParser.NParensContext ctx) {
+        return visitArithExpression(ctx.expr);
+    }
+
+    @Override
+    public ASTNode visitDivMul(SBGrammarParser.DivMulContext ctx) {
+        return new BinOpASTNode(
+                BinOpASTNode.BinOp.parse(ctx.op.getText()),
+                (ExpressionASTNode) visitArithExpression(ctx.left),
+                (ExpressionASTNode) visitArithExpression(ctx.right)
+        );
+    }
+
+    @Override
+    public ASTNode visitPlusMin(SBGrammarParser.PlusMinContext ctx) {
+        return new BinOpASTNode(
+                BinOpASTNode.BinOp.parse(ctx.op.getText()),
+                (ExpressionASTNode) visitArithExpression(ctx.left),
+                (ExpressionASTNode) visitArithExpression(ctx.right)
+        );
+    }
+
+    @Override
+    public ASTNode visitNumberLiteral(SBGrammarParser.NumberLiteralContext ctx) {
+        return NumberLiteralASTNode.parse(ctx.Number().getText());
+    }
+
+    @Override
     public ASTNode visitCallRoutine(SBGrammarParser.CallRoutineContext ctx) {
         return new RoutineCallASTNode("", ctx.FunctionCall().getText(), Collections.emptyList());
     }
-
-
 
     // This is hideous
     public ASTNode visitStatement(SBGrammarParser.StatementContext ctx) {
@@ -133,22 +230,54 @@ class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
 
     @Override
     public ASTNode visitExpression(SBGrammarParser.ExpressionContext ctx) {
-        return null;
+        try {
+            return visitArithExpression(ctx.arithExpression());
+        } catch (ClassCastException e) {
+            try {
+                return visitStringExpression(ctx.stringExpression());
+            } catch (ClassCastException e1) {
+                return visitBooleanExpression(ctx.booleanExpression());
+            }
+        }
     }
 
-    @Override
     public ASTNode visitBooleanExpression(SBGrammarParser.BooleanExpressionContext ctx) {
-        return null;
+        if (ctx instanceof SBGrammarParser.NumberComparisonContext numComp)
+            return visitNumberComparison(numComp);
+        else if (ctx instanceof SBGrammarParser.StringComparisonContext strComp)
+            return visitStringComparison(strComp);
+        else if (ctx instanceof SBGrammarParser.BoolOpContext boolOp)
+            return visitBoolOp(boolOp);
+        else if (ctx instanceof SBGrammarParser.BParensContext bParens)
+            return visitBParens(bParens);
+        else if (ctx instanceof SBGrammarParser.BoolLiteralContext bLit)
+            return visitBoolLiteral(bLit);
+        else
+            return visitBoolIdent((SBGrammarParser.BoolIdentContext) ctx);
     }
 
-    @Override
     public ASTNode visitStringExpression(SBGrammarParser.StringExpressionContext ctx) {
-        return null;
+        if (ctx instanceof SBGrammarParser.StringConcatContext strConcat)
+            return visitStringConcat(strConcat);
+        else if (ctx instanceof SBGrammarParser.SParensContext sParens)
+            return visitSParens(sParens);
+        else if (ctx instanceof SBGrammarParser.StringLiteralContext sLit)
+            return visitStringLiteral(sLit);
+        else
+            return visitStringIdent((SBGrammarParser.StringIdentContext) ctx);
     }
 
-    @Override
     public ASTNode visitArithExpression(SBGrammarParser.ArithExpressionContext ctx) {
-        return null;
+        if (ctx instanceof SBGrammarParser.DivMulContext divMul)
+            return visitDivMul(divMul);
+        else if (ctx instanceof SBGrammarParser.PlusMinContext plusMin)
+            return visitPlusMin(plusMin);
+        else if (ctx instanceof SBGrammarParser.NParensContext nParens)
+            return visitNParens(nParens);
+        else if (ctx instanceof SBGrammarParser.NumberLiteralContext nLit)
+            return visitNumberLiteral(nLit);
+        else
+            return visitNumberIdent((SBGrammarParser.NumberIdentContext) ctx);
     }
 
 

@@ -12,4 +12,25 @@ public class AssStmtASTNode implements StatementASTNode {
         this.varName = varName;
         this.value = value;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AssStmtASTNode that = (AssStmtASTNode) o;
+        return varName.equals(that.varName) && value.equals(that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(varName, value);
+    }
+
+    @Override
+    public String toString() {
+        return "AssStmtASTNode{" +
+                "varName=" + varName +
+                ", value=" + value +
+                '}';
+    }
 }

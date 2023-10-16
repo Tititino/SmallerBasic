@@ -25,7 +25,7 @@ callRoutine : FunctionCall ')'
             | ExternalFunctionCall args+=expression? (',' args+=expression)* ')'
             ;
 
-subroutineDecl : 'Sub' name=Ident body+=statement* 'EndSub' NL ;
+subroutineDecl : 'Sub' name=Ident NL body+=statement* 'EndSub' NL ;
 
 expression : arithExpression
            | stringExpression
@@ -53,30 +53,31 @@ whileStmt : 'While' '(' cond=booleanExpression ')' NL
 gotoStmt  : 'Goto' lbl=Ident
           ;
 
-booleanExpression : arithExpression relop=('<='|'='|'<>'|'<'|'>'|'>=') arithExpression
-                  | stringExpression relop=('<='|'='|'<>'|'<'|'>'|'>=') stringExpression
-                  | booleanExpression binop=('And'|'Or') booleanExpression
-                  | '(' booleanExpression ')'
-                  | Bool
-                  | Ident
+booleanExpression : left=arithExpression relop=('<='|'='|'<>'|'<'|'>'|'>=') right=arithExpression       # NumberComparison
+                  | left=stringExpression relop=('<='|'='|'<>'|'<'|'>'|'>=') right=stringExpression     # StringComparison
+                  | left=booleanExpression binop=('And'|'Or') right=booleanExpression                   # BoolOp
+                  | '(' expr=booleanExpression ')'                                                      # BParens
+                  | Bool                                                                                # BoolLiteral
+                  | Ident                                                                               # BoolIdent
                   ;
 
-stringExpression : stringExpression '+' stringExpression
-                 | '(' stringExpression ')'
-                 | String
-                 | Ident
+stringExpression : left=stringExpression '+' right=stringExpression                         # StringConcat
+                 | '(' expr=stringExpression ')'                                            # SParens
+                 | String                                                                   # StringLiteral
+                 | Ident                                                                    # StringIdent
                  ;
 
-arithExpression : arithExpression op=('/' | '*') arithExpression
-                | arithExpression op=('+' | '-') arithExpression
-                | '(' arithExpression ')'
-                | Number
-                | Ident
+arithExpression : left=arithExpression op=('/' | '*') right=arithExpression                 # DivMul
+                | left=arithExpression op=('+' | '-') right=arithExpression                 # PlusMin
+                | '(' expr=arithExpression ')'                                              # NParens
+                | Number                                                                    # NumberLiteral
+                | Ident                                                                     # NumberIdent
                 ;
 
 fragment DIGIT : [0-9] ;
 fragment PRINTABLE : ~["] ;
 
+Bool   : 'true' | 'false' ;
 Ident  : [A-Za-z_][A-Za-z0-9_]* ;
 WS     : [ \t]+ -> skip ;
 NL     : '\r'? '\n' ;
@@ -84,4 +85,3 @@ Number : [+-]?(DIGIT+('.'DIGIT*)?|'.'DIGIT+)([eE][-+]?DIGIT+)? ;
 String : '"'PRINTABLE*'"' ;
 FunctionCall : Ident'(' ;
 ExternalFunctionCall : Ident'.'Ident'(' ;   // no spaces between tokens
-Bool   : 'true' | 'false' ;

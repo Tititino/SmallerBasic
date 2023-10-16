@@ -6,6 +6,9 @@ import java.util.Optional;
 
 public class IfThenASTNode implements StatementASTNode {
     private final ExpressionASTNode condition;
+
+
+
     private final List<StatementASTNode> trueBody;
     private final Optional<List<StatementASTNode>> falseBody;
 
@@ -27,4 +30,28 @@ public class IfThenASTNode implements StatementASTNode {
         this.trueBody = trueBody;
         this.falseBody = Optional.of(falseBody);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        IfThenASTNode that = (IfThenASTNode) o;
+        return condition.equals(that.condition) && trueBody.equals(that.trueBody) && falseBody.equals(that.falseBody);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(condition, trueBody, falseBody);
+    }
+
+    @Override
+    public String toString() {
+        return "IfThenASTNode{" +
+                "condition=" + condition +
+                ", trueBody=" + trueBody +
+                ", falseBody=" + falseBody +
+                '}';
+    }
+
+
 }

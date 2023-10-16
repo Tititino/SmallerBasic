@@ -16,4 +16,26 @@ public class RoutineCallASTNode implements StatementASTNode {
         this.function = function;
         this.args = args;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RoutineCallASTNode that = (RoutineCallASTNode) o;
+        return module.equals(that.module) && function.equals(that.function) && args.equals(that.args);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(module, function, args);
+    }
+
+    @Override
+    public String toString() {
+        return "RoutineCallASTNode{" +
+                "module='" + module + '\'' +
+                ", function='" + function + '\'' +
+                ", args=" + args +
+                '}';
+    }
 }

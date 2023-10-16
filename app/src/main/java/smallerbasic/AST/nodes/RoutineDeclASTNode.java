@@ -13,4 +13,25 @@ public class RoutineDeclASTNode implements DeclOrStmtASTNode {
         this.name = name;
         this.body = body;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RoutineDeclASTNode that = (RoutineDeclASTNode) o;
+        return name.equals(that.name) && body.equals(that.body);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, body);
+    }
+
+    @Override
+    public String toString() {
+        return "RoutineDeclASTNode{" +
+                "name='" + name + '\'' +
+                ", body=" + body +
+                '}';
+    }
 }
