@@ -27,31 +27,39 @@ callRoutine : FunctionCall ')'
 subroutineDecl : 'Sub' name=Ident body=statement* 'EndSub' NL ;
 
 expression : arithExpression
+           | stringExpression
            | booleanExpression
            ;
 
-ifStmt : 'If' '(' cond=booleanExpression ')' 'Then' bodyTrue=statement* ('Else' bodyFalse=statement*)? 'EndIf'
+ifStmt : 'If' '(' cond=booleanExpression ')' 'Then' NL bodyTrue=statement* ('Else' NL bodyFalse=statement*)? 'EndIf'
        ;
 
-forStmt : 'For' var=Ident '=' from=arithExpression 'To' to=arithExpression ('Step' step=arithExpression)? body=statement* 'EndFor' ;
+forStmt : 'For' var=Ident '=' from=arithExpression 'To' to=arithExpression ('Step' arithExpression)? NL body=statement* 'EndFor'
+        ;
 
-whileStmt : 'While' '(' cond=booleanExpression ')' body=statement* 'EndWhile'
+whileStmt : 'While' '(' cond=booleanExpression ')' NL body=statement* 'EndWhile'
           ;
 
 gotoStmt  : 'Goto' lbl=Ident
           ;
 
-booleanExpression : arithExpression relop=('<='|'='|'<>'|'<'|'>'|'>=') arithExpression  # Comparison
+booleanExpression : arithExpression relop=('<='|'='|'<>'|'<'|'>'|'>=') arithExpression  # NumberComparison
+                  | stringExpression relop=('<='|'='|'<>'|'<'|'>'|'>=') stringExpression  # StringComparison
                   | booleanExpression binop=('And'|'Or') booleanExpression              # Boolean
                   | '(' booleanExpression ')'                                           # BParens
                   | Bool                                                                # BoolLiteral
                   | Ident                                                               # BIdentifier
                   ;
 
+stringExpression : stringExpression '+' stringExpression
+                 | '(' stringExpression ')'
+                 | String
+                 | Ident
+                 ;
+
 arithExpression : arithExpression op=('/' | '*') arithExpression    # MulDiv
                 | arithExpression op=('+' | '-') arithExpression    # PlusMinus
                 | '(' arithExpression ')'                           # AParens
-                | String                                            # StringLiteral
                 | Number                                            # NumberLiteral
                 | Ident                                             # AIdentifier
                 ;

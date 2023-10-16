@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
@@ -76,7 +77,7 @@ public class ParserTest {
 
         assertThat(tree.toStringTree(parser))
                 .isEqualTo(
-                        "(assignmentStmt a = (arithExpression 10))"
+                        "(assignmentStmt a = (expression (arithExpression 10)))"
                 );
     }
 
@@ -84,15 +85,16 @@ public class ParserTest {
     void statementsTest() {
         SBGrammarLexer lexer = new SBGrammarLexer(CharStreams.fromString(
                 """
-                        For A = 1 To 10
+                       For A = 1 To 10
                           For B = 1 To 10
                             C = 3 * 4
                             Goto fine
                           EndFor
-                        EndFor
-                        B = 1 + 2
-                        fine:
-                        D = 4"""
+                       EndFor
+                       B = 1 + 2
+                       fine:
+                       D = 4
+                       """
         ));
         SBGrammarParser parser = new SBGrammarParser(new CommonTokenStream(lexer));
         parser.setErrorHandler(errorHandler);
@@ -101,12 +103,12 @@ public class ParserTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "If (true) Then Else EndIf",
-            "If (false) Then EndIf",
-            "While (true) EndWhile",
-            "For I = 2 To 10 EndFor",
-            "For I = 2 To 20 Step 10 EndFor"
+    @ValueSource(strings = {
+            "If (true) Then\n Else\n EndIf\n",
+            "If (false) Then\n EndIf\n",
+            "While (true)\n EndWhile\n",
+            "For I = 2 To 10\n EndFor\n",
+            "For I = 2 To 20 Step 10\n EndFor\n"
     })
     void emptyStatementTest(String test) {
         SBGrammarLexer lexer = new SBGrammarLexer(CharStreams.fromString(test));
