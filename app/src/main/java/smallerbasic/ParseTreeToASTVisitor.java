@@ -16,9 +16,6 @@ import java.util.stream.IntStream;
  */
 class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
 
-    static final int IF_WITHOUT_ELSE_NUMBERS_OF_TOKENS = 8;
-    static final int FOR_WITHOUT_STEP_NUMBER_OF_TOKENS = 9;
-
     private @NotNull List<StatementASTNode> childrenToAST(@NotNull List<SBGrammarParser.StatementContext> ctxs) {
         return ctxs.stream()
                 .map(x -> (StatementASTNode) visitStatement(x))
@@ -27,13 +24,17 @@ class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
 
     @Override
     public @NotNull ASTNode visitProgram(SBGrammarParser.@NotNull ProgramContext ctx) {
-        List<DeclOrStmtASTNode> body = IntStream.rangeClosed(0, ctx.getChildCount())
+        List<DeclOrStmtASTNode> body = IntStream.range(0, ctx.getChildCount())
                 .mapToObj(i -> {
                     SBGrammarParser.StatementContext stmt = ctx.statement(i);
                     if (!Objects.isNull(stmt))
                         return (StatementASTNode) visitStatement(stmt);
-                    else
-                        return (RoutineDeclASTNode) visitSubroutineDecl(ctx.subroutineDecl(i));
+
+                    SBGrammarParser.SubroutineDeclContext sub = ctx.subroutineDecl(i);
+                    if (!Objects.isNull(sub))
+                        return (RoutineDeclASTNode) visitSubroutineDecl(sub);
+
+                    throw new IllegalArgumentException("Unexpected or null program member (statement or subroutine declaration)");
                 }).toList();
         return new ProgramASTNode(body);
     }
@@ -46,7 +47,11 @@ class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
         if (!Objects.isNull(expr))
             return new AssStmtASTNode(ident, (ExpressionASTNode) visitExpression(expr));
 
-        return new AssStmtASTNode(ident, new IdentifierASTNode(ctx.Ident(1).getText()));
+        TerminalNode ident2 = ctx.Ident(1);
+        if (!Objects.isNull(ident2))
+            return new AssStmtASTNode(ident, new IdentifierASTNode(ident2.getText()));
+
+        throw new IllegalArgumentException("Unexpected or null assignment");
     }
 
     @Override
@@ -58,7 +63,7 @@ class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
     public @NotNull ASTNode visitIfStmt(SBGrammarParser.@NotNull IfStmtContext ctx) {
         ExpressionASTNode condition = (ExpressionASTNode) visitBooleanExpression(ctx.cond);
         List<StatementASTNode> trueBody = childrenToAST(ctx.bodyTrue);
-        if (ctx.getChildCount() == IF_WITHOUT_ELSE_NUMBERS_OF_TOKENS)
+        if (ctx.bodyFalse.isEmpty())
             return new IfThenASTNode(condition, trueBody);
         else
             return new IfThenASTNode(condition, trueBody, childrenToAST(ctx.bodyFalse));
@@ -70,7 +75,7 @@ class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
         ExpressionASTNode from = (ExpressionASTNode) visitArithExpression(ctx.from);
         ExpressionASTNode to   = (ExpressionASTNode) visitArithExpression(ctx.to);
         List<StatementASTNode> body = childrenToAST(ctx.body);
-        if (ctx.getChildCount() == FOR_WITHOUT_STEP_NUMBER_OF_TOKENS)
+        if (Objects.isNull(ctx.step))
             return new ForLoopASTNode(varName, from, to, body);
         else
             return new ForLoopASTNode(varName, from, to,
@@ -258,7 +263,7 @@ class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
         if (!Objects.isNull(callExt))
             return visitCallExternalFunction(callExt);
 
-        throw new IllegalArgumentException();
+        throw new IllegalArgumentException("Unexpected or null statement");
     }
 
     @Override
@@ -280,7 +285,7 @@ class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
         if (!Objects.isNull(bool))
             return visitBooleanExpression(bool);
 
-        throw new IllegalArgumentException();
+        throw new IllegalArgumentException("Unexpected or null expression");
     }
 
     public @NotNull ASTNode visitBooleanExpression(SBGrammarParser.@NotNull BooleanExpressionContext ctx) {
@@ -296,8 +301,10 @@ class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
             return visitBoolLiteral(bLit);
         else if (ctx instanceof SBGrammarParser.BoolReturningFuncContext callExt)
             return visitBoolReturningFunc(callExt);
+        else if (ctx instanceof SBGrammarParser.BoolIdentContext bIdent)
+            return visitBoolIdent(bIdent);
         else
-            return visitBoolIdent((SBGrammarParser.BoolIdentContext) ctx);
+            throw new IllegalArgumentException("Unexpected or null boolean expression");
     }
 
     public @NotNull ASTNode visitStringExpression(SBGrammarParser.@NotNull StringExpressionContext ctx) {
@@ -309,8 +316,10 @@ class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
             return visitStringLiteral(sLit);
         else if (ctx instanceof SBGrammarParser.StrReturningFuncContext callExt)
             return visitStrReturningFunc(callExt);
+        else if (ctx instanceof SBGrammarParser.StringIdentContext sIdent)
+            return visitStringIdent(sIdent);
         else
-            return visitStringIdent((SBGrammarParser.StringIdentContext) ctx);
+            throw new IllegalArgumentException("Unexpected or null string expression");
     }
 
     public @NotNull ASTNode visitArithExpression(SBGrammarParser.@NotNull ArithExpressionContext ctx) {
@@ -327,7 +336,7 @@ class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
         else if (ctx instanceof SBGrammarParser.NumberReturningFuncContext callExt)
             return visitNumberReturningFunc(callExt);
         else
-            throw new IllegalArgumentException("arith expression");
+            throw new IllegalArgumentException("Unexpected or null arithmetical expression");
     }
 
 

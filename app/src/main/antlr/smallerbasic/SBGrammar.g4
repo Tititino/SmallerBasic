@@ -10,7 +10,7 @@ assignmentStmt : Ident '=' expression
                | Ident '=' Ident
                ;
 
-label : Ident ':';
+label : Ident ':' ;
 
 statement : assignmentStmt          NL
           | ifStmt                  NL
@@ -24,7 +24,7 @@ statement : assignmentStmt          NL
 
 callRoutine : FunctionCall ;
 
-callExternalFunction : name=ExternalFunctionCall args+=expression? (',' args+=expression)* ')';
+callExternalFunction : name=ExternalFunctionCall args+=expression? (',' args+=expression)* ')' ;
 
 subroutineDecl : 'Sub' name=Ident NL
                      body+=statement*
