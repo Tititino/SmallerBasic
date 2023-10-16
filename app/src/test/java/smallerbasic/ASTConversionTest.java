@@ -5,6 +5,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.Test;
 import smallerbasic.AST.nodes.*;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -86,5 +87,42 @@ public class ASTConversionTest {
         ParseTreeToASTVisitor convert = new ParseTreeToASTVisitor();
 
         assertThat(convert.visitSubroutineDecl(tree)).isEqualTo(expected);
+    }
+
+    @Test
+    public void externFuncExpressionTest() {
+        SBGrammarLexer lexer = new SBGrammarLexer(CharStreams.fromString("a = IO.readLine()"));
+        SBGrammarParser parser = new SBGrammarParser(new CommonTokenStream(lexer));
+        SBGrammarParser.AssignmentStmtContext tree = parser.assignmentStmt();
+
+        ASTNode expected = new AssStmtASTNode(
+                new IdentifierASTNode("a"),
+                new ExternalFunctionCallASTNode("IO", "readLine", Collections.emptyList())
+        );
+        ParseTreeToASTVisitor convert = new ParseTreeToASTVisitor();
+
+        assertThat(convert.visitAssignmentStmt(tree)).isEqualTo(expected);
+    }
+
+    @Test
+    public void externFuncStatementTest() {
+        SBGrammarLexer lexer = new SBGrammarLexer(CharStreams.fromString("If (true) Then\nIO.writeLine(X)\nEndIf"));
+        SBGrammarParser parser = new SBGrammarParser(new CommonTokenStream(lexer));
+        SBGrammarParser.IfStmtContext tree = parser.ifStmt();
+
+        ASTNode expected = new IfThenASTNode(
+                new BoolLiteralASTNode(true),
+                List.of(
+                    new ExternalFunctionCallASTNode(
+                            "IO",
+                            "writeLine",
+                            List.of(
+                                    new IdentifierASTNode("X")
+                            ))
+                )
+        );
+        ParseTreeToASTVisitor convert = new ParseTreeToASTVisitor();
+
+        assertThat(convert.visitIfStmt(tree)).isEqualTo(expected);
     }
 }
