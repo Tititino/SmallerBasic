@@ -2,13 +2,18 @@ package smallerbasic;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.TokenStream;
 import org.junit.jupiter.api.Test;
 import smallerbasic.AST.nodes.*;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static smallerbasic.CompilationUtils.*;
 
 public class ASTConversionTest {
     @Test
@@ -124,5 +129,12 @@ public class ASTConversionTest {
         ParseTreeToASTVisitor convert = new ParseTreeToASTVisitor();
 
         assertThat(convert.visitIfStmt(tree)).isEqualTo(expected);
+    }
+
+    @Test
+    public void programParsingTest() throws IOException {
+        TokenStream lexedSource = lex("src/test/resources/test1.sb");
+        ParserRuleContext parsedSource = parse(lexedSource);
+        assertThatNoException().isThrownBy(() -> clean(parsedSource));
     }
 }
