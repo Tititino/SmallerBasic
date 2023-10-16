@@ -85,7 +85,6 @@ public class ASTConversionTest {
         );
         ParseTreeToASTVisitor convert = new ParseTreeToASTVisitor();
 
-        System.out.println(convert.visitSubroutineDecl(tree));
         assertThat(convert.visitSubroutineDecl(tree)).isEqualTo(expected);
     }
 }
