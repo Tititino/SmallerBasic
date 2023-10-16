@@ -3,7 +3,10 @@ grammar SBGrammar;
 package smallerbasic;
 }
 
-program : ( statement | subroutineDecl )* ;
+program : statement program         # StatementBody
+        | subroutineDecl program    # RoutineDecl
+        | EOF                       # Empty
+        ;
 
 assignmentStmt : Ident '=' expression
                | Ident '=' Ident
@@ -11,13 +14,13 @@ assignmentStmt : Ident '=' expression
 
 label : Ident ':';
 
-statement : assignmentStmt  NL
-          | ifStmt          NL
-          | forStmt         NL
-          | whileStmt       NL
-          | gotoStmt        NL
-          | callRoutine     NL
-          | label           NL
+statement : assignmentStmt  NL  # AssignmentStatment
+          | ifStmt          NL  # IfStatement
+          | forStmt         NL  # ForStatement
+          | whileStmt       NL  # WhileStatement
+          | gotoStmt        NL  # GotoStatement
+          | callRoutine     NL  # CallRoutineStatement
+          | label           NL  # LabelStatement
           ;
 
 callRoutine : FunctionCall ')'
@@ -43,25 +46,25 @@ whileStmt : 'While' '(' cond=booleanExpression ')' NL body=statement* 'EndWhile'
 gotoStmt  : 'Goto' lbl=Ident
           ;
 
-booleanExpression : arithExpression relop=('<='|'='|'<>'|'<'|'>'|'>=') arithExpression  # NumberComparison
-                  | stringExpression relop=('<='|'='|'<>'|'<'|'>'|'>=') stringExpression  # StringComparison
-                  | booleanExpression binop=('And'|'Or') booleanExpression              # Boolean
-                  | '(' booleanExpression ')'                                           # BParens
-                  | Bool                                                                # BoolLiteral
-                  | Ident                                                               # BIdentifier
+booleanExpression : arithExpression relop=('<='|'='|'<>'|'<'|'>'|'>=') arithExpression      # NumberComparison
+                  | stringExpression relop=('<='|'='|'<>'|'<'|'>'|'>=') stringExpression    # StringComparison
+                  | booleanExpression binop=('And'|'Or') booleanExpression                  # Boolean
+                  | '(' booleanExpression ')'                                               # BParens
+                  | Bool                                                                    # BoolLiteral
+                  | Ident                                                                   # BoolIdentifier
                   ;
 
-stringExpression : stringExpression '+' stringExpression
-                 | '(' stringExpression ')'
-                 | String
-                 | Ident
+stringExpression : stringExpression '+' stringExpression                                    # ConcatExpr
+                 | '(' stringExpression ')'                                                 # SParen
+                 | String                                                                   # StrLiteral
+                 | Ident                                                                    # StrIdentifier
                  ;
 
 arithExpression : arithExpression op=('/' | '*') arithExpression    # MulDiv
                 | arithExpression op=('+' | '-') arithExpression    # PlusMinus
                 | '(' arithExpression ')'                           # AParens
                 | Number                                            # NumberLiteral
-                | Ident                                             # AIdentifier
+                | Ident                                             # NumIdentifier
                 ;
 
 fragment DIGIT : [0-9] ;
