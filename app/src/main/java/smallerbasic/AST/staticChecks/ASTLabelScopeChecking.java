@@ -6,10 +6,14 @@ import smallerbasic.AST.nodes.*;
 
 import java.util.*;
 
-public abstract class ASTLabelScopeChecking {
+public abstract class ASTLabelScopeChecking implements Check {
 
-    public void check(@NotNull ASTNode n) {
+    private boolean isOk = true;
+
+    public boolean check(@NotNull ASTNode n) {
+        isOk = true;
         n.accept(new ScopeVisitor());
+        return isOk;
     }
     public abstract void reportError(Collection<String> missingLabels, ASTNode where);
 
@@ -77,6 +81,7 @@ public abstract class ASTLabelScopeChecking {
         public InAndOut visit(ProgramASTNode n) {
             InAndOut labels = visitStmts(n.getContents());
             if (!labels.check()) {
+                isOk = false;
                 Set<String> missing = new HashSet<>(labels.gotoLabels());
                 missing.removeAll(labels.definedLabels());
                 reportError(missing, n);
@@ -93,8 +98,8 @@ public abstract class ASTLabelScopeChecking {
         public InAndOut visit(RoutineDeclASTNode n) {
             InAndOut labels = visitStmts(n.getBody());
 
-
             if (!labels.check()) {
+                isOk = false;
                 Set<String> missing = new HashSet<>(labels.gotoLabels());
                 missing.removeAll(labels.definedLabels());
                 reportError(missing, n);
@@ -128,7 +133,7 @@ public abstract class ASTLabelScopeChecking {
         }
 
         public boolean check() {
-            return definedLabels.containsAll(gotoLabels);
+            return this.definedLabels().containsAll(this.gotoLabels());
         }
 
         @Override
@@ -141,8 +146,4 @@ public abstract class ASTLabelScopeChecking {
             return Collections.unmodifiableSet(gotoLabels);
         }
     }
-
-
-
-
 }

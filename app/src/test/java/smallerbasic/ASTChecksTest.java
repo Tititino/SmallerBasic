@@ -22,6 +22,7 @@ public class ASTChecksTest {
             }
         };
 
+        assertThat(checkScope.check(tree)).isTrue();
         assertThatNoException().isThrownBy(() -> checkScope.check(tree));
     }
 
