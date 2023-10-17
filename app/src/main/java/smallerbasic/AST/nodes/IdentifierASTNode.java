@@ -1,5 +1,7 @@
 package smallerbasic.AST.nodes;
 
+import smallerbasic.AST.ASTVisitor;
+
 import java.util.Objects;
 
 public class IdentifierASTNode implements ExpressionASTNode {
@@ -7,6 +9,11 @@ public class IdentifierASTNode implements ExpressionASTNode {
 
     public IdentifierASTNode(String name) {
         this.name = name;
+    }
+
+    @Override
+    public <T> T accept(ASTVisitor<T> v) {
+        return v.visit(this);
     }
 
     @Override

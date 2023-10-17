@@ -26,15 +26,15 @@ class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
     public @NotNull ASTNode visitProgram(SBGrammarParser.@NotNull ProgramContext ctx) {
         List<DeclOrStmtASTNode> body = IntStream.range(0, ctx.getChildCount())
                 .mapToObj(i -> {
-                    SBGrammarParser.StatementContext stmt = ctx.statement(i);
-                    if (!Objects.isNull(stmt))
+                    if (ctx.getChild(i) instanceof SBGrammarParser.StatementContext stmt)
                         return (StatementASTNode) visitStatement(stmt);
 
-                    SBGrammarParser.SubroutineDeclContext sub = ctx.subroutineDecl(i);
-                    if (!Objects.isNull(sub))
+                    if (ctx.getChild(i) instanceof SBGrammarParser.SubroutineDeclContext sub)
                         return (RoutineDeclASTNode) visitSubroutineDecl(sub);
 
-                    throw new IllegalArgumentException("Unexpected or null program member (statement or subroutine declaration)");
+                    throw new IllegalArgumentException(
+                            "Unexpected or null program member (statement or subroutine declaration)"
+                    );
                 }).toList();
         return new ProgramASTNode(body);
     }

@@ -1,5 +1,8 @@
 package smallerbasic.AST.nodes;
 
+import smallerbasic.AST.ASTVisitor;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -12,6 +15,14 @@ public class ProgramASTNode implements ASTNode {
         this.contents = contents;
     }
 
+    public List<DeclOrStmtASTNode> getContents() {
+        return Collections.unmodifiableList(contents);
+    }
+
+    @Override
+    public <T> T accept(ASTVisitor<T> v) {
+        return v.visit(this);
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -19,6 +30,7 @@ public class ProgramASTNode implements ASTNode {
         ProgramASTNode that = (ProgramASTNode) o;
         return contents.equals(that.contents);
     }
+
 
     @Override
     public int hashCode() {

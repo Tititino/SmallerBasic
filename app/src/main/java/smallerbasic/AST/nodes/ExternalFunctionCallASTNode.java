@@ -1,6 +1,7 @@
 package smallerbasic.AST.nodes;
 
 import org.jetbrains.annotations.NotNull;
+import smallerbasic.AST.ASTVisitor;
 
 import java.util.List;
 import java.util.Objects;
@@ -19,6 +20,11 @@ public class ExternalFunctionCallASTNode implements ExpressionASTNode, Statement
         this.module = module;
         this.function = function;
         this.args = args;
+    }
+
+    @Override
+    public <T> T accept(ASTVisitor<T> v) {
+        return v.visit(this);
     }
 
     @Override

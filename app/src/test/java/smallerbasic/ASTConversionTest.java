@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import smallerbasic.AST.nodes.*;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
@@ -133,8 +134,24 @@ public class ASTConversionTest {
 
     @Test
     public void programParsingTest() throws IOException {
-        TokenStream lexedSource = lex("src/test/resources/test1.sb");
+        TokenStream lexedSource = lex(Paths.get("src/test/resources/test1.sb"));
         ParserRuleContext parsedSource = parse(lexedSource);
         assertThatNoException().isThrownBy(() -> clean(parsedSource));
+    }
+
+    @Test
+    public void routineAndStatementTest() {
+        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nGoto label\n")));
+        ASTNode expected = new ProgramASTNode(List.of(
+                new RoutineDeclASTNode(
+                        "test",
+                        List.of(
+                                new LabelDeclASTNode("label")
+                        )
+                ),
+                new GotoStmtASTNode("label")
+        ));
+
+        assertThat(tree).isEqualTo(expected);
     }
 }

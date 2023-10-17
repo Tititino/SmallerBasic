@@ -1,5 +1,7 @@
 package smallerbasic.AST.nodes;
 
+import smallerbasic.AST.ASTVisitor;
+
 import java.util.Objects;
 
 public class BoolLiteralASTNode implements LiteralASTNode {
@@ -12,6 +14,10 @@ public class BoolLiteralASTNode implements LiteralASTNode {
         this.value = value;
     }
 
+    @Override
+    public <T> T accept(ASTVisitor<T> v) {
+        return v.visit(this);
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

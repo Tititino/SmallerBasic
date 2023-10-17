@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.*;
 import smallerbasic.AST.nodes.ASTNode;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 
 public class App {
 
@@ -14,7 +15,7 @@ public class App {
         }
 
         try {
-            TokenStream lexedSource = CompilationUtils.lex(args[0]);
+            TokenStream lexedSource = CompilationUtils.lex(Paths.get(args[0]));
             ParserRuleContext parsedSource = CompilationUtils.parse(lexedSource);
             ASTNode ast = CompilationUtils.clean(parsedSource);
 
