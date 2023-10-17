@@ -1,6 +1,7 @@
 package smallerbasic.AST.nodes;
 
 import org.jetbrains.annotations.NotNull;
+import smallerbasic.AST.ASTVisitor;
 
 import java.util.Objects;
 
@@ -9,6 +10,10 @@ public class RoutineCallASTNode implements StatementASTNode {
     public RoutineCallASTNode(@NotNull String function) {
         Objects.requireNonNull(function);
         this.function = function;
+    }
+    @Override
+    public <T> T accept(ASTVisitor<T> v) {
+        return v.visit(this);
     }
 
     @Override

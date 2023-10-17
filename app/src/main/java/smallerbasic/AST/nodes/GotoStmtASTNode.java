@@ -1,5 +1,7 @@
 package smallerbasic.AST.nodes;
 
+import smallerbasic.AST.ASTVisitor;
+
 import java.util.Objects;
 
 public class GotoStmtASTNode implements StatementASTNode {
@@ -15,6 +17,15 @@ public class GotoStmtASTNode implements StatementASTNode {
         if (o == null || getClass() != o.getClass()) return false;
         GotoStmtASTNode that = (GotoStmtASTNode) o;
         return label.equals(that.label);
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    @Override
+    public <T> T accept(ASTVisitor<T> v) {
+        return v.visit(this);
     }
 
     @Override

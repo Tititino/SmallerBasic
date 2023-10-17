@@ -1,5 +1,7 @@
 package smallerbasic.AST.nodes;
 
+import smallerbasic.AST.ASTVisitor;
+
 import java.util.Objects;
 
 public class NumberLiteralASTNode implements LiteralASTNode {
@@ -18,6 +20,11 @@ public class NumberLiteralASTNode implements LiteralASTNode {
         if (o == null || getClass() != o.getClass()) return false;
         NumberLiteralASTNode that = (NumberLiteralASTNode) o;
         return Double.compare(that.value, value) == 0;
+    }
+
+    @Override
+    public <T> T accept(ASTVisitor<T> v) {
+        return v.visit(this);
     }
 
     @Override

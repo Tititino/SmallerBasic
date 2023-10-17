@@ -1,5 +1,7 @@
 package smallerbasic.AST.nodes;
 
+import smallerbasic.AST.ASTVisitor;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -11,7 +13,10 @@ public class WhileLoopASTNode implements StatementASTNode {
         this.condition = condition;
         this.body = body;
     }
-
+    @Override
+    public <T> T accept(ASTVisitor<T> v) {
+        return v.visit(this);
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

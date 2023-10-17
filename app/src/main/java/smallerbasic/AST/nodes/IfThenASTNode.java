@@ -1,5 +1,8 @@
 package smallerbasic.AST.nodes;
 
+import smallerbasic.AST.ASTVisitor;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -29,6 +32,23 @@ public class IfThenASTNode implements StatementASTNode {
         this.condition = condition;
         this.trueBody = trueBody;
         this.falseBody = Optional.of(falseBody);
+    }
+
+    public ExpressionASTNode getCondition() {
+        return condition;
+    }
+
+    public List<StatementASTNode> getTrueBody() {
+        return Collections.unmodifiableList(trueBody);
+    }
+
+    public Optional<List<StatementASTNode>> getFalseBody() {
+        return falseBody.map(Collections::unmodifiableList);
+    }
+
+    @Override
+    public <T> T accept(ASTVisitor<T> v) {
+        return v.visit(this);
     }
 
     @Override

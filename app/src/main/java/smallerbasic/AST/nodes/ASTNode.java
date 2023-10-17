@@ -1,10 +1,8 @@
 package smallerbasic.AST.nodes;
 
-import org.antlr.v4.runtime.ParserRuleContext;
+import smallerbasic.AST.ASTVisitor;
+
 
 public interface ASTNode {
-
-    static ASTNode fromParseTree(ParserRuleContext parsed) {
-        return null;
-    }
+    <T> T accept(ASTVisitor<T> v);
 }

@@ -1,5 +1,8 @@
 package smallerbasic.AST.nodes;
 
+import smallerbasic.AST.ASTVisitor;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -12,6 +15,19 @@ public class RoutineDeclASTNode implements DeclOrStmtASTNode {
         Objects.requireNonNull(body);
         this.name = name;
         this.body = body;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<StatementASTNode> getBody() {
+        return Collections.unmodifiableList(body);
+    }
+
+    @Override
+    public <T> T accept(ASTVisitor<T> v) {
+        return v.visit(this);
     }
 
     @Override

@@ -1,5 +1,8 @@
 package smallerbasic.AST.nodes;
 
+import smallerbasic.AST.ASTVisitor;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -35,6 +38,31 @@ public class ForLoopASTNode implements StatementASTNode {
         this.end = end;
         this.step = Optional.empty();
         this.body = body;
+    }
+
+    @Override
+    public <T> T accept(ASTVisitor<T> v) {
+        return v.visit(this);
+    }
+
+    public IdentifierASTNode getVarName() {
+        return varName;
+    }
+
+    public ExpressionASTNode getStart() {
+        return start;
+    }
+
+    public ExpressionASTNode getEnd() {
+        return end;
+    }
+
+    public Optional<ExpressionASTNode> getStep() {
+        return step;
+    }
+
+    public List<StatementASTNode> getBody() {
+        return Collections.unmodifiableList(this.body);
     }
 
     @Override
