@@ -1,25 +1,24 @@
 package smallerbasic.AST.nodes;
 
+import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTVisitor;
 
 import java.util.Objects;
 
 public class AssStmtASTNode implements StatementASTNode {
-    private final IdentifierASTNode varName;
-    private final ExpressionASTNode value;
+    private final @NotNull IdentifierASTNode varName;
+    private final @NotNull ExpressionASTNode value;
 
-    public AssStmtASTNode(IdentifierASTNode varName, ExpressionASTNode value) {
-        Objects.requireNonNull(varName);
-        Objects.requireNonNull(value);
+    public AssStmtASTNode(@NotNull IdentifierASTNode varName, @NotNull ExpressionASTNode value) {
         this.varName = varName;
         this.value = value;
     }
 
-    public IdentifierASTNode getVarName() {
+    public @NotNull IdentifierASTNode getVarName() {
         return varName;
     }
 
-    public ExpressionASTNode getValue() {
+    public @NotNull ExpressionASTNode getValue() {
         return value;
     }
 
