@@ -231,39 +231,7 @@ class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
     }
 
     public @NotNull ASTNode visitStatement(SBGrammarParser.@NotNull StatementContext ctx) {
-        SBGrammarParser.AssignmentStmtContext assStmt = ctx.assignmentStmt();
-        if (!Objects.isNull(assStmt))
-            return visitAssignmentStmt(assStmt);
-
-        SBGrammarParser.ForStmtContext forStmt = ctx.forStmt();
-        if (!Objects.isNull(forStmt))
-                return visitForStmt(ctx.forStmt());
-
-        SBGrammarParser.IfStmtContext ifStmt = ctx.ifStmt();
-        if (!Objects.isNull(ifStmt))
-            return visitIfStmt(ctx.ifStmt());
-
-        SBGrammarParser.WhileStmtContext whileStmt = ctx.whileStmt();
-        if (!Objects.isNull(whileStmt))
-            return visitWhileStmt(ctx.whileStmt());
-
-        SBGrammarParser.GotoStmtContext gotoStmt = ctx.gotoStmt();
-        if (!Objects.isNull(gotoStmt))
-            return visitGotoStmt(ctx.gotoStmt());
-
-        SBGrammarParser.CallRoutineContext call = ctx.callRoutine();
-        if (!Objects.isNull(call))
-            return visitCallRoutine(ctx.callRoutine());
-
-        SBGrammarParser.LabelContext label = ctx.label();
-        if (!Objects.isNull(label))
-            return visitLabel(ctx.label());
-
-        SBGrammarParser.CallExternalFunctionContext callExt = ctx.callExternalFunction();
-        if (!Objects.isNull(callExt))
-            return visitCallExternalFunction(callExt);
-
-        throw new IllegalArgumentException("Unexpected or null statement");
+        return ctx.getChild(0).accept(this);
     }
 
     @Override
@@ -273,76 +241,25 @@ class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
 
     @Override
     public @NotNull ASTNode visitExpression(SBGrammarParser.@NotNull ExpressionContext ctx) {
-        SBGrammarParser.ArithExpressionContext arith = ctx.arithExpression();
-        if (!Objects.isNull(arith))
-            return visitArithExpression(arith);
-
-        SBGrammarParser.StringExpressionContext str = ctx.stringExpression();
-        if (!Objects.isNull(str))
-                return visitStringExpression(str);
-
-        SBGrammarParser.BooleanExpressionContext bool = ctx.booleanExpression();
-        if (!Objects.isNull(bool))
-            return visitBooleanExpression(bool);
-
-        throw new IllegalArgumentException("Unexpected or null expression");
+        return ctx.getChild(0).accept(this);
     }
 
     public @NotNull ASTNode visitBooleanExpression(SBGrammarParser.@NotNull BooleanExpressionContext ctx) {
-        if (ctx instanceof SBGrammarParser.NumberComparisonContext numComp)
-            return visitNumberComparison(numComp);
-        else if (ctx instanceof SBGrammarParser.StringComparisonContext strComp)
-            return visitStringComparison(strComp);
-        else if (ctx instanceof SBGrammarParser.BoolOpContext boolOp)
-            return visitBoolOp(boolOp);
-        else if (ctx instanceof SBGrammarParser.BParensContext bParens)
-            return visitBParens(bParens);
-        else if (ctx instanceof SBGrammarParser.BoolLiteralContext bLit)
-            return visitBoolLiteral(bLit);
-        else if (ctx instanceof SBGrammarParser.BoolReturningFuncContext callExt)
-            return visitBoolReturningFunc(callExt);
-        else if (ctx instanceof SBGrammarParser.BoolIdentContext bIdent)
-            return visitBoolIdent(bIdent);
-        else
-            throw new IllegalArgumentException("Unexpected or null boolean expression");
+        return ctx.accept(this);
     }
 
     public @NotNull ASTNode visitStringExpression(SBGrammarParser.@NotNull StringExpressionContext ctx) {
-        if (ctx instanceof SBGrammarParser.StringConcatContext strConcat)
-            return visitStringConcat(strConcat);
-        else if (ctx instanceof SBGrammarParser.SParensContext sParens)
-            return visitSParens(sParens);
-        else if (ctx instanceof SBGrammarParser.StringLiteralContext sLit)
-            return visitStringLiteral(sLit);
-        else if (ctx instanceof SBGrammarParser.StrReturningFuncContext callExt)
-            return visitStrReturningFunc(callExt);
-        else if (ctx instanceof SBGrammarParser.StringIdentContext sIdent)
-            return visitStringIdent(sIdent);
-        else
-            throw new IllegalArgumentException("Unexpected or null string expression");
+        return ctx.accept(this);
     }
 
     public @NotNull ASTNode visitArithExpression(SBGrammarParser.@NotNull ArithExpressionContext ctx) {
-        if (ctx instanceof SBGrammarParser.DivMulContext divMul)
-            return visitDivMul(divMul);
-        else if (ctx instanceof SBGrammarParser.PlusMinContext plusMin)
-            return visitPlusMin(plusMin);
-        else if (ctx instanceof SBGrammarParser.NParensContext nParens)
-            return visitNParens(nParens);
-        else if (ctx instanceof SBGrammarParser.NumberLiteralContext nLit)
-            return visitNumberLiteral(nLit);
-        else if (ctx instanceof SBGrammarParser.NumberIdentContext nIdent)
-            return visitNumberIdent(nIdent);
-        else if (ctx instanceof SBGrammarParser.NumberReturningFuncContext callExt)
-            return visitNumberReturningFunc(callExt);
-        else
-            throw new IllegalArgumentException("Unexpected or null arithmetical expression");
+        return ctx.accept(this);
     }
 
 
     @Override
     public ASTNode visit(ParseTree tree) {
-        return null;
+        return tree.accept(this);
     }
 
     @Override
