@@ -2,6 +2,7 @@ package smallerbasic;
 
 import org.junit.jupiter.api.Test;
 import smallerbasic.AST.nodes.ASTNode;
+import smallerbasic.AST.staticChecks.ASTDoubleLabelChecking;
 import smallerbasic.AST.staticChecks.ASTLabelScopeChecking;
 
 import java.util.ArrayList;
@@ -62,5 +63,23 @@ public class ASTChecksTest {
         assertThatThrownBy(() -> checkScope.check(tree))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("label \"label1\" not in scope");
+    }
+
+    @Test
+    public void doubleLabelTest() {
+        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nlabel:\nEndSub\n")));
+
+        ASTDoubleLabelChecking checkDoubles = new ASTDoubleLabelChecking();
+
+        assertThat(checkDoubles.check(tree)).isFalse();
+    }
+
+    @Test
+    public void doubleLabelDifferentScopeTest() {
+        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nlabel:\n")));
+
+        ASTDoubleLabelChecking checkDoubles = new ASTDoubleLabelChecking();
+
+        assertThat(checkDoubles.check(tree)).isTrue();
     }
 }
