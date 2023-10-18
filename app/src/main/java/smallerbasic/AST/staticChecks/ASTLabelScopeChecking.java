@@ -1,7 +1,7 @@
 package smallerbasic.AST.staticChecks;
 
 import org.jetbrains.annotations.NotNull;
-import smallerbasic.AST.ASTVisitor;
+import smallerbasic.AST.ASTMonoidVisitor;
 import smallerbasic.AST.nodes.*;
 
 import java.util.*;
@@ -17,37 +17,15 @@ public abstract class ASTLabelScopeChecking implements Check {
     }
     public abstract void reportError(Collection<String> missingLabels, ASTNode where);
 
-    private class ScopeVisitor implements  ASTVisitor<InAndOut> {
-
-        private InAndOut visitStmts(List<? extends ASTNode> l) {
-            return l.stream()
-                    .map(x -> x.accept(this))
-                    .reduce(InAndOut.empty(), InAndOut::compose);
-        }
-
+    private class ScopeVisitor implements ASTMonoidVisitor<InAndOut> {
         @Override
-        public InAndOut visit(AssStmtASTNode n) {
+        public InAndOut empty() {
             return InAndOut.empty();
         }
 
         @Override
-        public InAndOut visit(BinOpASTNode n) {
-            return InAndOut.empty();
-        }
-
-        @Override
-        public InAndOut visit(BoolLiteralASTNode n) {
-            return InAndOut.empty();
-        }
-
-        @Override
-        public InAndOut visit(ExternalFunctionCallASTNode n) {
-            return InAndOut.empty();
-        }
-
-        @Override
-        public InAndOut visit(ForLoopASTNode n) {
-            return visitStmts(n.getBody());
+        public InAndOut compose(InAndOut o1, InAndOut o2) {
+            return o1.compose(o2);
         }
 
         @Override
@@ -56,30 +34,13 @@ public abstract class ASTLabelScopeChecking implements Check {
         }
 
         @Override
-        public InAndOut visit(IdentifierASTNode n) {
-            return InAndOut.empty();
-        }
-
-        @Override
-        public InAndOut visit(IfThenASTNode n) {
-            if (n.getFalseBody().isPresent())
-                return visitStmts(n.getFalseBody().get()).compose(visitStmts(n.getTrueBody()));
-            return visitStmts(n.getTrueBody());
-        }
-
-        @Override
         public InAndOut visit(LabelDeclASTNode n) {
             return new InAndOut(Set.of(n.getName()), Collections.emptySet());
         }
 
         @Override
-        public InAndOut visit(NumberLiteralASTNode n) {
-            return InAndOut.empty();
-        }
-
-        @Override
         public InAndOut visit(ProgramASTNode n) {
-            InAndOut labels = visitStmts(n.getContents());
+            InAndOut labels = visitChildren(n.getContents());
             if (!labels.check()) {
                 isOk = false;
                 Set<String> missing = new HashSet<>(labels.gotoLabels());
@@ -90,13 +51,8 @@ public abstract class ASTLabelScopeChecking implements Check {
         }
 
         @Override
-        public InAndOut visit(RoutineCallASTNode n) {
-            return InAndOut.empty();
-        }
-
-        @Override
         public InAndOut visit(RoutineDeclASTNode n) {
-            InAndOut labels = visitStmts(n.getBody());
+            InAndOut labels = visitChildren(n.getBody());
 
             if (!labels.check()) {
                 isOk = false;
@@ -104,17 +60,7 @@ public abstract class ASTLabelScopeChecking implements Check {
                 missing.removeAll(labels.definedLabels());
                 reportError(missing, n);
             }
-            return InAndOut.empty();
-        }
-
-        @Override
-        public InAndOut visit(StringLiteralASTNode n) {
-            return InAndOut.empty();
-        }
-
-        @Override
-        public InAndOut visit(WhileLoopASTNode n) {
-            return InAndOut.empty();
+            return empty();
         }
     }
 

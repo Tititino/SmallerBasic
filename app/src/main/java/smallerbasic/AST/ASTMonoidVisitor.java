@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ASTMonoidVisitor<T> extends ASTVisitor<T> {
 
-    private T visitChildren(List<? extends ASTNode> l) {
+     default T visitChildren(List<? extends ASTNode> l) {
         return l.stream()
                 .map(x -> x.accept(this))
                 .reduce(empty(), this::compose);
