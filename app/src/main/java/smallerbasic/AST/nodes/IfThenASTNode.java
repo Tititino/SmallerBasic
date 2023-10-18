@@ -9,9 +9,6 @@ import java.util.Optional;
 
 public class IfThenASTNode implements StatementASTNode {
     private final ExpressionASTNode condition;
-
-
-
     private final List<StatementASTNode> trueBody;
     private final Optional<List<StatementASTNode>> falseBody;
 
