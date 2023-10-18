@@ -15,6 +15,14 @@ public class AssStmtASTNode implements StatementASTNode {
         this.value = value;
     }
 
+    public IdentifierASTNode getVarName() {
+        return varName;
+    }
+
+    public ExpressionASTNode getValue() {
+        return value;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
