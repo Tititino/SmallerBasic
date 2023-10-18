@@ -1,7 +1,9 @@
 package smallerbasic;
 
 import org.junit.jupiter.api.Test;
+import smallerbasic.AST.SymbolTable;
 import smallerbasic.AST.nodes.ASTNode;
+import smallerbasic.AST.nodes.IdentifierASTNode;
 import smallerbasic.AST.staticChecks.ASTDoubleLabelChecking;
 import smallerbasic.AST.staticChecks.ASTLabelScopeChecking;
 
@@ -81,5 +83,29 @@ public class ASTChecksTest {
         ASTDoubleLabelChecking checkDoubles = new ASTDoubleLabelChecking();
 
         assertThat(checkDoubles.check(tree)).isTrue();
+    }
+
+    @Test
+    public void symbolTableTest() {
+        ASTNode tree = clean(parse(lex("""
+                       For A = 1 To 10
+                          For B = 1 To 10
+                            C = 3 * A
+                            Goto fine
+                          EndFor
+                       EndFor
+                       B = C + B
+                       fine:
+                       D = 4
+                       """)));
+
+        SymbolTable symbols = new SymbolTable(tree);
+
+        assertThat(symbols).containsExactlyInAnyOrder(
+                new IdentifierASTNode("A"),
+                new IdentifierASTNode("B"),
+                new IdentifierASTNode("C"),
+                new IdentifierASTNode("D")
+        );
     }
 }
