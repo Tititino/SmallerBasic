@@ -17,30 +17,30 @@ public abstract class ASTLabelScopeChecking implements Check {
     }
     public abstract void reportError(Collection<String> missingLabels, ASTNode where);
 
-    private class ScopeVisitor implements ASTMonoidVisitor<InAndOut> {
+    private class ScopeVisitor implements ASTMonoidVisitor<DefAndRefLabels> {
         @Override
-        public InAndOut empty() {
-            return InAndOut.empty();
+        public DefAndRefLabels empty() {
+            return DefAndRefLabels.empty();
         }
 
         @Override
-        public InAndOut compose(InAndOut o1, InAndOut o2) {
+        public DefAndRefLabels compose(DefAndRefLabels o1, DefAndRefLabels o2) {
             return o1.compose(o2);
         }
 
         @Override
-        public InAndOut visit(GotoStmtASTNode n) {
-            return new InAndOut(Collections.emptySet(), Set.of(n.getLabel()));
+        public DefAndRefLabels visit(GotoStmtASTNode n) {
+            return new DefAndRefLabels(Collections.emptySet(), Set.of(n.getLabel()));
         }
 
         @Override
-        public InAndOut visit(LabelDeclASTNode n) {
-            return new InAndOut(Set.of(n.getName()), Collections.emptySet());
+        public DefAndRefLabels visit(LabelDeclASTNode n) {
+            return new DefAndRefLabels(Set.of(n.getName()), Collections.emptySet());
         }
 
         @Override
-        public InAndOut visit(ProgramASTNode n) {
-            InAndOut labels = visitChildren(n.getContents());
+        public DefAndRefLabels visit(ProgramASTNode n) {
+            DefAndRefLabels labels = visitChildren(n.getContents());
             if (!labels.check()) {
                 isOk = false;
                 Set<String> missing = new HashSet<>(labels.gotoLabels());
@@ -51,8 +51,8 @@ public abstract class ASTLabelScopeChecking implements Check {
         }
 
         @Override
-        public InAndOut visit(RoutineDeclASTNode n) {
-            InAndOut labels = visitChildren(n.getBody());
+        public DefAndRefLabels visit(RoutineDeclASTNode n) {
+            DefAndRefLabels labels = visitChildren(n.getBody());
 
             if (!labels.check()) {
                 isOk = false;
@@ -64,18 +64,18 @@ public abstract class ASTLabelScopeChecking implements Check {
         }
     }
 
-    private record InAndOut(@NotNull Set<String> definedLabels, @NotNull Set<String> gotoLabels) {
+    private record DefAndRefLabels(@NotNull Set<String> definedLabels, @NotNull Set<String> gotoLabels) {
 
-        public static @NotNull InAndOut empty() {
-            return new InAndOut(Collections.emptySet(), Collections.emptySet());
+        public static @NotNull ASTLabelScopeChecking.DefAndRefLabels empty() {
+            return new DefAndRefLabels(Collections.emptySet(), Collections.emptySet());
         }
 
-        public @NotNull InAndOut compose(@NotNull InAndOut other) {
+        public @NotNull ASTLabelScopeChecking.DefAndRefLabels compose(@NotNull ASTLabelScopeChecking.DefAndRefLabels other) {
             Set<String> newDLabels = new HashSet<>(this.definedLabels);
             Set<String> newGLabels = new HashSet<>(this.gotoLabels);
             newDLabels.addAll(other.definedLabels);
             newGLabels.addAll(other.gotoLabels);
-            return new InAndOut(newDLabels, newGLabels);
+            return new DefAndRefLabels(newDLabels, newGLabels);
         }
 
         public boolean check() {
