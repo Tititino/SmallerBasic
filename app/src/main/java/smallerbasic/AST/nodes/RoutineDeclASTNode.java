@@ -1,5 +1,6 @@
 package smallerbasic.AST.nodes;
 
+import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTVisitor;
 
 import java.util.Collections;
@@ -7,21 +8,19 @@ import java.util.List;
 import java.util.Objects;
 
 public class RoutineDeclASTNode extends AbstractASTNode implements DeclOrStmtASTNode {
-    private final String name;
-    private final List<StatementASTNode> body;
+    private final @NotNull String name;
+    private final @NotNull List<@NotNull StatementASTNode> body;
 
-    public RoutineDeclASTNode(String name, List<StatementASTNode> body) {
-        Objects.requireNonNull(name);
-        Objects.requireNonNull(body);
+    public RoutineDeclASTNode(@NotNull String name, @NotNull List<@NotNull StatementASTNode> body) {
         this.name = name;
         this.body = body;
     }
 
-    public String getName() {
+    public @NotNull String getName() {
         return name;
     }
 
-    public List<StatementASTNode> getBody() {
+    public @NotNull List<@NotNull StatementASTNode> getBody() {
         return Collections.unmodifiableList(body);
     }
 

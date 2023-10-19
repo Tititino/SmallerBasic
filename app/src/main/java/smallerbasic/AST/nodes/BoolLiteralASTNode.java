@@ -1,5 +1,6 @@
 package smallerbasic.AST.nodes;
 
+import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTVisitor;
 
 import java.util.Objects;
@@ -7,7 +8,7 @@ import java.util.Objects;
 public class BoolLiteralASTNode extends AbstractASTNode implements LiteralASTNode {
     private final boolean value;
 
-    public static BoolLiteralASTNode parse(String text) {
+    public static @NotNull BoolLiteralASTNode parse(@NotNull String text) {
         return new BoolLiteralASTNode("true".equals(text));
     }
     public BoolLiteralASTNode(boolean value) {

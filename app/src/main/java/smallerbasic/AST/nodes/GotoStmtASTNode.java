@@ -1,13 +1,14 @@
 package smallerbasic.AST.nodes;
 
+import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTVisitor;
 
 import java.util.Objects;
 
 public class GotoStmtASTNode extends AbstractASTNode implements StatementASTNode {
-    private final String label;
+    private final @NotNull String label;
 
-    public GotoStmtASTNode(String label) {
+    public GotoStmtASTNode(@NotNull String label) {
         this.label = label;
     }
 
@@ -19,7 +20,7 @@ public class GotoStmtASTNode extends AbstractASTNode implements StatementASTNode
         return label.equals(that.label);
     }
 
-    public String getLabel() {
+    public @NotNull String getLabel() {
         return label;
     }
 

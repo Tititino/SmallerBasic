@@ -1,5 +1,7 @@
 package smallerbasic.AST.nodes;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import smallerbasic.AST.ASTVisitor;
 
 import java.util.Collections;
@@ -8,36 +10,32 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class ForLoopASTNode extends AbstractASTNode implements StatementASTNode {
-    private final IdentifierASTNode varName;
+    private final @NotNull IdentifierASTNode varName;
+    private final @NotNull ExpressionASTNode start;
+    private final @NotNull ExpressionASTNode end;
+    private final @Nullable ExpressionASTNode step;
+    private final @NotNull List<@NotNull StatementASTNode> body;
 
-    private final ExpressionASTNode start;
-    private final ExpressionASTNode end;
-    private final Optional<ExpressionASTNode> step;
-
-    private final List<StatementASTNode> body;
-
-    public ForLoopASTNode(IdentifierASTNode varName
-            , ExpressionASTNode start
-            , ExpressionASTNode end
-            , ExpressionASTNode step
-            , List<StatementASTNode> body) {
+    public ForLoopASTNode(
+            @NotNull IdentifierASTNode varName,
+            @NotNull ExpressionASTNode start,
+            @NotNull ExpressionASTNode end,
+            @Nullable  ExpressionASTNode step,
+            @NotNull List<@NotNull StatementASTNode> body) {
         this.varName = varName;
         this.start = start;
         this.end = end;
-        this.step = Optional.of(step);
+        this.step = step;
         this.body = body;
     }
 
 
-    public ForLoopASTNode(IdentifierASTNode varName
-            , ExpressionASTNode start
-            , ExpressionASTNode end
-            , List<StatementASTNode> body) {
-        this.varName = varName;
-        this.start = start;
-        this.end = end;
-        this.step = Optional.empty();
-        this.body = body;
+    public ForLoopASTNode(
+            @NotNull IdentifierASTNode varName,
+            @NotNull ExpressionASTNode start,
+            @NotNull ExpressionASTNode end,
+            @NotNull List<@NotNull StatementASTNode> body) {
+        this(varName, start, end, null, body);
     }
 
     @Override
@@ -45,23 +43,23 @@ public class ForLoopASTNode extends AbstractASTNode implements StatementASTNode 
         return v.visit(this);
     }
 
-    public IdentifierASTNode getVarName() {
+    public @NotNull IdentifierASTNode getVarName() {
         return varName;
     }
 
-    public ExpressionASTNode getStart() {
+    public @NotNull ExpressionASTNode getStart() {
         return start;
     }
 
-    public ExpressionASTNode getEnd() {
+    public @NotNull ExpressionASTNode getEnd() {
         return end;
     }
 
-    public Optional<ExpressionASTNode> getStep() {
-        return step;
+    public @NotNull Optional<@NotNull ExpressionASTNode> getStep() {
+        return Optional.ofNullable(step);
     }
 
-    public List<StatementASTNode> getBody() {
+    public @NotNull List<@NotNull StatementASTNode> getBody() {
         return Collections.unmodifiableList(this.body);
     }
 
@@ -70,7 +68,11 @@ public class ForLoopASTNode extends AbstractASTNode implements StatementASTNode 
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ForLoopASTNode that = (ForLoopASTNode) o;
-        return varName.equals(that.varName) && start.equals(that.start) && end.equals(that.end) && step.equals(that.step) && body.equals(that.body);
+        return varName.equals(that.varName)
+                && start.equals(that.start)
+                && end.equals(that.end)
+                && Objects.equals(step, that.step)
+                && body.equals(that.body);
     }
 
     @Override

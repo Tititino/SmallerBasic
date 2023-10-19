@@ -9,7 +9,6 @@ public class BinOpASTNode extends AbstractASTNode implements ExpressionASTNode {
 
     private final @NotNull BinOp op;
 
-
     private final @NotNull ExpressionASTNode left;
     private final @NotNull ExpressionASTNode right;
 

@@ -1,5 +1,6 @@
 package smallerbasic.AST.nodes;
 
+import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTVisitor;
 
 import java.util.Collections;
@@ -8,14 +9,14 @@ import java.util.Objects;
 
 public class ProgramASTNode extends AbstractASTNode implements ASTNode {
 
-    private final List<DeclOrStmtASTNode> contents;
+    private final @NotNull List<@NotNull DeclOrStmtASTNode> contents;
 
-    public ProgramASTNode(List<DeclOrStmtASTNode> contents) {
+    public ProgramASTNode(@NotNull List<@NotNull DeclOrStmtASTNode> contents) {
         Objects.requireNonNull(contents);
         this.contents = contents;
     }
 
-    public List<DeclOrStmtASTNode> getContents() {
+    public @NotNull List<@NotNull DeclOrStmtASTNode> getContents() {
         return Collections.unmodifiableList(contents);
     }
 
