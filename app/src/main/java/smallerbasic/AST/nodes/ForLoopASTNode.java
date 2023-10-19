@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public class ForLoopASTNode implements StatementASTNode {
+public class ForLoopASTNode extends AbstractASTNode implements StatementASTNode {
     private final IdentifierASTNode varName;
 
     private final ExpressionASTNode start;

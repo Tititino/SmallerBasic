@@ -5,7 +5,7 @@ import smallerbasic.AST.ASTVisitor;
 
 import java.util.Objects;
 
-public class RoutineCallASTNode implements StatementASTNode {
+public class RoutineCallASTNode extends AbstractASTNode implements StatementASTNode {
     private final @NotNull String function;
     public RoutineCallASTNode(@NotNull String function) {
         Objects.requireNonNull(function);

@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class RoutineDeclASTNode implements DeclOrStmtASTNode {
+public class RoutineDeclASTNode extends AbstractASTNode implements DeclOrStmtASTNode {
     private final String name;
     private final List<StatementASTNode> body;
 

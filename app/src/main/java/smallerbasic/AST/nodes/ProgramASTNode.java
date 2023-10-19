@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class ProgramASTNode implements ASTNode {
+public class ProgramASTNode extends AbstractASTNode implements ASTNode {
 
     private final List<DeclOrStmtASTNode> contents;
 

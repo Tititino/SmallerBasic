@@ -4,7 +4,7 @@ import smallerbasic.AST.ASTVisitor;
 
 import java.util.Objects;
 
-public class IdentifierASTNode implements ExpressionASTNode {
+public class IdentifierASTNode extends AbstractASTNode implements ExpressionASTNode {
     private final String name;
 
     public IdentifierASTNode(String name) {

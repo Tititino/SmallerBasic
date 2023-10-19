@@ -4,7 +4,7 @@ import smallerbasic.AST.ASTVisitor;
 
 import java.util.Objects;
 
-public class StringLiteralASTNode implements LiteralASTNode {
+public class StringLiteralASTNode extends AbstractASTNode implements LiteralASTNode {
     private final String value;
 
     public StringLiteralASTNode(String value) {

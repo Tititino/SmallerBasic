@@ -154,4 +154,12 @@ public class ASTConversionTest {
 
         assertThat(tree).isEqualTo(expected);
     }
+
+    @Test
+    public void testTokenPosition() {
+        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nGoto label\n")));
+
+        assertThat(tree.getStartToken().get().getText()).isEqualTo("Sub");
+        assertThat(tree.getEndToken().get().getText()).isEqualTo("\n");
+    }
 }

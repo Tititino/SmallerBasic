@@ -4,7 +4,7 @@ import smallerbasic.AST.ASTVisitor;
 
 import java.util.Objects;
 
-public class GotoStmtASTNode implements StatementASTNode {
+public class GotoStmtASTNode extends AbstractASTNode implements StatementASTNode {
     private final String label;
 
     public GotoStmtASTNode(String label) {
