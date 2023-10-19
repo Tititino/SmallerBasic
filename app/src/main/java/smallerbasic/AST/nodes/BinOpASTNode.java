@@ -5,10 +5,9 @@ import smallerbasic.AST.ASTVisitor;
 
 import java.util.Objects;
 
-public class BinOpASTNode implements ExpressionASTNode {
+public class BinOpASTNode extends AbstractASTNode implements ExpressionASTNode {
 
     private final @NotNull BinOp op;
-
 
     private final @NotNull ExpressionASTNode left;
     private final @NotNull ExpressionASTNode right;

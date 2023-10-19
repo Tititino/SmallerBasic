@@ -5,7 +5,7 @@ import smallerbasic.AST.ASTVisitor;
 
 import java.util.Objects;
 
-public class AssStmtASTNode implements StatementASTNode {
+public class AssStmtASTNode extends AbstractASTNode implements StatementASTNode {
     private final @NotNull IdentifierASTNode varName;
     private final @NotNull ExpressionASTNode value;
 

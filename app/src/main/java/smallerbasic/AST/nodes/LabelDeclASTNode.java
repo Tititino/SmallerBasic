@@ -1,17 +1,18 @@
 package smallerbasic.AST.nodes;
 
+import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTVisitor;
 
 import java.util.Objects;
 
-public class LabelDeclASTNode implements StatementASTNode {
-    private final String name;
+public class LabelDeclASTNode extends AbstractASTNode implements StatementASTNode {
+    private final @NotNull String name;
 
-    public LabelDeclASTNode(String name) {
+    public LabelDeclASTNode(@NotNull String name) {
         this.name = name;
     }
 
-    public String getName() {
+    public @NotNull String getName() {
         return name;
     }
 

@@ -1,13 +1,14 @@
 package smallerbasic.AST.nodes;
 
+import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTVisitor;
 
 import java.util.Objects;
 
-public class StringLiteralASTNode implements LiteralASTNode {
-    private final String value;
+public class StringLiteralASTNode extends AbstractASTNode implements LiteralASTNode {
+    private final @NotNull String value;
 
-    public StringLiteralASTNode(String value) {
+    public StringLiteralASTNode(@NotNull String value) {
         this.value = value;
     }
 

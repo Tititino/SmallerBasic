@@ -6,7 +6,7 @@ import smallerbasic.AST.ASTVisitor;
 import java.util.List;
 import java.util.Objects;
 
-public class WhileLoopASTNode implements StatementASTNode {
+public class WhileLoopASTNode extends AbstractASTNode implements StatementASTNode {
     private final @NotNull ExpressionASTNode condition;
     private final @NotNull List<@NotNull StatementASTNode> body;
 

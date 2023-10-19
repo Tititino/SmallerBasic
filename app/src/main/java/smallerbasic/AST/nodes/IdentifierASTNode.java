@@ -1,13 +1,14 @@
 package smallerbasic.AST.nodes;
 
+import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTVisitor;
 
 import java.util.Objects;
 
-public class IdentifierASTNode implements ExpressionASTNode {
-    private final String name;
+public class IdentifierASTNode extends AbstractASTNode implements ExpressionASTNode {
+    private final @NotNull String name;
 
-    public IdentifierASTNode(String name) {
+    public IdentifierASTNode(@NotNull String name) {
         this.name = name;
     }
 

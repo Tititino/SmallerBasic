@@ -6,7 +6,7 @@ import smallerbasic.AST.ASTVisitor;
 import java.util.List;
 import java.util.Objects;
 
-public class ExternalFunctionCallASTNode implements ExpressionASTNode, StatementASTNode {
+public class ExternalFunctionCallASTNode extends AbstractASTNode implements ExpressionASTNode, StatementASTNode {
 
     private final @NotNull String module;
     private final @NotNull String function;
