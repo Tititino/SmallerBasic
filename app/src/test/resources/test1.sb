@@ -7,6 +7,7 @@ EndFor
 B = 1 + 2
 fine:
 D = 4
+IO.writeLine(D)
 
 Sub ciao
     B = true And false

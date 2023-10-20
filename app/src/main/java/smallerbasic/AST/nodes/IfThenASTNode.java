@@ -66,7 +66,7 @@ public class IfThenASTNode extends AbstractASTNode implements StatementASTNode {
         return "IfThenASTNode{" +
                 "condition=" + condition +
                 ", trueBody=" + trueBody +
-                ", falseBody=" + falseBody +
+                (Objects.isNull(falseBody) ? "" : "falseBody=" + falseBody) +
                 '}';
     }
 

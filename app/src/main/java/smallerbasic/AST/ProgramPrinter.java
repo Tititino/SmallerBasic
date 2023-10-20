@@ -70,6 +70,8 @@ public class ProgramPrinter {
 
         @Override
         public String visit(ExternalFunctionCallASTNode n) {
+            String firstArg = n.getArg(0).accept(this);
+            llvmProgram.append("call void @PRINT(%struct.Boxed* %" + firstArg + ")\n");
             return null;
         }
 

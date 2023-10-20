@@ -22,6 +22,10 @@ public class ExternalFunctionCallASTNode extends AbstractASTNode implements Expr
         this.args = args;
     }
 
+    public @NotNull ExpressionASTNode getArg(int i) {
+        return args.get(i);
+    }
+
     @Override
     public <T> T accept(ASTVisitor<T> v) {
         return v.visit(this);

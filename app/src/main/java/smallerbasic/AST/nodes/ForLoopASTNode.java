@@ -13,14 +13,14 @@ public class ForLoopASTNode extends AbstractASTNode implements StatementASTNode 
     private final @NotNull IdentifierASTNode varName;
     private final @NotNull ExpressionASTNode start;
     private final @NotNull ExpressionASTNode end;
-    private final @Nullable ExpressionASTNode step;
+    private final @NotNull ExpressionASTNode step;
     private final @NotNull List<@NotNull StatementASTNode> body;
 
     public ForLoopASTNode(
             @NotNull IdentifierASTNode varName,
             @NotNull ExpressionASTNode start,
             @NotNull ExpressionASTNode end,
-            @Nullable  ExpressionASTNode step,
+            @NotNull  ExpressionASTNode step,
             @NotNull List<@NotNull StatementASTNode> body) {
         this.varName = varName;
         this.start = start;
@@ -35,7 +35,7 @@ public class ForLoopASTNode extends AbstractASTNode implements StatementASTNode 
             @NotNull ExpressionASTNode start,
             @NotNull ExpressionASTNode end,
             @NotNull List<@NotNull StatementASTNode> body) {
-        this(varName, start, end, null, body);
+        this(varName, start, end, new NumberLiteralASTNode(1.0), body);
     }
 
     @Override
