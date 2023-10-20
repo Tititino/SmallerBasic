@@ -7,3 +7,7 @@ EndFor
 B = 1 + 2
 fine:
 D = 4
+
+Sub ciao
+    B = 4 + 3
+End

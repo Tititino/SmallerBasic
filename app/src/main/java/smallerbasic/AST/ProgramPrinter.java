@@ -7,12 +7,11 @@ import smallerbasic.SymbolTable;
 public class ProgramPrinter {
 
     private final @NotNull SymbolTable<IdentifierASTNode> symbols;
-
     private final @NotNull SymbolTable<String> labels;
     private final @NotNull SymbolTable<String> functions;
     private final @NotNull VarNameGenerator gen;
 
-    private final @NotNull StringBuilder llvmProgram = new StringBuilder();
+    private @NotNull StringBuilder llvmProgram = new StringBuilder();
 
     public ProgramPrinter(@NotNull SymbolTable<IdentifierASTNode> symbols,
                           @NotNull SymbolTable<String> labels,
@@ -25,7 +24,9 @@ public class ProgramPrinter {
     }
 
     public @NotNull String compile(@NotNull ASTNode n) {
-        return n.accept(new ProgramPrinterVisitor()).toString();
+        llvmProgram = new StringBuilder();
+        n.accept(new ProgramPrinterVisitor());
+        return llvmProgram.toString();
     }
 
     private class ProgramPrinterVisitor implements ASTVisitor<String> {
@@ -33,10 +34,12 @@ public class ProgramPrinter {
         private final static @NotNull String NUMBER_SETTER = "@SetNumberValue";
         private final static @NotNull String BOOL_SETTER = "@SetBoolValue";
 
+        // valuto prima il lato destro di quello sinistro !!!
         @Override
         public String visit(AssStmtASTNode n) {
-            String name = gen.newName();
-            String rightSide = n.accept(this);
+            symbols.newBinding(n.getVarName());
+            String name = symbols.getBinding(n.getVarName());
+            String rightSide = n.getValue().accept(this);
             llvmProgram.append("%" + name + " = alloca %struct.Boxed\n");
             llvmProgram.append("call void @COPY(%struct.Boxed* %" + name + ", %struct.Boxed* %" + rightSide + ")\n");
             return name;
@@ -48,7 +51,7 @@ public class ProgramPrinter {
             String right = n.getRight().accept(this);
 
             String res = gen.newName();
-            llvmProgram.append("%" + res + " = alloca %struct.Boxed");
+            llvmProgram.append("%" + res + " = alloca %struct.Boxed\n");
             llvmProgram.append("call void @" + n.getOp()
                     + "(%struct.Boxed* %" + res
                     + ", %struct.Boxed* %" + left
@@ -72,6 +75,43 @@ public class ProgramPrinter {
 
         @Override
         public String visit(ForLoopASTNode n) {
+            String start = n.getStart().accept(this);
+            String end   = n.getEnd().accept(this);
+
+            symbols.newBinding(n.getVarName());
+            String name = symbols.getBinding(n.getVarName());
+            llvmProgram.append("%" + name + " = alloca %struct.Boxed\n");
+            llvmProgram.append("call void @COPY(%struct.Boxed* %" + name + ", %struct.Boxed* %" + start + ")\n");
+
+
+            String flooredStart = gen.newName();
+            llvmProgram.append("%" + flooredStart + " = alloca i64\n");
+            String floorResult = gen.newName();
+            llvmProgram.append("%" + floorResult + " = call i64 @Floor(%struct.Boxed* %" + start + ")\n");
+            llvmProgram.append("store i64 %" + floorResult + ", i64* %" + floorResult + "\n");
+
+            String flooredEnd = gen.newName();
+            llvmProgram.append("%" + flooredEnd + " = call i64 @Floor(%struct.Boxed* %" + end + ")\n");
+
+            String testLabel = gen.newName();
+            String bodyLabel  = gen.newName();
+            String endLabel  = gen.newName();
+            llvmProgram.append(testLabel + ":\n");
+            String temp = gen.newName();
+            llvmProgram.append("%" + temp + " = load i64, i64* %" + flooredStart);
+            String bool = gen.newName();
+            llvmProgram.append("%" + bool + " = icmp eq i64 %" + temp + ", %" + flooredEnd + "\n");
+            llvmProgram.append("br i1 %" + bool + "label %" + bodyLabel + ", label %" + endLabel + "\n");
+            llvmProgram.append(bodyLabel + ":\n");
+
+
+            // manca aggiungere + 1 all variablie
+            // manca gestione degli step
+            String temp2 = gen.newName();
+            llvmProgram.append("%" + temp2 + " = add i64 %" + temp + ", 1\n");
+            llvmProgram.append("store i64 %" + temp2 + ", i64* %" + floorResult + "\n");
+            llvmProgram.append("br label %" + testLabel + "\n");
+            llvmProgram.append(endLabel + ":\n");
             return null;
         }
 

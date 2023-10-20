@@ -2,9 +2,6 @@ package smallerbasic.AST.nodes;
 
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTVisitor;
-import smallerbasic.AST.SymbolTableVisitor;
-import smallerbasic.AST.VarNameGenerator;
-import smallerbasic.SymbolTable;
 
 import java.util.Objects;
 
@@ -43,8 +40,4 @@ public class LabelDeclASTNode extends AbstractASTNode implements StatementASTNod
                 '}';
     }
 
-    @Override
-    public void printLLVM(VarNameGenerator gen, SymbolTableVisitor s) {
-        System.out.println(name + ":");
-    }
 }

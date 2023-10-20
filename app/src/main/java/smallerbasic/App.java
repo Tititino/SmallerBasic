@@ -1,8 +1,6 @@
 package smallerbasic;
 
-import org.antlr.v4.runtime.*;
-import smallerbasic.AST.SymbolTableVisitor;
-import smallerbasic.AST.VarNameGenerator;
+import smallerbasic.AST.*;
 import smallerbasic.AST.nodes.ASTNode;
 
 import java.io.IOException;
@@ -21,8 +19,15 @@ public class App {
         try {
             ASTNode ast = clean(parse(lex(Paths.get(args[0]))));
 
+            System.out.println(ast);
+            VarNameGenerator gen = new VarNameGenerator();
+            String program = new ProgramPrinter(new VariableNames(ast, gen),
+                    new LabelNames(ast, gen),
+                    new FunctionNames(ast, gen),
+                    gen
+            ).compile(ast);
 
-            ast.printLLVM(new VarNameGenerator(), new SymbolTableVisitor(ast));
+            System.out.println(program);
         } catch (IOException e) {
             System.out.println("Error reading file \"" + args[0] + "\"");
         }

@@ -3,8 +3,6 @@ package smallerbasic.AST.nodes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import smallerbasic.AST.ASTVisitor;
-import smallerbasic.AST.SymbolTableVisitor;
-import smallerbasic.AST.VarNameGenerator;
 
 import java.util.Collections;
 import java.util.List;
@@ -93,8 +91,4 @@ public class ForLoopASTNode extends AbstractASTNode implements StatementASTNode 
                 '}';
     }
 
-    @Override
-    public void printLLVM(VarNameGenerator gen, SymbolTableVisitor s) {
-
-    }
 }
