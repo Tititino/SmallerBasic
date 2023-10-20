@@ -6,20 +6,14 @@ import smallerbasic.AST.nodes.IdentifierASTNode;
 
 import java.util.*;
 
-public class SymbolTable implements Iterable<IdentifierASTNode> {
+public class VariableNames extends SymbolTableVisitor<IdentifierASTNode> {
 
-    private final @NotNull List<IdentifierASTNode> symbols;
-
-    public SymbolTable(@NotNull ASTNode node) {
-        this.symbols = node.accept(new GetSymbols()).stream().toList();
+    public VariableNames(@NotNull ASTNode node, @NotNull VarNameGenerator gen) {
+        super(node, gen);
     }
-
-    @NotNull
-    @Override
-    public Iterator<IdentifierASTNode> iterator() {
-        return symbols.iterator();  // intellij says using Collections.unmodifiableList is redundant
+    protected @NotNull List<IdentifierASTNode> getAll(@NotNull ASTNode n) {
+        return new ArrayList<>(n.accept(new GetSymbols()));
     }
-
     private static class GetSymbols implements ASTMonoidVisitor<Set<IdentifierASTNode>> {
         @Override
         public Set<IdentifierASTNode> empty() {

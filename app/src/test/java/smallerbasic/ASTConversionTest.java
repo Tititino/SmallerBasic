@@ -2,8 +2,8 @@ package smallerbasic;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.jupiter.api.Test;
 import smallerbasic.AST.nodes.*;
 
@@ -135,7 +135,7 @@ public class ASTConversionTest {
     @Test
     public void programParsingTest() throws IOException {
         TokenStream lexedSource = lex(Paths.get("src/test/resources/test1.sb"));
-        ParserRuleContext parsedSource = parse(lexedSource);
+        ParseTree parsedSource = parse(lexedSource);
         assertThatNoException().isThrownBy(() -> clean(parsedSource));
     }
 
@@ -160,6 +160,6 @@ public class ASTConversionTest {
         ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nGoto label\n")));
 
         assertThat(tree.getStartToken().get().getText()).isEqualTo("Sub");
-        assertThat(tree.getEndToken().get().getText()).isEqualTo("\n");
+        assertThat(tree.getEndToken().get().getText()).isEqualTo("<EOF>");
     }
 }

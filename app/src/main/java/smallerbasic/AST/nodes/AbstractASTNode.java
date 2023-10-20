@@ -3,6 +3,9 @@ package smallerbasic.AST.nodes;
 import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import smallerbasic.AST.SymbolTableVisitor;
+import smallerbasic.AST.VarNameGenerator;
+import smallerbasic.SymbolTable;
 
 import java.util.Optional;
 
@@ -29,4 +32,5 @@ public abstract class AbstractASTNode implements ASTNode {
     public @NotNull Optional<@NotNull Token> getEndToken() {
         return Optional.ofNullable(end);
     }
+
 }

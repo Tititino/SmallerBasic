@@ -39,4 +39,5 @@ public class LabelDeclASTNode extends AbstractASTNode implements StatementASTNod
                 "name='" + name + '\'' +
                 '}';
     }
+
 }
