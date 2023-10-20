@@ -1,7 +1,8 @@
 package smallerbasic;
 
 import org.junit.jupiter.api.Test;
-import smallerbasic.AST.SymbolTableVisitor;
+import smallerbasic.AST.VarNameGenerator;
+import smallerbasic.AST.VariableNames;
 import smallerbasic.AST.nodes.ASTNode;
 import smallerbasic.AST.nodes.IdentifierASTNode;
 import smallerbasic.AST.staticChecks.ASTDoubleLabelChecking;
@@ -12,6 +13,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 import static smallerbasic.CompilationUtils.*;
 
 public class ASTChecksTest {
@@ -99,7 +101,8 @@ public class ASTChecksTest {
                        D = 4
                        """)));
 
-        SymbolTableVisitor symbols = new SymbolTableVisitor(tree);
+        VarNameGenerator gen = mock(VarNameGenerator.class);
+        VariableNames symbols = new VariableNames(tree, gen);
 
         assertThat(symbols).containsExactlyInAnyOrder(
                 new IdentifierASTNode("A"),

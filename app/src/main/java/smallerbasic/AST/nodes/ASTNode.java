@@ -3,10 +3,6 @@ package smallerbasic.AST.nodes;
 import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTVisitor;
-import smallerbasic.AST.SymbolTableVisitor;
-import smallerbasic.AST.VarNameGenerator;
-import smallerbasic.PrintableToLLVM;
-import smallerbasic.SymbolTable;
 
 import java.util.Optional;
 

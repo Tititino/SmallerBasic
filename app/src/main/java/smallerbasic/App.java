@@ -19,7 +19,6 @@ public class App {
         try {
             ASTNode ast = clean(parse(lex(Paths.get(args[0]))));
 
-            System.out.println(ast);
             VarNameGenerator gen = new VarNameGenerator();
             String program = new ProgramPrinter(new VariableNames(ast, gen),
                     new LabelNames(ast, gen),

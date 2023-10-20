@@ -62,7 +62,7 @@ public class ProgramPrinter {
         @Override
         public String visit(BoolLiteralASTNode n) {
             String name = gen.newName();
-            llvmProgram.append("%" + name + " = alloca %struct.Boxed*\n");
+            llvmProgram.append("%" + name + " = alloca %struct.Boxed\n");
             llvmProgram.append("call void " + BOOL_SETTER + "(%struct.Boxed* %"
                     + name + ", " + (n.getValue() ? "TRUE" : "FALSE") + ")\n");
             return name;
@@ -104,6 +104,7 @@ public class ProgramPrinter {
             llvmProgram.append("br i1 %" + bool + "label %" + bodyLabel + ", label %" + endLabel + "\n");
             llvmProgram.append(bodyLabel + ":\n");
 
+            n.getBody().forEach(x -> x.accept(this));
 
             // manca aggiungere + 1 all variablie
             // manca gestione degli step
@@ -190,7 +191,7 @@ public class ProgramPrinter {
         public String visit(RoutineDeclASTNode n) {
             llvmProgram.append("define void @" + functions.getBinding(n.getName()) + "() {\n");
             n.getBody().forEach(x -> x.accept(this));
-            llvmProgram.append("}\n");
+            llvmProgram.append("ret void\n}\n");
             return null;
         }
 

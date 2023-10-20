@@ -3,7 +3,7 @@ grammar SBGrammar;
 package smallerbasic;
 }
 
-program : (statement | subroutineDecl)*
+program : (statement | subroutineDecl | NL)* EOF
         ;
 
 assignmentStmt : Ident '=' expression

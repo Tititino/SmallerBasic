@@ -9,5 +9,5 @@ fine:
 D = 4
 
 Sub ciao
-    B = 4 + 3
-End
+    B = true And false
+EndSub
