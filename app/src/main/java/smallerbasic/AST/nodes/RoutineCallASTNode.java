@@ -10,6 +10,11 @@ public class RoutineCallASTNode extends AbstractASTNode implements StatementASTN
     public RoutineCallASTNode(@NotNull String function) {
         this.function = function;
     }
+
+    public String getFunction() {
+        return function;
+    }
+
     @Override
     public <T> T accept(ASTVisitor<T> v) {
         return v.visit(this);

@@ -15,6 +15,10 @@ public class BoolLiteralASTNode extends AbstractASTNode implements LiteralASTNod
         this.value = value;
     }
 
+    public boolean getValue() {
+        return value;
+    }
+
     @Override
     public <T> T accept(ASTVisitor<T> v) {
         return v.visit(this);

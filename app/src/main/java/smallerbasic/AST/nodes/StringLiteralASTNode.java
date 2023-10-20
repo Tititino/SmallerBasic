@@ -12,6 +12,10 @@ public class StringLiteralASTNode extends AbstractASTNode implements LiteralASTN
         this.value = value;
     }
 
+    public @NotNull String getValue() {
+        return value;
+    }
+
     @Override
     public <T> T accept(ASTVisitor<T> v) {
         return v.visit(this);

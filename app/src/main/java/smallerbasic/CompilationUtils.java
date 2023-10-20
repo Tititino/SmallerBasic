@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.nodes.ASTNode;
 
@@ -19,11 +20,11 @@ public class CompilationUtils {
         return new CommonTokenStream(new SBGrammarLexer(CharStreams.fromString(text)));
     }
 
-    public static @NotNull ParserRuleContext parse(@NotNull TokenStream tokens) {
+    public static @NotNull ParseTree parse(@NotNull TokenStream tokens) {
         return (new SBGrammarParser(tokens)).program();
     }
 
-    public static @NotNull ASTNode clean(@NotNull ParserRuleContext tree) {
-        return (new ParseTreeToASTVisitor()).visitProgram((SBGrammarParser.ProgramContext) tree);
+    public static @NotNull ASTNode clean(@NotNull ParseTree tree) {
+        return (new ParseTreeToASTVisitor()).visit(tree);
     }
 }

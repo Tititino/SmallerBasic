@@ -47,4 +47,5 @@ public class AssStmtASTNode extends AbstractASTNode implements StatementASTNode 
     public <T> T accept(ASTVisitor<T> v) {
         return v.visit(this);
     }
+
 }

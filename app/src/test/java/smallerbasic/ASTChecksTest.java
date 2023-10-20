@@ -1,7 +1,7 @@
 package smallerbasic;
 
 import org.junit.jupiter.api.Test;
-import smallerbasic.AST.SymbolTable;
+import smallerbasic.AST.SymbolTableVisitor;
 import smallerbasic.AST.nodes.ASTNode;
 import smallerbasic.AST.nodes.IdentifierASTNode;
 import smallerbasic.AST.staticChecks.ASTDoubleLabelChecking;
@@ -99,7 +99,7 @@ public class ASTChecksTest {
                        D = 4
                        """)));
 
-        SymbolTable symbols = new SymbolTable(tree);
+        SymbolTableVisitor symbols = new SymbolTableVisitor(tree);
 
         assertThat(symbols).containsExactlyInAnyOrder(
                 new IdentifierASTNode("A"),

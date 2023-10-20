@@ -2,6 +2,8 @@ package smallerbasic.AST.nodes;
 
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTVisitor;
+import smallerbasic.AST.SymbolTableVisitor;
+import smallerbasic.AST.VarNameGenerator;
 
 import java.util.Objects;
 
@@ -40,4 +42,6 @@ public class GotoStmtASTNode extends AbstractASTNode implements StatementASTNode
                 "label='" + label + '\'' +
                 '}';
     }
+
+
 }
