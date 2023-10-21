@@ -3,6 +3,7 @@ package smallerbasic.AST.nodes;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTVisitor;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,8 +23,8 @@ public class ExternalFunctionCallASTNode extends AbstractASTNode implements Expr
         this.args = args;
     }
 
-    public @NotNull ExpressionASTNode getArg(int i) {
-        return args.get(i);
+    public @NotNull List<ExpressionASTNode> getArgs() {
+        return Collections.unmodifiableList(args);
     }
 
     @Override

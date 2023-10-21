@@ -29,11 +29,8 @@ public abstract class SymbolTableVisitor<T> implements SymbolTable<T> {
 
     protected abstract @NotNull List<T> getAll(@NotNull ASTNode n);
 
-    @NotNull
     @Override
-    public Iterator<T> iterator() {
-        return symbols.iterator();  // intellij says using Collections.unmodifiableList is redundant
+    public @NotNull List<T> getSymbols() {
+        return symbols;
     }
-
-
 }

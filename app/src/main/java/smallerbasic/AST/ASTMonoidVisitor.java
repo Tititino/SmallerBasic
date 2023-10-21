@@ -31,7 +31,10 @@ public interface ASTMonoidVisitor<T> extends ASTVisitor<T> {
 
     @Override
     default T visit(ExternalFunctionCallASTNode n) {
-        return empty();
+        return n.getArgs()
+                .stream()
+                .map(x -> x.accept(this))
+                .reduce(empty(), this::compose);
     }
 
     @Override
@@ -43,7 +46,7 @@ public interface ASTMonoidVisitor<T> extends ASTVisitor<T> {
                         compose(
                                 n.getEnd().accept(this),
                                 compose(
-                                        n.getStep().map(x -> x.accept(this)).orElse(empty()),
+                                        n.getStep().accept(this),
                                         visitChildren(n.getBody())
                                 )
                         )

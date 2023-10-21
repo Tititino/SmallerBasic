@@ -6,20 +6,14 @@ import smallerbasic.SymbolTable;
 
 public class ProgramPrinter {
 
-    private final @NotNull SymbolTable<IdentifierASTNode> symbols;
-    private final @NotNull SymbolTable<String> labels;
-    private final @NotNull SymbolTable<String> functions;
+    private final @NotNull SymbolTable<ASTNode> symbols;
     private final @NotNull VarNameGenerator gen;
 
     private @NotNull StringBuilder llvmProgram = new StringBuilder();
 
-    public ProgramPrinter(@NotNull SymbolTable<IdentifierASTNode> symbols,
-                          @NotNull SymbolTable<String> labels,
-                          @NotNull SymbolTable<String> functions,
+    public ProgramPrinter(@NotNull SymbolTable<ASTNode> symbols,
                           @NotNull VarNameGenerator gen) {
         this.symbols = symbols;
-        this.labels = labels;
-        this.functions = functions;
         this.gen = gen;
     }
 
@@ -30,19 +24,18 @@ public class ProgramPrinter {
     }
 
     private class ProgramPrinterVisitor implements ASTVisitor<String> {
-        private final static @NotNull String BOOL_GETTER = "@GetBoolValue";
-        private final static @NotNull String NUMBER_SETTER = "@SetNumberValue";
-        private final static @NotNull String BOOL_SETTER = "@SetBoolValue";
+        private final static @NotNull String BOOL_GETTER = "@_GET_BOOL_VALUE";
+        private final static @NotNull String NUMBER_SETTER = "@_SET_NUM_VALUE";
+        private final static @NotNull String BOOL_SETTER = "@_SET_BOOL_VALUE";
+        private final static @NotNull String STRING_SETTER = "@_SET_STR_VALUE";
 
-        // valuto prima il lato destro di quello sinistro !!!
+
         @Override
         public String visit(AssStmtASTNode n) {
-            symbols.newBinding(n.getVarName());
-            String name = symbols.getBinding(n.getVarName());
+            String name = n.getVarName().accept(this);
             String rightSide = n.getValue().accept(this);
-            llvmProgram.append("%" + name + " = alloca %struct.Boxed\n");
-            llvmProgram.append("call void @COPY(%struct.Boxed* %" + name + ", %struct.Boxed* %" + rightSide + ")\n");
-            return name;
+            llvmProgram.append("call void @COPY(%struct.Boxed* " + name + ", %struct.Boxed* " + rightSide + ")\n");
+            return null;
         }
 
         @Override
@@ -50,121 +43,124 @@ public class ProgramPrinter {
             String left = n.getLeft().accept(this);
             String right = n.getRight().accept(this);
 
-            String res = gen.newName();
-            llvmProgram.append("%" + res + " = alloca %struct.Boxed\n");
+            String res = "%" + gen.newName();
+            llvmProgram.append(res + " = alloca %struct.Boxed\n");
             llvmProgram.append("call void @" + n.getOp()
-                    + "(%struct.Boxed* %" + res
-                    + ", %struct.Boxed* %" + left
-                    + ", %struct.Boxed* %" + right + ")\n");
+                    + "(%struct.Boxed* " + res
+                    + ", %struct.Boxed* " + left
+                    + ", %struct.Boxed* " + right + ")\n");
             return res;
         }
 
         @Override
         public String visit(BoolLiteralASTNode n) {
-            String name = gen.newName();
-            llvmProgram.append("%" + name + " = alloca %struct.Boxed\n");
-            llvmProgram.append("call void " + BOOL_SETTER + "(%struct.Boxed* %"
-                    + name + ", " + (n.getValue() ? "TRUE" : "FALSE") + ")\n");
-            return name;
+            return "@" + symbols.getBinding(n);
         }
 
         @Override
         public String visit(ExternalFunctionCallASTNode n) {
-            String firstArg = n.getArg(0).accept(this);
-            llvmProgram.append("call void @PRINT(%struct.Boxed* %" + firstArg + ")\n");
+            String firstArg = n.getArgs().get(0).accept(this);
+            llvmProgram.append("call void @PRINT(%struct.Boxed* " + firstArg + ")\n");
             return null;
         }
 
         @Override
         public String visit(ForLoopASTNode n) {
-            String start = n.getStart().accept(this);
-            String end   = n.getEnd().accept(this);
+            String label = gen.newName();
+            (new AssStmtASTNode(n.getVarName(), n.getStart())).accept(this);
+            llvmProgram.append("br label %" + label + ".begin\n");
+            llvmProgram.append(label + ".begin:\n");
 
-            symbols.newBinding(n.getVarName());
-            String name = symbols.getBinding(n.getVarName());
-            llvmProgram.append("%" + name + " = alloca %struct.Boxed\n");
-            llvmProgram.append("call void @COPY(%struct.Boxed* %" + name + ", %struct.Boxed* %" + start + ")\n");
-
-
-            String flooredStart = gen.newName();
-            llvmProgram.append("%" + flooredStart + " = alloca i64\n");
-            String floorResult = gen.newName();
-            llvmProgram.append("%" + floorResult + " = call i64 @Floor(%struct.Boxed* %" + start + ")\n");
-            llvmProgram.append("store i64 %" + floorResult + ", i64* %" + floorResult + "\n");
-
-            String flooredEnd = gen.newName();
-            llvmProgram.append("%" + flooredEnd + " = call i64 @Floor(%struct.Boxed* %" + end + ")\n");
-
-            String testLabel = gen.newName();
-            String bodyLabel  = gen.newName();
-            String endLabel  = gen.newName();
-            llvmProgram.append(testLabel + ":\n");
-            String temp = gen.newName();
-            llvmProgram.append("%" + temp + " = load i64, i64* %" + flooredStart);
-            String bool = gen.newName();
-            llvmProgram.append("%" + bool + " = icmp eq i64 %" + temp + ", %" + flooredEnd + "\n");
-            llvmProgram.append("br i1 %" + bool + "label %" + bodyLabel + ", label %" + endLabel + "\n");
-            llvmProgram.append(bodyLabel + ":\n");
-
+            String cond = (new BinOpASTNode(BinOpASTNode.BinOp.LT, n.getVarName(), n.getEnd())).accept(this);
+            String bool = "%" + gen.newName();
+            llvmProgram.append(bool + " = call i1 " + BOOL_GETTER + "(%struct.Boxed* " + cond + ")\n");
+            llvmProgram.append("br i1 " + bool + ", label %" + label + ".continue, label %" + label + ".end\n");
+            llvmProgram.append(label + ".continue:\n");
             n.getBody().forEach(x -> x.accept(this));
 
-            // manca aggiungere + 1 all variablie
-            // manca gestione degli step
-            String temp2 = gen.newName();
-            llvmProgram.append("%" + temp2 + " = add i64 %" + temp + ", 1\n");
-            llvmProgram.append("store i64 %" + temp2 + ", i64* %" + floorResult + "\n");
-            llvmProgram.append("br label %" + testLabel + "\n");
-            llvmProgram.append(endLabel + ":\n");
+            (new AssStmtASTNode(
+                    n.getVarName(),
+                    new BinOpASTNode(
+                            BinOpASTNode.BinOp.PLUS,
+                            n.getVarName(),
+                            n.getStep()
+                    )
+            )).accept(this);
+
+            llvmProgram.append("br label %" + label + ".begin\n");
+            llvmProgram.append(label + ".end:\n");
+
             return null;
         }
 
         @Override
         public String visit(GotoStmtASTNode n) {
-            llvmProgram.append("br label %").append(n.getLabel()).append("\n");
+            llvmProgram.append("br label %").append(symbols.getBinding(new LabelDeclASTNode(n.getLabel()))).append("\n");
             return null;
         }
 
         @Override
         public String visit(IdentifierASTNode n) {
-            return symbols.getBinding(n);
+            return "@" + symbols.getBinding(n);
         }
 
         @Override
         public String visit(IfThenASTNode n) {
             String cond = n.getCondition().accept(this);
-            String bool = gen.newName();
-            String trueLabel = gen.newName();
-            String falseLabel = gen.newName();
-            String endLabel = gen.newName();
-            llvmProgram.append("%" + bool + " = call i1 " + BOOL_GETTER + "(%struct.Boxed* %" + cond + ")\n");
-            llvmProgram.append("br i1 %" + bool + ", label %" + trueLabel + ", label %" + falseLabel + "\n");
-            llvmProgram.append(trueLabel + ":\n");
+            String bool = "%" + gen.newName();
+            String label = gen.newName();
+            llvmProgram.append(bool + " = call i1 " + BOOL_GETTER + "(%struct.Boxed* " + cond + ")\n");
+            llvmProgram.append("br i1 " + bool + ", label %" + label + ".true, label %" + label + ".false\n");
+            llvmProgram.append(label + ".true:\n");
             n.getTrueBody().forEach(x -> x.accept(this));
-            llvmProgram.append("br label %" + endLabel + "\n");
-            llvmProgram.append(trueLabel + ":\n");
+            llvmProgram.append("br label %" + label + ".end\n");
+            llvmProgram.append(label + ".false:\n");
             n.getFalseBody().ifPresent(x -> x.forEach(y -> y.accept(this)));
-            llvmProgram.append("br label %" + endLabel + "\n");
+            llvmProgram.append("br label %" + label + ".end\n");
+            llvmProgram.append(label + ".end:\n");
             return null;
         }
 
         @Override
         public String visit(LabelDeclASTNode n) {
-            llvmProgram.append(labels.getBinding(n.getName()) + ":\n");
+            llvmProgram.append(symbols.getBinding(n) + ":\n");
             return null;
         }
 
         @Override
         public String visit(NumberLiteralASTNode n) {
-            String name = gen.newName();
-            llvmProgram.append("%" + name + " = alloca %struct.Boxed*\n");
-            llvmProgram.append("call void " + NUMBER_SETTER + "(%struct.Boxed* %" + name + ", double " + n.getValue() + ")\n");
-            return name;
+            return "@" + symbols.getBinding(n);
         }
 
         @Override
         public String visit(ProgramASTNode n) {
-            for (IdentifierASTNode id : symbols)
-                llvmProgram.append("%").append(symbols.getBinding(id)).append(" = alloca %struct.Boxed\n");
+            llvmProgram.append("; variables\n");
+            for (ASTNode id : symbols
+                    .getSymbols()
+                    .stream()
+                    .filter(x -> x instanceof IdentifierASTNode)
+                    .toList())
+                llvmProgram.append("@").append(symbols.getBinding(id)).append(" = global %struct.Boxed { i2 0, i64 0 }\n");
+
+            llvmProgram.append("; boxed constants\n");
+            for (ASTNode lit : symbols
+                    .getSymbols()
+                    .stream()
+                    .filter(x -> x instanceof LiteralASTNode)
+                    .toList())
+                llvmProgram.append("@" + symbols.getBinding(lit)).append(" = global %struct.Boxed { i2 0, i64 0 }\n");
+
+            llvmProgram.append("; string constants\n");
+            for (ASTNode lit : symbols
+                    .getSymbols()
+                    .stream()
+                    .filter(x -> x instanceof StringLiteralASTNode)
+                    .toList()) {
+                String text = ((StringLiteralASTNode) lit).getValue();
+                llvmProgram.append("@" + symbols.getBinding(lit)
+                        + ".value = constant [" + (text.length() + 1)
+                        + " x i8] c\"" + text + "\\00\"\n");
+            }
 
             n.getContents()
                     .stream()
@@ -172,7 +168,14 @@ public class ProgramPrinter {
                     .map(x -> (RoutineDeclASTNode) x)
                     .forEach(x -> x.accept(this));
 
-            llvmProgram.append("define @main() {\n");
+            llvmProgram.append("define void @main() {\n");
+            for (ASTNode lit : symbols
+                    .getSymbols()
+                    .stream()
+                    .filter(x -> x instanceof LiteralASTNode)
+                    .toList())
+                prealloc((LiteralASTNode) lit);
+
             n.getContents()
                     .stream()
                     .filter(x -> x instanceof StatementASTNode)
@@ -183,15 +186,38 @@ public class ProgramPrinter {
             return null;
         }
 
+        private void prealloc(LiteralASTNode n) {
+            if (n instanceof StringLiteralASTNode s) {
+                String text = s.getValue();
+                String arrayType = "[" + (text.length() + 1) + " x i8]";
+                String ptr = "%" + gen.newName();
+                llvmProgram.append(ptr + " = getelementptr "
+                        + arrayType + ", "
+                        + arrayType + "* @"
+                        + symbols.getBinding(n) + ".value, i32 0, i32 0\n");
+                llvmProgram.append("call void " + STRING_SETTER + "(%struct.Boxed* @" + symbols.getBinding(s) + ", i8* " + ptr + ")\n");
+            }
+            else if (n instanceof NumberLiteralASTNode f) {
+                String text = Double.toString(f.getValue());
+                llvmProgram.append("call void " + NUMBER_SETTER + "(%struct.Boxed* @" + symbols.getBinding(f) + ", double " + text + ")\n");
+            }
+            else if (n instanceof BoolLiteralASTNode b){
+                llvmProgram.append("call void " + BOOL_SETTER + "(%struct.Boxed* @" + symbols.getBinding(b)
+                        + ", " + (b.getValue() ? "TRUE" : "FALSE") + ")\n");
+            }
+        }
+
+        // sistemo in modo tale da prendere i nomi dalla symbol table, così da evitare clash
+        // faccio lo stesso per i label
         @Override
         public String visit(RoutineCallASTNode n) {
-            llvmProgram.append("call void @" + n.getFunction() + "()\n");
+            llvmProgram.append("call void @").append(n.getFunction()).append("()\n");
             return null;
         }
 
         @Override
         public String visit(RoutineDeclASTNode n) {
-            llvmProgram.append("define void @" + functions.getBinding(n.getName()) + "() {\n");
+            llvmProgram.append("define void @" + n.getName() + "() {\n");
             n.getBody().forEach(x -> x.accept(this));
             llvmProgram.append("ret void\n}\n");
             return null;
@@ -199,11 +225,22 @@ public class ProgramPrinter {
 
         @Override
         public String visit(StringLiteralASTNode n) {
-            return null;
+            return "@" + symbols.getBinding(n);
         }
 
         @Override
         public String visit(WhileLoopASTNode n) {
+            String label = gen.newName();
+            String bool = "%" + gen.newName();
+            llvmProgram.append("br label %" + label + ".begin\n");  // strange llvm magic
+            llvmProgram.append(label + ".begin:\n");
+            String cond = n.getCondition().accept(this);
+            llvmProgram.append(bool + " = call i1 " + BOOL_GETTER + "(%struct.Boxed* " + cond + ")\n");
+            llvmProgram.append("br i1 " + bool + ", label %" + label + ".continue, label %" + label + ".end\n");
+            llvmProgram.append(label + ".continue:\n");
+            n.getBody().forEach(x -> x.accept(this));
+            llvmProgram.append("br label %" + label + ".begin\n");
+            llvmProgram.append(label + ".end:\n");
             return null;
         }
     }
