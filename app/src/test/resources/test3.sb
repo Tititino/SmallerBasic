@@ -1,0 +1,7 @@
+B = true And false
+If (B) Then
+    IO.WriteLine("true")
+Else
+    IO.WriteLine("false")
+EndIf
+

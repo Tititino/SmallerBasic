@@ -1,6 +1,7 @@
 package smallerbasic;
 
 import smallerbasic.AST.*;
+import smallerbasic.AST.SymbolTable;
 import smallerbasic.AST.nodes.ASTNode;
 
 import java.io.IOException;
@@ -20,11 +21,7 @@ public class App {
             ASTNode ast = clean(parse(lex(Paths.get(args[0]))));
 
             VarNameGenerator gen = new VarNameGenerator();
-            String program = new ProgramPrinter(new VariableNames(ast, gen),
-                    new LabelNames(ast, gen),
-                    new FunctionNames(ast, gen),
-                    gen
-            ).compile(ast);
+            String program = new ProgramPrinter(new SymbolTable(ast, gen), gen).compile(ast);
 
             System.out.println(program);
         } catch (IOException e) {

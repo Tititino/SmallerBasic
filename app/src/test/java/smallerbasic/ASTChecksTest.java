@@ -2,7 +2,7 @@ package smallerbasic;
 
 import org.junit.jupiter.api.Test;
 import smallerbasic.AST.VarNameGenerator;
-import smallerbasic.AST.VariableNames;
+import smallerbasic.AST.SymbolTable;
 import smallerbasic.AST.nodes.ASTNode;
 import smallerbasic.AST.nodes.IdentifierASTNode;
 import smallerbasic.AST.staticChecks.ASTDoubleLabelChecking;
@@ -102,9 +102,9 @@ public class ASTChecksTest {
                        """)));
 
         VarNameGenerator gen = mock(VarNameGenerator.class);
-        VariableNames symbols = new VariableNames(tree, gen);
+        SymbolTable symbols = new SymbolTable(tree, gen);
 
-        assertThat(symbols).containsExactlyInAnyOrder(
+        assertThat(symbols.getSymbols()).containsExactlyInAnyOrder(
                 new IdentifierASTNode("A"),
                 new IdentifierASTNode("B"),
                 new IdentifierASTNode("C"),

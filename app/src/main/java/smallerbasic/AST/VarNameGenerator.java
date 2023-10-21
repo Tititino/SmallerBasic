@@ -8,6 +8,6 @@ public class VarNameGenerator {
     public @NotNull String newName() {
         String newName = name.toString();
         name++;
-        return newName;
+        return "v" + newName;
     }
 }
