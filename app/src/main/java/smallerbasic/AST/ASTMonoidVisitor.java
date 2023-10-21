@@ -46,7 +46,7 @@ public interface ASTMonoidVisitor<T> extends ASTVisitor<T> {
                         compose(
                                 n.getEnd().accept(this),
                                 compose(
-                                        n.getStep().map(x -> x.accept(this)).orElse(empty()),
+                                        n.getStep().accept(this),
                                         visitChildren(n.getBody())
                                 )
                         )

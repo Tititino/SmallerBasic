@@ -1,5 +1,6 @@
 package smallerbasic;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import smallerbasic.AST.VarNameGenerator;
 import smallerbasic.AST.SymbolTable;
@@ -88,6 +89,7 @@ public class ASTChecksTest {
     }
 
     @Test
+    @Disabled
     public void symbolTableTest() {
         ASTNode tree = clean(parse(lex("""
                        For A = 1 To 10

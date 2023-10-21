@@ -67,20 +67,29 @@ public class ProgramPrinter {
         @Override
         public String visit(ForLoopASTNode n) {
             String label = gen.newName();
-            String bool  = "%" + gen.newName();
             (new AssStmtASTNode(n.getVarName(), n.getStart())).accept(this);
-            String end = n.getEnd().accept(this);
-            llvmProgram.append("br label %" + label + ".begin\n");  // strange llvm magic
+            llvmProgram.append("br label %" + label + ".begin\n");
             llvmProgram.append(label + ".begin:\n");
 
-
-            // String cond = n.getCondition().accept(this);
-            // llvmProgram.append(bool + " = call i1 " + BOOL_GETTER + "(%struct.Boxed* " + cond + ")\n");
+            String cond = (new BinOpASTNode(BinOpASTNode.BinOp.LT, n.getVarName(), n.getEnd())).accept(this);
+            String bool = "%" + gen.newName();
+            llvmProgram.append(bool + " = call i1 " + BOOL_GETTER + "(%struct.Boxed* " + cond + ")\n");
             llvmProgram.append("br i1 " + bool + ", label %" + label + ".continue, label %" + label + ".end\n");
             llvmProgram.append(label + ".continue:\n");
             n.getBody().forEach(x -> x.accept(this));
+
+            (new AssStmtASTNode(
+                    n.getVarName(),
+                    new BinOpASTNode(
+                            BinOpASTNode.BinOp.PLUS,
+                            n.getVarName(),
+                            n.getStep()
+                    )
+            )).accept(this);
+
             llvmProgram.append("br label %" + label + ".begin\n");
             llvmProgram.append(label + ".end:\n");
+
             return null;
         }
 
@@ -184,9 +193,9 @@ public class ProgramPrinter {
                 String ptr = "%" + gen.newName();
                 llvmProgram.append(ptr + " = getelementptr "
                         + arrayType + ", "
-                        + arrayType + "* %"
+                        + arrayType + "* @"
                         + symbols.getBinding(n) + ".value, i32 0, i32 0\n");
-                llvmProgram.append("call void " + STRING_SETTER + "(@struct.Boxed*" + symbols.getBinding(s) + ", i8* " + ptr + ")\n");
+                llvmProgram.append("call void " + STRING_SETTER + "(%struct.Boxed* @" + symbols.getBinding(s) + ", i8* " + ptr + ")\n");
             }
             else if (n instanceof NumberLiteralASTNode f) {
                 String text = Double.toString(f.getValue());

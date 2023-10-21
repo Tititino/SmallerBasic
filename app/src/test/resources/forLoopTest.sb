@@ -1,0 +1,4 @@
+For X = 1 To 10 Step 2
+    IO.WriteLine("ciao")
+EndFor
+IO.WriteLine("End")

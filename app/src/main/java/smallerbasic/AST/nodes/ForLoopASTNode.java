@@ -1,13 +1,11 @@
 package smallerbasic.AST.nodes;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import smallerbasic.AST.ASTVisitor;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public class ForLoopASTNode extends AbstractASTNode implements StatementASTNode {
     private final @NotNull IdentifierASTNode varName;
@@ -55,8 +53,8 @@ public class ForLoopASTNode extends AbstractASTNode implements StatementASTNode 
         return end;
     }
 
-    public @NotNull Optional<@NotNull ExpressionASTNode> getStep() {
-        return Optional.ofNullable(step);
+    public @NotNull ExpressionASTNode getStep() {
+        return step;
     }
 
     public @NotNull List<@NotNull StatementASTNode> getBody() {
@@ -71,7 +69,7 @@ public class ForLoopASTNode extends AbstractASTNode implements StatementASTNode 
         return varName.equals(that.varName)
                 && start.equals(that.start)
                 && end.equals(that.end)
-                && Objects.equals(step, that.step)
+                && step.equals(that.step)
                 && body.equals(that.body);
     }
 
