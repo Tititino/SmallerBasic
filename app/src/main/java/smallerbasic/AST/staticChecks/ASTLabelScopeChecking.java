@@ -44,7 +44,8 @@ public class ASTLabelScopeChecking implements Check {
                 isOk = false;
                 Set<String> missing = new HashSet<>(labels.gotoLabels());
                 missing.removeAll(labels.definedLabels());
-                // reportError(missing, n);
+                for (String label : missing)
+                    reportError("label \"" + label + "\" is used in a goto, but never declared in this scope");
             }
             return labels;
         }
@@ -57,7 +58,8 @@ public class ASTLabelScopeChecking implements Check {
                 isOk = false;
                 Set<String> missing = new HashSet<>(labels.gotoLabels());
                 missing.removeAll(labels.definedLabels());
-                // reportError(missing, n);
+                for (String label : missing)
+                    reportError("label \"" + label + "\" is used in a goto, but never declared in this scope");
             }
             return empty();
         }

@@ -12,6 +12,7 @@ import smallerbasic.AST.staticChecks.Check;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 public class CompilationUtils {
     public static @NotNull TokenStream lex(@NotNull Path path) throws IOException {
@@ -30,8 +31,10 @@ public class CompilationUtils {
         return (new ParseTreeToASTVisitor()).visit(tree);
     }
 
-    public static @NotNull ASTNode check(@NotNull ASTNode tree, @NotNull List<Check> checks) {
-        checks.forEach(x -> x.check(tree));
-        return tree;
+    public static @NotNull Optional<ASTNode> check(@NotNull ASTNode tree, @NotNull List<Check> checks) {
+        boolean allPass = checks
+                .stream()
+                .allMatch(x -> x.check(tree));
+        return allPass ? Optional.of(tree) : Optional.empty();
     }
 }
