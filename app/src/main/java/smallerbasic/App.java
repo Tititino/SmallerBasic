@@ -1,11 +1,14 @@
 package smallerbasic;
 
-import smallerbasic.AST.*;
-import smallerbasic.AST.SymbolTable;
 import smallerbasic.AST.nodes.ASTNode;
+import smallerbasic.AST.staticChecks.ASTDoubleLabelChecking;
+import smallerbasic.AST.staticChecks.ASTLabelScopeChecking;
+import smallerbasic.AST.staticChecks.Check;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
 
 import static smallerbasic.CompilationUtils.*;
 
@@ -18,10 +21,17 @@ public class App {
         }
 
         try {
-            ASTNode ast = clean(parse(lex(Paths.get(args[0]))));
-
+            List<Check> staticChecks = List.of(
+                    new ASTLabelScopeChecking(),
+                    new ASTDoubleLabelChecking()
+            );
+            Optional<ASTNode> ast = check(clean(parse(lex(Paths.get(args[0])))), staticChecks);
+            if (ast.isEmpty()) {
+                System.out.println("Static checks failed");
+                return;
+            }
             VarNameGenerator gen = new VarNameGenerator();
-            String program = new ProgramPrinter(new SymbolTable(ast, gen), gen).compile(ast);
+            String program = new ProgramPrinter(new SymbolTable(ast.get(), gen), gen).compile(ast.get());
 
             System.out.println(program);
         } catch (IOException e) {

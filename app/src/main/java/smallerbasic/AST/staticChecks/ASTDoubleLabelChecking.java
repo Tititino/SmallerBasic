@@ -37,9 +37,11 @@ public class ASTDoubleLabelChecking implements Check {
         @Override
         public Map<String, Integer> visit(ProgramASTNode n) {
             Map<String, Integer> labelCounts = visitChildren(n.getContents());
-            if (labelCounts.values().stream().anyMatch(x -> x > 1)) {
-                isOk = false;
-            }
+            for (String key : labelCounts.keySet())
+                if (labelCounts.get(key) > 1) {
+                    isOk = false;
+                    reportError("label \"" + key + "\" defined two times in the same scope");
+                }
             return labelCounts;
         }
 

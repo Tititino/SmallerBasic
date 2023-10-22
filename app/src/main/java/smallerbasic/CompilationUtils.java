@@ -2,14 +2,17 @@ package smallerbasic;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.jetbrains.annotations.NotNull;
+import smallerbasic.AST.ParseTreeToASTVisitor;
 import smallerbasic.AST.nodes.ASTNode;
+import smallerbasic.AST.staticChecks.Check;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
 
 public class CompilationUtils {
     public static @NotNull TokenStream lex(@NotNull Path path) throws IOException {
@@ -26,5 +29,12 @@ public class CompilationUtils {
 
     public static @NotNull ASTNode clean(@NotNull ParseTree tree) {
         return (new ParseTreeToASTVisitor()).visit(tree);
+    }
+
+    public static @NotNull Optional<ASTNode> check(@NotNull ASTNode tree, @NotNull List<Check> checks) {
+        boolean allPass = checks
+                .stream()
+                .allMatch(x -> x.check(tree));
+        return allPass ? Optional.of(tree) : Optional.empty();
     }
 }

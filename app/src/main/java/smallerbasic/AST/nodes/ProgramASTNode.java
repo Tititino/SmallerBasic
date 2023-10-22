@@ -2,9 +2,6 @@ package smallerbasic.AST.nodes;
 
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTVisitor;
-import smallerbasic.AST.SymbolTableVisitor;
-import smallerbasic.AST.VarNameGenerator;
-import smallerbasic.SymbolTable;
 
 import java.util.Collections;
 import java.util.List;

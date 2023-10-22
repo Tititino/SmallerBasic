@@ -1,0 +1,10 @@
+Sub Print
+    IO.WriteLine(X)
+    IO.WriteLine(Y)
+EndSub
+
+For X = 0 To 10
+    For Y = 0 To 10 Step 2
+        Print()
+    EndFor
+EndFor
