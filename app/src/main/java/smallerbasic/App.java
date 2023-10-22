@@ -1,7 +1,5 @@
 package smallerbasic;
 
-import smallerbasic.AST.*;
-import smallerbasic.AST.SymbolTable;
 import smallerbasic.AST.nodes.ASTNode;
 
 import java.io.IOException;

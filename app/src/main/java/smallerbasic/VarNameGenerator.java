@@ -1,4 +1,4 @@
-package smallerbasic.AST;
+package smallerbasic;
 
 import org.jetbrains.annotations.NotNull;
 

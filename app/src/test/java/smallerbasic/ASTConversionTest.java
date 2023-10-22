@@ -5,6 +5,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.jupiter.api.Test;
+import smallerbasic.AST.ParseTreeToASTVisitor;
 import smallerbasic.AST.nodes.*;
 
 import java.io.IOException;

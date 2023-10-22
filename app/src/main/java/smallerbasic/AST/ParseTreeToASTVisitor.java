@@ -1,4 +1,4 @@
-package smallerbasic;
+package smallerbasic.AST;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -8,12 +8,14 @@ import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.nodes.*;
+import smallerbasic.SBGrammarParser;
+import smallerbasic.SBGrammarVisitor;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
-class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode>  {
+public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
 
     private <N extends ASTNode> @NotNull N setTokens(@NotNull N ast, @NotNull ParserRuleContext ctx) {
         ast.setStartToken(ctx.getStart());

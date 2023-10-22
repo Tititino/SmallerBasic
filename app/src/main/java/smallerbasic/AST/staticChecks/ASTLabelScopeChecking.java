@@ -6,7 +6,7 @@ import smallerbasic.AST.nodes.*;
 
 import java.util.*;
 
-public abstract class ASTLabelScopeChecking implements Check {
+public class ASTLabelScopeChecking implements Check {
 
     private boolean isOk = true;
 
@@ -15,7 +15,6 @@ public abstract class ASTLabelScopeChecking implements Check {
         n.accept(new ScopeVisitor());
         return isOk;
     }
-    public abstract void reportError(Collection<String> missingLabels, ASTNode where);
 
     private class ScopeVisitor implements ASTMonoidVisitor<DefAndRefLabels> {
         @Override
@@ -45,7 +44,7 @@ public abstract class ASTLabelScopeChecking implements Check {
                 isOk = false;
                 Set<String> missing = new HashSet<>(labels.gotoLabels());
                 missing.removeAll(labels.definedLabels());
-                reportError(missing, n);
+                // reportError(missing, n);
             }
             return labels;
         }
@@ -58,7 +57,7 @@ public abstract class ASTLabelScopeChecking implements Check {
                 isOk = false;
                 Set<String> missing = new HashSet<>(labels.gotoLabels());
                 missing.removeAll(labels.definedLabels());
-                reportError(missing, n);
+                // reportError(missing, n);
             }
             return empty();
         }
