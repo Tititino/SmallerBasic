@@ -122,4 +122,9 @@ public interface ASTMonoidVisitor<T> extends ASTVisitor<T> {
         );
     }
 
+    @Override
+    default T visit(UnaryMinusASTNode n) {
+        return n.getExpr().accept(this);
+    }
+
 }

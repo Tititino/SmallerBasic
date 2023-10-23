@@ -304,5 +304,18 @@ public class ProgramPrinter {
             addLine(label + ".end:");
             return null;
         }
+
+        @Override
+        public String visit(UnaryMinusASTNode n) {
+            updateLineNumber(n);
+            String expr  = n.getExpr().accept(this);
+            String res = "%" + gen.newName();
+
+            addLine(res + " = alloca %struct.Boxed");
+            addLine("call void @UNARY_MINUS(%struct.Boxed* " + res
+                    + ", %struct.Boxed* " + expr
+                    + ")");
+            return res;
+        }
     }
 }

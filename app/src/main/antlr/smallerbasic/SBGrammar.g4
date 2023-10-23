@@ -75,6 +75,8 @@ stringExpression : left=stringExpression '+' right=stringExpression             
 arithExpression : left=arithExpression op=('/' | '*') right=arithExpression                 # DivMul
                 | left=arithExpression op=('+' | '-') right=arithExpression                 # PlusMin
                 | '(' expr=arithExpression ')'                                              # NParens
+                | op='-' var=Ident                                                          # MinusVar
+                | op='-' '(' expr=arithExpression ')'                                       # UnaryMinus
                 | Number                                                                    # NumberLiteral
                 | callExternalFunction                                                      # NumberReturningFunc
                 | Ident                                                                     # NumberIdent
