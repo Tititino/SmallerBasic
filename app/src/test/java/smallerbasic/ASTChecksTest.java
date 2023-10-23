@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import smallerbasic.AST.nodes.ASTNode;
 import smallerbasic.AST.nodes.LabelNameASTNode;
-import smallerbasic.AST.staticChecks.ASTDoubleLabelChecking;
+import smallerbasic.AST.staticChecks.DoubleLabelCheck;
 import smallerbasic.AST.staticChecks.ASTLabelScopeChecking;
 import smallerbasic.symbolTable.SymbolTable;
 import smallerbasic.symbolTable.VarNameGenerator;
@@ -65,7 +65,7 @@ public class ASTChecksTest {
     public void doubleLabelTest() {
         ASTNode tree = clean(parse(lex("Sub test\nlabel:\nlabel:\nEndSub\n")));
 
-        ASTDoubleLabelChecking checkDoubles = new ASTDoubleLabelChecking();
+        DoubleLabelCheck checkDoubles = new DoubleLabelCheck();
 
         assertThat(checkDoubles.check(tree)).isFalse();
     }
@@ -74,7 +74,7 @@ public class ASTChecksTest {
     public void doubleLabelDifferentScopeTest() {
         ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nlabel:\n")));
 
-        ASTDoubleLabelChecking checkDoubles = new ASTDoubleLabelChecking();
+        DoubleLabelCheck checkDoubles = new DoubleLabelCheck();
 
         assertThat(checkDoubles.check(tree)).isTrue();
     }

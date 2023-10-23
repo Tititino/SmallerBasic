@@ -9,28 +9,28 @@ import java.util.*;
 public class SymbolTable {
 
     private final @NotNull VarNameGenerator gen;
-    private final @NotNull List<@NotNull ScopedName> symbols;
-    private final @NotNull Map<ScopedName, String> bindings = new HashMap<>();
+    private final @NotNull List<@NotNull ScopedName<HasSymbol>> symbols;
+    private final @NotNull Map<ScopedName<HasSymbol>, String> bindings = new HashMap<>();
 
     public @NotNull String getBinding(@NotNull HasSymbol n) {
-        return bindings.get(new ScopedName(n, Scope.TOPLEVEL));
+        return bindings.get(new ScopedName<>(n, Scope.TOPLEVEL));
     }
     public @NotNull String getBinding(@NotNull HasSymbol id, @NotNull Scope scope) {
-        return bindings.get(new ScopedName(id, scope));
+        return bindings.get(new ScopedName<>(id, scope));
     }
 
-    private void newBinding(@NotNull ScopedName id) {
+    private void newBinding(@NotNull ScopedName<HasSymbol> id) {
         bindings.put(id, gen.newName());
     }
 
     public SymbolTable(@NotNull ASTNode node, @NotNull VarNameGenerator gen) {
         this.gen = gen;
         this.symbols = node.accept(new GetSymbols()).stream().toList();
-        for (ScopedName id : symbols)
+        for (ScopedName<HasSymbol> id : symbols)
             newBinding(id);
     }
 
-    public @NotNull List<ScopedName> getSymbols() {
+    public @NotNull List<ScopedName<HasSymbol>> getSymbols() {
         return symbols;
     }
     public <T extends HasSymbol> @NotNull List<? extends T> getSymbols(Class<? extends T> c) {
@@ -42,30 +42,30 @@ public class SymbolTable {
                 .toList();
     }
 
-    private static class GetSymbols implements ASTMonoidVisitor<Set<ScopedName>> {
+    private static class GetSymbols implements ASTMonoidVisitor<Set<ScopedName<HasSymbol>>> {
 
         private @NotNull Scope currentScope = Scope.TOPLEVEL;
         @Override
-        public Set<ScopedName> empty() {
+        public Set<ScopedName<HasSymbol>> empty() {
             return Collections.emptySet();
         }
 
         @Override
-        public Set<ScopedName> compose(Set<ScopedName> o1, Set<ScopedName> o2) {
-            Set<ScopedName> newSet = new HashSet<>(o1);
+        public Set<ScopedName<HasSymbol>> compose(Set<ScopedName<HasSymbol>> o1, Set<ScopedName<HasSymbol>> o2) {
+            Set<ScopedName<HasSymbol>> newSet = new HashSet<>(o1);
             newSet.addAll(o2);
             return newSet;
         }
 
         @Override
-        public Set<ScopedName> visit(RoutineNameASTNode n) {
-            return Set.of(new ScopedName(n, Scope.TOPLEVEL));
+        public Set<ScopedName<HasSymbol>> visit(RoutineNameASTNode n) {
+            return Set.of(new ScopedName<>(n, Scope.TOPLEVEL));
         }
 
         @Override
-        public Set<ScopedName> visit(RoutineDeclASTNode n) {
+        public Set<ScopedName<HasSymbol>> visit(RoutineDeclASTNode n) {
             currentScope = new Scope(n.getName().getText());
-            Set<ScopedName> body = n.getBody()
+            Set<ScopedName<HasSymbol>> body = n.getBody()
                     .stream()
                     .map(x -> x.accept(this))
                     .reduce(empty(), this::compose);
@@ -74,34 +74,34 @@ public class SymbolTable {
         }
 
         @Override
-        public Set<ScopedName> visit(RoutineCallASTNode n) {
+        public Set<ScopedName<HasSymbol>> visit(RoutineCallASTNode n) {
             return empty();
         }
 
         @Override
-        public Set<ScopedName> visit(GotoStmtASTNode n) {
+        public Set<ScopedName<HasSymbol>> visit(GotoStmtASTNode n) {
             return empty();
         }
 
         @Override
-        public Set<ScopedName> visit(LabelNameASTNode n) {
-            return Set.of(new ScopedName(n, currentScope));
+        public Set<ScopedName<HasSymbol>> visit(LabelNameASTNode n) {
+            return Set.of(new ScopedName<>(n, currentScope));
         }
         @Override
-        public Set<ScopedName> visit(NumberLiteralASTNode n) {
-            return Set.of(new ScopedName(n, Scope.TOPLEVEL));
+        public Set<ScopedName<HasSymbol>> visit(NumberLiteralASTNode n) {
+            return Set.of(new ScopedName<>(n, Scope.TOPLEVEL));
         }
         @Override
-        public Set<ScopedName> visit(StringLiteralASTNode n) {
-            return Set.of(new ScopedName(n, Scope.TOPLEVEL));
+        public Set<ScopedName<HasSymbol>> visit(StringLiteralASTNode n) {
+            return Set.of(new ScopedName<>(n, Scope.TOPLEVEL));
         }
         @Override
-        public Set<ScopedName> visit(BoolLiteralASTNode n) {
-            return Set.of(new ScopedName(n, Scope.TOPLEVEL));
+        public Set<ScopedName<HasSymbol>> visit(BoolLiteralASTNode n) {
+            return Set.of(new ScopedName<>(n, Scope.TOPLEVEL));
         }
         @Override
-        public Set<ScopedName> visit(IdentifierASTNode n) {
-            return Set.of(new ScopedName(n, Scope.TOPLEVEL));
+        public Set<ScopedName<HasSymbol>> visit(IdentifierASTNode n) {
+            return Set.of(new ScopedName<>(n, Scope.TOPLEVEL));
         }
     }
 }
