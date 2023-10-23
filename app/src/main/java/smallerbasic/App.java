@@ -2,7 +2,7 @@ package smallerbasic;
 
 import smallerbasic.AST.nodes.ASTNode;
 import smallerbasic.AST.staticChecks.DoubleLabelCheck;
-import smallerbasic.AST.staticChecks.ASTLabelScopeChecking;
+import smallerbasic.AST.staticChecks.LabelScopeCheck;
 import smallerbasic.AST.staticChecks.Check;
 import smallerbasic.symbolTable.SymbolTable;
 import smallerbasic.symbolTable.VarNameGenerator;
@@ -24,7 +24,7 @@ public class App {
 
         try {
             List<Check> staticChecks = List.of(
-                    new ASTLabelScopeChecking(),
+                    new LabelScopeCheck(),
                     new DoubleLabelCheck()
             );
             Optional<ASTNode> ast = check(clean(parse(lex(Paths.get(args[0])))), staticChecks);
