@@ -4,6 +4,8 @@ import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTVisitor;
 import smallerbasic.AST.nodes.*;
 
+import java.util.List;
+
 public class ProgramPrinter {
 
     private final @NotNull SymbolTable symbols;
@@ -30,8 +32,6 @@ public class ProgramPrinter {
         private final static @NotNull String NUMBER_SETTER = "@_SET_NUM_VALUE";
         private final static @NotNull String BOOL_SETTER = "@_SET_BOOL_VALUE";
         private final static @NotNull String STRING_SETTER = "@_SET_STR_VALUE";
-        private final static @NotNull String OUTPUT_FUNC = "@OUTPUT";
-        private final static @NotNull String INPUT_FUNC = "@INPUT";
         private final static @NotNull String COPY_FUNC = "@_COPY";
 
         private void addLine(@NotNull String s) {
@@ -42,7 +42,7 @@ public class ProgramPrinter {
         public String visit(AssStmtASTNode n) {
             String name = n.getVarName().accept(this);
             String rightSide = n.getValue().accept(this);
-            addLine("call void @" + COPY_FUNC + "(%struct.Boxed* " + name + ", %struct.Boxed* " + rightSide + ")");
+            addLine("call void " + COPY_FUNC + "(%struct.Boxed* " + name + ", %struct.Boxed* " + rightSide + ")");
             return null;
         }
 
@@ -67,9 +67,16 @@ public class ProgramPrinter {
 
         @Override
         public String visit(ExternalFunctionCallASTNode n) {
-            String firstArg = n.getArgs().get(0).accept(this);
-            addLine("call void " + OUTPUT_FUNC + "(%struct.Boxed* " + firstArg + ")");
-            return null;
+            List<String> names = n.getArgs().stream().map(x -> x.accept(this)).toList();
+            String newName = "%" + gen.newName();
+            addLine(newName + " = alloca %struct.Boxed*");
+
+            llvmProgram.append("call void @" + n.getModule() + "." + n.getFunction() + "(");
+            llvmProgram.append("%struct.Boxed* ").append(newName);
+            for (String name : names)
+                llvmProgram.append(", %struct.Boxed* ").append(name);
+            llvmProgram.append(")\n");
+            return newName;
         }
 
         @Override
@@ -83,8 +90,7 @@ public class ProgramPrinter {
             String bool = "%" + gen.newName();
             addLine(bool + " = call i1 " + BOOL_GETTER + "(%struct.Boxed* " + cond + ")");
             addLine("br i1 " + bool + ", label %" + label + ".continue, label %" + label + ".end");
-            addLine(label + ".continue:" +
-                    "");
+            addLine(label + ".continue:");
             n.getBody().forEach(x -> x.accept(this));
 
             (new AssStmtASTNode(

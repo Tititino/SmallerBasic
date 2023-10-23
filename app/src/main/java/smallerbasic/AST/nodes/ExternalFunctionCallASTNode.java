@@ -23,6 +23,14 @@ public class ExternalFunctionCallASTNode extends AbstractASTNode implements Expr
         this.args = args;
     }
 
+    public @NotNull String getModule() {
+        return module;
+    }
+
+    public @NotNull String getFunction() {
+        return function;
+    }
+
     public @NotNull List<ExpressionASTNode> getArgs() {
         return Collections.unmodifiableList(args);
     }
