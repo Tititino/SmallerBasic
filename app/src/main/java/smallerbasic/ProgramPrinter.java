@@ -1,5 +1,6 @@
 package smallerbasic;
 
+import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTVisitor;
 import smallerbasic.AST.nodes.*;
@@ -40,11 +41,19 @@ public class ProgramPrinter {
         private void addLine(@NotNull String s) {
             llvmProgram.append(s).append("\n");
         }
+        private void updateLineNumber(@NotNull ASTNode node) {
+            addLine("store i32 " + node
+                    .getStartToken()
+                    .map(Token::getLine)
+                    .orElse(-1) + ", ptr @line.number");
+        }
 
         @Override
         public String visit(AssStmtASTNode n) {
             String name = n.getVarName().accept(this);
             String rightSide = n.getValue().accept(this);
+
+            updateLineNumber(n);
             addLine("call void " + COPY_FUNC + "(%struct.Boxed* " + name + ", %struct.Boxed* " + rightSide + ")");
             return null;
         }
@@ -54,6 +63,7 @@ public class ProgramPrinter {
             String left = n.getLeft().accept(this);
             String right = n.getRight().accept(this);
 
+            updateLineNumber(n);
             String res = "%" + gen.newName();
             addLine(res + " = alloca %struct.Boxed");
             addLine("call void @" + n.getOp()
@@ -72,6 +82,7 @@ public class ProgramPrinter {
         public String visit(ExternalFunctionCallASTNode n) {
             List<String> names = n.getArgs().stream().map(x -> x.accept(this)).toList();
             String newName = "%" + gen.newName();
+            updateLineNumber(n);
             addLine(newName + " = alloca %struct.Boxed*");
 
             llvmProgram.append("call void @").append(n.getModule()).append(".").append(n.getFunction()).append("(");
@@ -86,6 +97,8 @@ public class ProgramPrinter {
         public String visit(ForLoopASTNode n) {
             String label = gen.newName();
             (new AssStmtASTNode(n.getVarName(), n.getStart())).accept(this);
+
+            updateLineNumber(n);
             addLine("br label %" + label + ".begin");
             addLine(label + ".begin:");
 
@@ -113,18 +126,21 @@ public class ProgramPrinter {
 
         @Override
         public String visit(GotoStmtASTNode n) {
+            updateLineNumber(n);
             addLine("br label %" + symbols.getBinding(n.getLabel(), currentScope));
             return null;
         }
 
         @Override
         public String visit(IdentifierASTNode n) {
+            updateLineNumber(n);
             return "@" + symbols.getBinding(n);
         }
 
         @Override
         public String visit(IfThenASTNode n) {
             String cond = n.getCondition().accept(this);
+            updateLineNumber(n);
             String bool = "%" + gen.newName();
             String label = gen.newName();
             addLine(bool + " = call i1 " + BOOL_GETTER + "(%struct.Boxed* " + cond + ")");
@@ -141,17 +157,20 @@ public class ProgramPrinter {
 
         @Override
         public String visit(LabelDeclASTNode n) {
+            updateLineNumber(n);
             addLine(symbols.getBinding(n.getName(), currentScope) + ":\n");
             return null;
         }
 
         @Override
         public String visit(NumberLiteralASTNode n) {
+            updateLineNumber(n);
             return "@" + symbols.getBinding(n);
         }
 
         @Override
         public String visit(ProgramASTNode n) {
+            addLine("@line.number = global i32 -1");
             llvmProgram.append("; variables\n");
             for (IdentifierASTNode id : symbols.getSymbols(IdentifierASTNode.class))
                 addLine("@" + symbols.getBinding(id) + " = global %struct.Boxed { i2 0, i64 0 }");
@@ -177,6 +196,7 @@ public class ProgramPrinter {
             addLine("define i32 @main() {");
             for (LiteralASTNode lit : symbols.getSymbols(LiteralASTNode.class))
                 prealloc(lit);
+            updateLineNumber(n);
 
             n.getContents()
                     .stream()
@@ -221,6 +241,7 @@ public class ProgramPrinter {
 
         @Override
         public String visit(RoutineCallASTNode n) {
+            updateLineNumber(n);
             addLine("call void @" + n.getFunction() + "()");
             return null;
         }
@@ -228,6 +249,7 @@ public class ProgramPrinter {
         @Override
         public String visit(RoutineDeclASTNode n) {
             currentScope = new Scope(n.getName().getText());
+            updateLineNumber(n);
             addLine("define void @" + n.getName() + "() {");
             n.getBody().forEach(x -> x.accept(this));
             addLine("ret void\n}");
@@ -237,11 +259,13 @@ public class ProgramPrinter {
 
         @Override
         public String visit(StringLiteralASTNode n) {
+            updateLineNumber(n);
             return "@" + symbols.getBinding(n);
         }
 
         @Override
         public String visit(WhileLoopASTNode n) {
+            updateLineNumber(n);
             String label = gen.newName();
             String bool = "%" + gen.newName();
             addLine("br label %" + label + ".begin");  // strange llvm magic
