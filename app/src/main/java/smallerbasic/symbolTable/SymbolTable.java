@@ -29,6 +29,7 @@ public class SymbolTable {
         for (ScopedName id : symbols)
             newBinding(id);
     }
+
     public @NotNull List<ScopedName> getSymbols() {
         return symbols;
     }
@@ -56,25 +57,36 @@ public class SymbolTable {
             return newSet;
         }
 
-        /*
+        @Override
+        public Set<ScopedName> visit(RoutineNameASTNode n) {
+            return Set.of(new ScopedName(n, Scope.TOPLEVEL));
+        }
+
         @Override
         public Set<ScopedName> visit(RoutineDeclASTNode n) {
-            ScopedName functionName = new ScopedName(n, Scope.TOPLEVEL);
-            currentScope = new Scope(n.getName());
+            currentScope = new Scope(n.getName().getText());
             Set<ScopedName> body = n.getBody()
                     .stream()
                     .map(x -> x.accept(this))
-                    .reduce(Set.of(functionName), this::compose);
+                    .reduce(empty(), this::compose);
             currentScope = Scope.TOPLEVEL;
             return body;
         }
-        */
-        /*
+
         @Override
-        public Set<ScopedName> visit(LabelDeclASTNode n) {
+        public Set<ScopedName> visit(RoutineCallASTNode n) {
+            return empty();
+        }
+
+        @Override
+        public Set<ScopedName> visit(GotoStmtASTNode n) {
+            return empty();
+        }
+
+        @Override
+        public Set<ScopedName> visit(LabelNameASTNode n) {
             return Set.of(new ScopedName(n, currentScope));
         }
-         */
         @Override
         public Set<ScopedName> visit(NumberLiteralASTNode n) {
             return Set.of(new ScopedName(n, Scope.TOPLEVEL));

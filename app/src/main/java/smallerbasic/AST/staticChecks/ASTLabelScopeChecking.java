@@ -29,12 +29,12 @@ public class ASTLabelScopeChecking implements Check {
 
         @Override
         public DefAndRefLabels visit(GotoStmtASTNode n) {
-            return new DefAndRefLabels(Collections.emptySet(), Set.of(n.getLabel()));
+            return new DefAndRefLabels(Collections.emptySet(), Set.of(n.getLabel().getText()));
         }
 
         @Override
         public DefAndRefLabels visit(LabelDeclASTNode n) {
-            return new DefAndRefLabels(Set.of(n.getName()), Collections.emptySet());
+            return new DefAndRefLabels(Set.of(n.getName().getText()), Collections.emptySet());
         }
 
         @Override

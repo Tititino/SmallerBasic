@@ -281,7 +281,7 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
     @Override
     public @NotNull ASTNode visitSubroutineDecl(SBGrammarParser.@NotNull SubroutineDeclContext ctx) {
         RoutineNameASTNode name = setToken(
-                new RoutineNameASTNode(ctx.getText()),
+                new RoutineNameASTNode(ctx.name.getText()),
                 ctx.name
         );
         return setTokens(new RoutineDeclASTNode(name, childrenToAST(ctx.body)), ctx);

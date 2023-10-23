@@ -2,10 +2,7 @@ package smallerbasic.AST.staticChecks;
 
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTMonoidVisitor;
-import smallerbasic.AST.nodes.ASTNode;
-import smallerbasic.AST.nodes.LabelDeclASTNode;
-import smallerbasic.AST.nodes.ProgramASTNode;
-import smallerbasic.AST.nodes.RoutineDeclASTNode;
+import smallerbasic.AST.nodes.*;
 
 import java.util.*;
 
@@ -55,8 +52,8 @@ public class ASTDoubleLabelChecking implements Check {
         }
 
         @Override
-        public Map<String, Integer> visit(LabelDeclASTNode n) {
-            return Map.of(n.getName(), 1);
+        public Map<String, Integer> visit(LabelNameASTNode n) {
+            return Map.of(n.getText(), 1);
         }
     }
 }
