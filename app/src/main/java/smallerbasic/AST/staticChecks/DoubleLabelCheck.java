@@ -59,5 +59,10 @@ public class DoubleLabelCheck implements Check {
         public Map<ScopedName<LabelNameASTNode>, Integer> visit(LabelNameASTNode n) {
             return Map.of(new ScopedName<>(n, currentScope), 1);
         }
+
+        @Override
+        public Map<ScopedName<LabelNameASTNode>, Integer> visit(GotoStmtASTNode n) {
+            return empty();
+        }
     }
 }

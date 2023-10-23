@@ -32,9 +32,11 @@ public class CompilationUtils {
     }
 
     public static @NotNull Optional<ASTNode> check(@NotNull ASTNode tree, @NotNull List<Check> checks) {
-        boolean allPass = checks
+        // directly using allMatch stops the checks at the first failed one
+        List<Boolean> allPass = checks
                 .stream()
-                .allMatch(x -> x.check(tree));
-        return allPass ? Optional.of(tree) : Optional.empty();
+                .map(x -> x.check(tree))
+                .toList();
+        return allPass.stream().allMatch(x -> x) ? Optional.of(tree) : Optional.empty();
     }
 }
