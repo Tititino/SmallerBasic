@@ -31,42 +31,48 @@ public class ProgramPrinter {
 
     private class ProgramPrinterVisitor implements ASTVisitor<String> {
 
+        private int lastLine = -1;
         private @NotNull Scope currentScope = Scope.TOPLEVEL;
         private final static @NotNull String BOOL_GETTER = "@_GET_BOOL_VALUE";
         private final static @NotNull String NUMBER_SETTER = "@_SET_NUM_VALUE";
         private final static @NotNull String BOOL_SETTER = "@_SET_BOOL_VALUE";
         private final static @NotNull String STRING_SETTER = "@_SET_STR_VALUE";
+        private final static @NotNull String OVERLOADED_PLUS = "@_OVERLOADED_PLUS";
         private final static @NotNull String COPY_FUNC = "@_COPY";
+        private final static @NotNull String NULL_VALUE  = "%struct.Boxed { i2 0, i64 0 }";
 
         private void addLine(@NotNull String s) {
             llvmProgram.append(s).append("\n");
         }
         private void updateLineNumber(@NotNull ASTNode node) {
-            addLine("store i32 " + node
-                    .getStartToken()
-                    .map(Token::getLine)
-                    .orElse(-1) + ", ptr @line.number");
+            int line = node.getStartToken().map(Token::getLine).orElse(-1);
+            if (line != lastLine) {
+                lastLine = line;
+                addLine("store i32 " + line + ", ptr @line.number");
+            }
         }
 
         @Override
         public String visit(AssStmtASTNode n) {
+            updateLineNumber(n);
             String name = n.getVarName().accept(this);
             String rightSide = n.getValue().accept(this);
-
-            updateLineNumber(n);
             addLine("call void " + COPY_FUNC + "(%struct.Boxed* " + name + ", %struct.Boxed* " + rightSide + ")");
             return null;
         }
 
         @Override
         public String visit(BinOpASTNode n) {
+            updateLineNumber(n);
             String left = n.getLeft().accept(this);
             String right = n.getRight().accept(this);
 
-            updateLineNumber(n);
             String res = "%" + gen.newName();
+            String op  = (n.getOp() == BinOpASTNode.BinOp.PLUS || n.getOp() == BinOpASTNode.BinOp.CONCAT)
+                            ? OVERLOADED_PLUS
+                            : "@" + n.getOp();
             addLine(res + " = alloca %struct.Boxed");
-            addLine("call void @" + n.getOp()
+            addLine("call void " + op
                     + "(%struct.Boxed* " + res
                     + ", %struct.Boxed* " + left
                     + ", %struct.Boxed* " + right + ")");
@@ -80,9 +86,9 @@ public class ProgramPrinter {
 
         @Override
         public String visit(ExternalFunctionCallASTNode n) {
+            updateLineNumber(n);
             List<String> names = n.getArgs().stream().map(x -> x.accept(this)).toList();
             String newName = "%" + gen.newName();
-            updateLineNumber(n);
             addLine(newName + " = alloca %struct.Boxed*");
 
             llvmProgram.append("call void @").append(n.getModule()).append(".").append(n.getFunction()).append("(");
@@ -95,28 +101,41 @@ public class ProgramPrinter {
 
         @Override
         public String visit(ForLoopASTNode n) {
-            String label = gen.newName();
-            (new AssStmtASTNode(n.getVarName(), n.getStart())).accept(this);
-
             updateLineNumber(n);
+            String label = gen.newName();
+
+            // VAR = START
+            String var = visit(n.getVarName());
+            String start = n.getStart().accept(this);
+            addLine("call void " + COPY_FUNC + "(%struct.Boxed* " + var + ", %struct.Boxed* " + start + ")");
+
             addLine("br label %" + label + ".begin");
             addLine(label + ".begin:");
 
-            String cond = (new BinOpASTNode(BinOpASTNode.BinOp.LT, n.getVarName(), n.getEnd())).accept(this);
+            // VAR < END
+            String end = n.getEnd().accept(this);
+            String cond = "%" + gen.newName();
+            addLine(cond + " = alloca %struct.Boxed");
+            addLine("call void @" + BinOpASTNode.BinOp.LT
+                    + "(%struct.Boxed* " + cond
+                    + ", %struct.Boxed* " + var
+                    + ", %struct.Boxed* " + end + ")");
             String bool = "%" + gen.newName();
             addLine(bool + " = call i1 " + BOOL_GETTER + "(%struct.Boxed* " + cond + ")");
             addLine("br i1 " + bool + ", label %" + label + ".continue, label %" + label + ".end");
             addLine(label + ".continue:");
             n.getBody().forEach(x -> x.accept(this));
 
-            (new AssStmtASTNode(
-                    n.getVarName(),
-                    new BinOpASTNode(
-                            BinOpASTNode.BinOp.PLUS,
-                            n.getVarName(),
-                            n.getStep()
-                    )
-            )).accept(this);
+            // VAR += STEP
+            String step = n.getEnd().accept(this);
+            String rightSide = "%" + gen.newName();
+            addLine(cond + " = alloca %struct.Boxed");
+            addLine("call void @" + BinOpASTNode.BinOp.PLUS
+                    + "(%struct.Boxed* " + rightSide
+                    + ", %struct.Boxed* " + var
+                    + ", %struct.Boxed* " + step + ")");
+
+            addLine("call void " + COPY_FUNC + "(%struct.Boxed* " + var + ", %struct.Boxed* " + rightSide + ")");
 
             addLine("br label %" + label + ".begin");
             addLine(label + ".end:");
@@ -127,7 +146,8 @@ public class ProgramPrinter {
         @Override
         public String visit(GotoStmtASTNode n) {
             updateLineNumber(n);
-            addLine("br label %" + symbols.getBinding(n.getLabel(), currentScope));
+            String label = visit(n.getLabel());
+            addLine("br label %" + label);
             return null;
         }
 
@@ -139,8 +159,8 @@ public class ProgramPrinter {
 
         @Override
         public String visit(IfThenASTNode n) {
-            String cond = n.getCondition().accept(this);
             updateLineNumber(n);
+            String cond = n.getCondition().accept(this);
             String bool = "%" + gen.newName();
             String label = gen.newName();
             addLine(bool + " = call i1 " + BOOL_GETTER + "(%struct.Boxed* " + cond + ")");
@@ -158,7 +178,8 @@ public class ProgramPrinter {
         @Override
         public String visit(LabelDeclASTNode n) {
             updateLineNumber(n);
-            addLine(symbols.getBinding(n.getName(), currentScope) + ":\n");
+            String label = visit(n.getName());
+            addLine(label + ":");
             return null;
         }
 
@@ -177,7 +198,7 @@ public class ProgramPrinter {
 
             llvmProgram.append("; boxed constants\n");
             for (LiteralASTNode lit : symbols.getSymbols(LiteralASTNode.class))
-                addLine("@" + symbols.getBinding(lit) + " = global %struct.Boxed { i2 0, i64 0 }");
+                addLine("@" + symbols.getBinding(lit) + " = global " + NULL_VALUE);
 
             llvmProgram.append("; string constants\n");
             for (StringLiteralASTNode lit : symbols.getSymbols(StringLiteralASTNode.class)) {
@@ -210,12 +231,14 @@ public class ProgramPrinter {
 
         @Override
         public String visit(LabelNameASTNode n) {
-            return null;
+            updateLineNumber(n);
+            return symbols.getBinding(n, currentScope);
         }
 
         @Override
         public String visit(RoutineNameASTNode n) {
-            return null;
+            updateLineNumber(n);
+            return symbols.getBinding(n);
         }
 
         private void prealloc(LiteralASTNode n) {
@@ -242,15 +265,17 @@ public class ProgramPrinter {
         @Override
         public String visit(RoutineCallASTNode n) {
             updateLineNumber(n);
-            addLine("call void @" + n.getFunction() + "()");
+            String name = visit(n.getFunction());
+            addLine("call void @" + name + "()");
             return null;
         }
 
         @Override
         public String visit(RoutineDeclASTNode n) {
-            currentScope = new Scope(n.getName().getText());
             updateLineNumber(n);
-            addLine("define void @" + n.getName() + "() {");
+            String name = visit(n.getName());
+            currentScope = new Scope(n.getName().getText());
+            addLine("define void @" + name + "() {");
             n.getBody().forEach(x -> x.accept(this));
             addLine("ret void\n}");
             currentScope = Scope.TOPLEVEL;

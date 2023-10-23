@@ -70,7 +70,7 @@ public class SymbolTable {
                     .map(x -> x.accept(this))
                     .reduce(empty(), this::compose);
             currentScope = Scope.TOPLEVEL;
-            return body;
+            return compose(Set.of(new ScopedName<>(n.getName(), Scope.TOPLEVEL)), body);
         }
 
         @Override
