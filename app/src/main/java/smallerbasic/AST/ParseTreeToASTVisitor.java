@@ -64,7 +64,8 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
 
     @Override
     public @NotNull ASTNode visitLabel(SBGrammarParser.@NotNull LabelContext ctx) {
-        return setTokens(new LabelDeclASTNode(ctx.Ident().getText()), ctx);
+        LabelNameASTNode label = setToken(new LabelNameASTNode(ctx.Ident().getText()), ctx.Ident().getSymbol());
+        return setTokens(new LabelDeclASTNode(label), ctx);
     }
 
     @Override
@@ -108,7 +109,8 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
 
     @Override
     public @NotNull ASTNode visitGotoStmt(SBGrammarParser.@NotNull GotoStmtContext ctx) {
-        return setTokens(new GotoStmtASTNode(ctx.Ident().getText()), ctx);
+        LabelNameASTNode label = setToken(new LabelNameASTNode(ctx.Ident().getText()), ctx.Ident().getSymbol());
+        return setTokens(new GotoStmtASTNode(label), ctx);
     }
 
     @Override
@@ -249,8 +251,12 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
 
     @Override
     public @NotNull ASTNode visitCallRoutine(SBGrammarParser.@NotNull CallRoutineContext ctx) {
-        String funcName = ctx.FunctionCall().getText();
-        return setTokens(new RoutineCallASTNode(funcName.replaceAll("\\([\\t ]*\\)", "")), ctx);
+        RoutineNameASTNode name = setToken(
+                new RoutineNameASTNode(
+                        ctx.getText().replaceAll("\\([\\t ]*\\)", "")
+                ), ctx.FunctionCall().getSymbol()
+        );
+        return setTokens(new RoutineCallASTNode(name), ctx);
     }
 
     @Override
@@ -274,7 +280,11 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
 
     @Override
     public @NotNull ASTNode visitSubroutineDecl(SBGrammarParser.@NotNull SubroutineDeclContext ctx) {
-        return setTokens(new RoutineDeclASTNode(ctx.name.getText(), childrenToAST(ctx.body)), ctx);
+        RoutineNameASTNode name = setToken(
+                new RoutineNameASTNode(ctx.name.getText()),
+                ctx.name
+        );
+        return setTokens(new RoutineDeclASTNode(name, childrenToAST(ctx.body)), ctx);
     }
 
     @Override

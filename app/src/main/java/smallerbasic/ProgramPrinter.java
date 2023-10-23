@@ -3,6 +3,9 @@ package smallerbasic;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTVisitor;
 import smallerbasic.AST.nodes.*;
+import smallerbasic.symbolTable.Scope;
+import smallerbasic.symbolTable.SymbolTable;
+import smallerbasic.symbolTable.VarNameGenerator;
 
 import java.util.List;
 
@@ -71,7 +74,7 @@ public class ProgramPrinter {
             String newName = "%" + gen.newName();
             addLine(newName + " = alloca %struct.Boxed*");
 
-            llvmProgram.append("call void @" + n.getModule() + "." + n.getFunction() + "(");
+            llvmProgram.append("call void @").append(n.getModule()).append(".").append(n.getFunction()).append("(");
             llvmProgram.append("%struct.Boxed* ").append(newName);
             for (String name : names)
                 llvmProgram.append(", %struct.Boxed* ").append(name);
@@ -110,7 +113,7 @@ public class ProgramPrinter {
 
         @Override
         public String visit(GotoStmtASTNode n) {
-            addLine("br label %" + symbols.getBinding(new LabelDeclASTNode(n.getLabel()), currentScope));
+            addLine("br label %" + symbols.getBinding(n.getLabel(), currentScope));
             return null;
         }
 
@@ -138,7 +141,7 @@ public class ProgramPrinter {
 
         @Override
         public String visit(LabelDeclASTNode n) {
-            addLine(symbols.getBinding(n, currentScope) + ":\n");
+            addLine(symbols.getBinding(n.getName(), currentScope) + ":\n");
             return null;
         }
 
@@ -185,6 +188,16 @@ public class ProgramPrinter {
             return null;
         }
 
+        @Override
+        public String visit(LabelNameASTNode n) {
+            return null;
+        }
+
+        @Override
+        public String visit(RoutineNameASTNode n) {
+            return null;
+        }
+
         private void prealloc(LiteralASTNode n) {
             if (n instanceof StringLiteralASTNode s) {
                 String text = s.getValue();
@@ -214,7 +227,7 @@ public class ProgramPrinter {
 
         @Override
         public String visit(RoutineDeclASTNode n) {
-            currentScope = new Scope(n.getName());
+            currentScope = new Scope(n.getName().getText());
             addLine("define void @" + n.getName() + "() {");
             n.getBody().forEach(x -> x.accept(this));
             addLine("ret void\n}");

@@ -1,4 +1,4 @@
-package smallerbasic;
+package smallerbasic.symbolTable;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,5 +28,10 @@ public class Scope {
     @Override
     public int hashCode() {
         return Objects.hash(name);
+    }
+
+    @Override
+    public String toString() {
+        return (Objects.isNull(name) ? "TOPLEVEL" : name);
     }
 }

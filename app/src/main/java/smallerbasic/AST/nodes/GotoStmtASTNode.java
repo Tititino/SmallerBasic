@@ -6,9 +6,9 @@ import smallerbasic.AST.ASTVisitor;
 import java.util.Objects;
 
 public class GotoStmtASTNode extends AbstractASTNode implements StatementASTNode {
-    private final @NotNull String label;
+    private final @NotNull LabelNameASTNode label;
 
-    public GotoStmtASTNode(@NotNull String label) {
+    public GotoStmtASTNode(@NotNull LabelNameASTNode label) {
         this.label = label;
     }
 
@@ -20,7 +20,7 @@ public class GotoStmtASTNode extends AbstractASTNode implements StatementASTNode
         return label.equals(that.label);
     }
 
-    public @NotNull String getLabel() {
+    public @NotNull LabelNameASTNode getLabel() {
         return label;
     }
 

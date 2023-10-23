@@ -8,15 +8,15 @@ import java.util.List;
 import java.util.Objects;
 
 public class RoutineDeclASTNode extends AbstractASTNode implements DeclOrStmtASTNode {
-    private final @NotNull String name;
+    private final @NotNull RoutineNameASTNode name;
     private final @NotNull List<@NotNull StatementASTNode> body;
 
-    public RoutineDeclASTNode(@NotNull String name, @NotNull List<@NotNull StatementASTNode> body) {
+    public RoutineDeclASTNode(@NotNull RoutineNameASTNode name, @NotNull List<@NotNull StatementASTNode> body) {
         this.name = name;
         this.body = body;
     }
 
-    public @NotNull String getName() {
+    public @NotNull RoutineNameASTNode getName() {
         return name;
     }
 

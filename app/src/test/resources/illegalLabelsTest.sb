@@ -1,0 +1,11 @@
+Sub test
+    Goto test1
+    A = 1
+    Goto test
+    test:
+EndSub
+Goto test2
+test:
+test:
+
+A = 0

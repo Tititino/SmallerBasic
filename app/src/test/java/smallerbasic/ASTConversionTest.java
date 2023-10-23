@@ -75,7 +75,7 @@ public class ASTConversionTest {
         SBGrammarParser.SubroutineDeclContext tree = parser.subroutineDecl();
 
         ASTNode expected = new RoutineDeclASTNode(
-                "test",
+                new RoutineNameASTNode("test"),
                 List.of(
                         new AssStmtASTNode(
                                 new IdentifierASTNode("X"),
@@ -145,12 +145,12 @@ public class ASTConversionTest {
         ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nGoto label\n")));
         ASTNode expected = new ProgramASTNode(List.of(
                 new RoutineDeclASTNode(
-                        "test",
+                        new RoutineNameASTNode("test"),
                         List.of(
-                                new LabelDeclASTNode("label")
+                                new LabelDeclASTNode(new LabelNameASTNode("label"))
                         )
                 ),
-                new GotoStmtASTNode("label")
+                new GotoStmtASTNode(new LabelNameASTNode("label"))
         ));
 
         assertThat(tree).isEqualTo(expected);

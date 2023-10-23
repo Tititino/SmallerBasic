@@ -1,3 +1,5 @@
 package smallerbasic.AST.nodes;
 
-public interface LiteralASTNode extends ExpressionASTNode { }
+import smallerbasic.symbolTable.HasSymbol;
+
+public interface LiteralASTNode extends ExpressionASTNode, HasSymbol { }
