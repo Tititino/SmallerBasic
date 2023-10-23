@@ -1,4 +1,4 @@
-package smallerbasic;
+package smallerbasic.symbolTable;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

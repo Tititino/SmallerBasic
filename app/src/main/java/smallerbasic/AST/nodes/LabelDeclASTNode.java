@@ -6,13 +6,13 @@ import smallerbasic.AST.ASTVisitor;
 import java.util.Objects;
 
 public class LabelDeclASTNode extends AbstractASTNode implements StatementASTNode {
-    private final @NotNull String name;
+    private final @NotNull LabelNameASTNode name;
 
-    public LabelDeclASTNode(@NotNull String name) {
+    public LabelDeclASTNode(@NotNull LabelNameASTNode name) {
         this.name = name;
     }
 
-    public @NotNull String getName() {
+    public @NotNull LabelNameASTNode getName() {
         return name;
     }
 

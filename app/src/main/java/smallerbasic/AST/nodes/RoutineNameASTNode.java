@@ -6,11 +6,16 @@ import smallerbasic.symbolTable.HasSymbol;
 
 import java.util.Objects;
 
-public class IdentifierASTNode extends AbstractASTNode implements ExpressionASTNode, HasSymbol {
-    private final @NotNull String name;
+public class RoutineNameASTNode extends AbstractASTNode implements ASTNode, HasSymbol {
 
-    public IdentifierASTNode(@NotNull String name) {
-        this.name = name;
+    private final @NotNull String text;
+
+    public RoutineNameASTNode(@NotNull String text) {
+        this.text = text;
+    }
+
+    public @NotNull String getText() {
+        return text;
     }
 
     @Override
@@ -22,19 +27,19 @@ public class IdentifierASTNode extends AbstractASTNode implements ExpressionASTN
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        IdentifierASTNode that = (IdentifierASTNode) o;
-        return name.equals(that.name);
+        RoutineNameASTNode that = (RoutineNameASTNode) o;
+        return text.equals(that.text);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(text);
     }
 
     @Override
     public String toString() {
-        return "IdentifierASTNode{" +
-                "name='" + name + '\'' +
+        return "RoutineNameASTNode{" +
+                "text='" + text + '\'' +
                 '}';
     }
 }

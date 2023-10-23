@@ -56,7 +56,7 @@ public interface ASTMonoidVisitor<T> extends ASTVisitor<T> {
 
     @Override
     default T visit(GotoStmtASTNode n) {
-        return empty();
+        return visit(n.getLabel());
     }
 
     @Override
@@ -77,7 +77,7 @@ public interface ASTMonoidVisitor<T> extends ASTVisitor<T> {
 
     @Override
     default T visit(LabelDeclASTNode n) {
-        return empty();
+        return visit(n.getName());
     }
 
     @Override
@@ -92,12 +92,21 @@ public interface ASTMonoidVisitor<T> extends ASTVisitor<T> {
 
     @Override
     default T visit(RoutineCallASTNode n) {
-        return empty();
+        return visit(n.getFunction());
     }
 
     @Override
     default T visit(RoutineDeclASTNode n) {
-        return visitChildren(n.getBody());
+        return compose(visit(n.getName()), visitChildren(n.getBody()));
+    }
+
+    @Override
+    default T visit(RoutineNameASTNode n) {
+        return empty();
+    }
+    @Override
+    default T visit(LabelNameASTNode n) {
+        return empty();
     }
 
     @Override

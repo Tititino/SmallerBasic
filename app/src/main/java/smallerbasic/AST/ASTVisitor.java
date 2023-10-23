@@ -15,6 +15,8 @@ public interface ASTVisitor<T> {
     T visit(LabelDeclASTNode n);
     T visit(NumberLiteralASTNode n);
     T visit(ProgramASTNode n);
+    T visit(LabelNameASTNode n);
+    T visit(RoutineNameASTNode n);
     T visit(RoutineCallASTNode n);
     T visit(RoutineDeclASTNode n);
     T visit(StringLiteralASTNode n);

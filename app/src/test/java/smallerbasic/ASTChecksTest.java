@@ -4,9 +4,11 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import smallerbasic.AST.nodes.ASTNode;
-import smallerbasic.AST.nodes.LabelDeclASTNode;
+import smallerbasic.AST.nodes.LabelNameASTNode;
 import smallerbasic.AST.staticChecks.ASTDoubleLabelChecking;
 import smallerbasic.AST.staticChecks.ASTLabelScopeChecking;
+import smallerbasic.symbolTable.SymbolTable;
+import smallerbasic.symbolTable.VarNameGenerator;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -119,6 +121,6 @@ public class ASTChecksTest {
 
         SymbolTable symbols = new SymbolTable(tree, new VarNameGenerator());
 
-        assertThat(symbols.getSymbols(LabelDeclASTNode.class)).hasSize(2);
+        assertThat(symbols.getSymbols(LabelNameASTNode.class)).hasSize(2);
     }
 }

@@ -1,4 +1,4 @@
-package smallerbasic;
+package smallerbasic.symbolTable;
 
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTMonoidVisitor;
@@ -9,13 +9,13 @@ import java.util.*;
 public class SymbolTable {
 
     private final @NotNull VarNameGenerator gen;
-    private final @NotNull List<ScopedName> symbols;
+    private final @NotNull List<@NotNull ScopedName> symbols;
     private final @NotNull Map<ScopedName, String> bindings = new HashMap<>();
 
-    public @NotNull String getBinding(@NotNull ASTNode n) {
+    public @NotNull String getBinding(@NotNull HasSymbol n) {
         return bindings.get(new ScopedName(n, Scope.TOPLEVEL));
     }
-    public @NotNull String getBinding(@NotNull ASTNode id, @NotNull Scope scope) {
+    public @NotNull String getBinding(@NotNull HasSymbol id, @NotNull Scope scope) {
         return bindings.get(new ScopedName(id, scope));
     }
 
@@ -32,7 +32,7 @@ public class SymbolTable {
     public @NotNull List<ScopedName> getSymbols() {
         return symbols;
     }
-    public <T extends ASTNode> @NotNull List<? extends T> getSymbols(Class<? extends T> c) {
+    public <T extends HasSymbol> @NotNull List<? extends T> getSymbols(Class<? extends T> c) {
         return symbols
                 .stream()
                 .map(ScopedName::node)
@@ -56,6 +56,7 @@ public class SymbolTable {
             return newSet;
         }
 
+        /*
         @Override
         public Set<ScopedName> visit(RoutineDeclASTNode n) {
             ScopedName functionName = new ScopedName(n, Scope.TOPLEVEL);
@@ -67,10 +68,13 @@ public class SymbolTable {
             currentScope = Scope.TOPLEVEL;
             return body;
         }
+        */
+        /*
         @Override
         public Set<ScopedName> visit(LabelDeclASTNode n) {
             return Set.of(new ScopedName(n, currentScope));
         }
+         */
         @Override
         public Set<ScopedName> visit(NumberLiteralASTNode n) {
             return Set.of(new ScopedName(n, Scope.TOPLEVEL));

@@ -4,6 +4,8 @@ import smallerbasic.AST.nodes.ASTNode;
 import smallerbasic.AST.staticChecks.ASTDoubleLabelChecking;
 import smallerbasic.AST.staticChecks.ASTLabelScopeChecking;
 import smallerbasic.AST.staticChecks.Check;
+import smallerbasic.symbolTable.SymbolTable;
+import smallerbasic.symbolTable.VarNameGenerator;
 
 import java.io.IOException;
 import java.nio.file.Paths;

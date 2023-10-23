@@ -6,12 +6,12 @@ import smallerbasic.AST.ASTVisitor;
 import java.util.Objects;
 
 public class RoutineCallASTNode extends AbstractASTNode implements StatementASTNode {
-    private final @NotNull String function;
-    public RoutineCallASTNode(@NotNull String function) {
+    private final @NotNull RoutineNameASTNode function;
+    public RoutineCallASTNode(@NotNull RoutineNameASTNode function) {
         this.function = function;
     }
 
-    public String getFunction() {
+    public @NotNull RoutineNameASTNode getFunction() {
         return function;
     }
 

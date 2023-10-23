@@ -3,6 +3,9 @@ package smallerbasic;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTVisitor;
 import smallerbasic.AST.nodes.*;
+import smallerbasic.symbolTable.Scope;
+import smallerbasic.symbolTable.SymbolTable;
+import smallerbasic.symbolTable.VarNameGenerator;
 
 import java.util.List;
 
@@ -110,7 +113,7 @@ public class ProgramPrinter {
 
         @Override
         public String visit(GotoStmtASTNode n) {
-            addLine("br label %" + symbols.getBinding(new LabelDeclASTNode(n.getLabel()), currentScope));
+            addLine("br label %" + symbols.getBinding(n.getLabel(), currentScope));
             return null;
         }
 
@@ -138,7 +141,7 @@ public class ProgramPrinter {
 
         @Override
         public String visit(LabelDeclASTNode n) {
-            addLine(symbols.getBinding(n, currentScope) + ":\n");
+            addLine(symbols.getBinding(n.getName(), currentScope) + ":\n");
             return null;
         }
 
@@ -182,6 +185,16 @@ public class ProgramPrinter {
                     .forEach(x -> x.accept(this));
 
             addLine("ret i32 0\n}");
+            return null;
+        }
+
+        @Override
+        public String visit(LabelNameASTNode n) {
+            return null;
+        }
+
+        @Override
+        public String visit(RoutineNameASTNode n) {
             return null;
         }
 
