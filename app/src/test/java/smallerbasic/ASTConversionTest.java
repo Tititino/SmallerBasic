@@ -120,12 +120,12 @@ public class ASTConversionTest {
         ASTNode expected = new IfThenASTNode(
                 new BoolLiteralASTNode(true),
                 List.of(
-                    new ExternalFunctionCallASTNode(
-                            "IO",
-                            "writeLine",
-                            List.of(
-                                    new IdentifierASTNode("X")
-                            ))
+                        new ExternalFunctionCallASTNode(
+                                "IO",
+                                "writeLine",
+                                List.of(
+                                        new IdentifierASTNode("X")
+                                ))
                 )
         );
         ParseTreeToASTVisitor convert = new ParseTreeToASTVisitor();
@@ -162,5 +162,28 @@ public class ASTConversionTest {
 
         assertThat(tree.getStartToken().get().getText()).isEqualTo("Sub");
         assertThat(tree.getEndToken().get().getText()).isEqualTo("<EOF>");
+    }
+
+    @Test
+    public void unaryMinusTest() {
+        ASTNode tree = clean(parse(lex("A = -(B + -C)\n")));
+        assertThat(tree).isEqualTo(
+                new ProgramASTNode(
+                        List.of(
+                                new AssStmtASTNode(
+                                        new IdentifierASTNode("A"),
+                                        new UnaryMinusASTNode(
+                                                new BinOpASTNode(
+                                                        BinOpASTNode.BinOp.PLUS,
+                                                        new IdentifierASTNode("B"),
+                                                        new UnaryMinusASTNode(
+                                                                new IdentifierASTNode("C")
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                )
+        );
     }
 }

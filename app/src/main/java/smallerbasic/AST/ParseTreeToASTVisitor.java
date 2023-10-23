@@ -216,6 +216,18 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
     }
 
     @Override
+    public ASTNode visitMinusVar(SBGrammarParser.MinusVarContext ctx) {
+        IdentifierASTNode var = setToken(new IdentifierASTNode(ctx.var.getText()), ctx.var);
+        return setTokens(new UnaryMinusASTNode(var), ctx);
+    }
+
+    @Override
+    public ASTNode visitUnaryMinus(SBGrammarParser.@NotNull UnaryMinusContext ctx) {
+        ExpressionASTNode expr = (ExpressionASTNode) visit(ctx.expr);
+        return setTokens(new UnaryMinusASTNode(expr), ctx);
+    }
+
+    @Override
     public @NotNull ASTNode visitDivMul(SBGrammarParser.@NotNull DivMulContext ctx) {
         return setTokens(
                 new BinOpASTNode(

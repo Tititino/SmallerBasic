@@ -22,4 +22,6 @@ public interface ASTVisitor<T> {
     T visit(StringLiteralASTNode n);
     T visit(WhileLoopASTNode n);
 
+    T visit(UnaryMinusASTNode n);
+
 }
