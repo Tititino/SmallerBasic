@@ -55,7 +55,7 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
 
     @Override
     public @NotNull ASTNode visitVar(SBGrammarParser.@NotNull VarContext ctx) {
-        return ctx.accept(this);
+        return setToken(new IdentifierASTNode(ctx.name.getText()), ctx.name);
     }
 
     @Override
