@@ -6,9 +6,12 @@ package smallerbasic;
 program : (statement | subroutineDecl | NL)* EOF
         ;
 
-assignmentStmt : Ident '=' expression
-               | Ident '=' Ident
+assignmentStmt : var=variable '=' expr=expression
                ;
+
+variable : name=Ident                                   # Var
+         | name=ArrayAccess expr=arithExpression ']'    # Array
+         ;
 
 label : Ident ':' ;
 
@@ -30,7 +33,8 @@ subroutineDecl : 'Sub' name=Ident NL
                      body+=statement*
                  'EndSub' NL ;
 
-expression : arithExpression
+expression : variable
+           | arithExpression
            | stringExpression
            | booleanExpression
            ;
@@ -62,14 +66,14 @@ booleanExpression : left=arithExpression relop=('<='|'='|'<>'|'<'|'>'|'>=') righ
                   | '(' expr=booleanExpression ')'                                                      # BParens
                   | Bool                                                                                # BoolLiteral
                   | callExternalFunction                                                                # BoolReturningFunc
-                  | Ident                                                                               # BoolIdent
+                  | variable                                                                            # BoolVar
                   ;
 
 stringExpression : left=stringExpression '+' right=stringExpression                         # StringConcat
                  | '(' expr=stringExpression ')'                                            # SParens
                  | String                                                                   # StringLiteral
                  | callExternalFunction                                                     # StrReturningFunc
-                 | Ident                                                                    # StringIdent
+                 | variable                                                                 # StrVar
                  ;
 
 arithExpression : left=arithExpression op=('/' | '*') right=arithExpression                 # DivMul
@@ -79,7 +83,7 @@ arithExpression : left=arithExpression op=('/' | '*') right=arithExpression     
                 | op='-' '(' expr=arithExpression ')'                                       # UnaryMinus
                 | Number                                                                    # NumberLiteral
                 | callExternalFunction                                                      # NumberReturningFunc
-                | Ident                                                                     # NumberIdent
+                | variable                                                                  # NumberVar
                 ;
 
 fragment DIGIT : [0-9] ;
@@ -91,5 +95,6 @@ String : '"'PRINTABLE*'"' ;
 Ident  : [A-Za-z_][A-Za-z0-9_]* ;
 WS     : [ \t]+ -> skip ;
 NL     : '\r'? '\n' ;
-FunctionCall : Ident'('WS*')' ;
-ExternalFunctionCall : Ident'.'Ident'(' ;   // no spaces between tokens
+FunctionCall : Ident'('WS*')' ;             // no spaces between brackets
+ExternalFunctionCall : Ident'.'Ident'(' ;   // no spaces between brackets
+ArrayAccess : Ident'[' ;                    // no spaces between brackets
