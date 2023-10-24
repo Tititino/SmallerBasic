@@ -37,7 +37,7 @@ public class ProgramPrinter {
         private final static @NotNull String NUMBER_SETTER = "@_SET_NUM_VALUE";
         private final static @NotNull String BOOL_SETTER = "@_SET_BOOL_VALUE";
         private final static @NotNull String STRING_SETTER = "@_SET_STR_VALUE";
-        private final static @NotNull String OVERLOADED_PLUS = "@_OVERLOADED_PLUS";
+        private final static @NotNull String OVERLOADED_PLUS = "@OVERLOADED_PLUS";
         private final static @NotNull String COPY_FUNC = "@_COPY";
         private final static @NotNull String NULL_VALUE  = "%struct.Boxed { i2 0, i64 0 }";
 
@@ -81,6 +81,7 @@ public class ProgramPrinter {
 
         @Override
         public String visit(BoolLiteralASTNode n) {
+            updateLineNumber(n);
             return "@" + symbols.getBinding(n);
         }
 
@@ -271,10 +272,10 @@ public class ProgramPrinter {
 
         @Override
         public String visit(RoutineDeclASTNode n) {
-            updateLineNumber(n);
             String name = visit(n.getName());
             currentScope = new Scope(n.getName().getText());
             addLine("define void @" + name + "() {");
+            updateLineNumber(n);
             n.getBody().forEach(x -> x.accept(this));
             addLine("ret void\n}");
             currentScope = Scope.TOPLEVEL;
