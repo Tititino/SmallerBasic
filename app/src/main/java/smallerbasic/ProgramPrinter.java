@@ -129,7 +129,7 @@ public class ProgramPrinter {
             // VAR += STEP
             String step = n.getEnd().accept(this);
             String rightSide = "%" + gen.newName();
-            addLine(cond + " = alloca %struct.Boxed");
+            addLine(rightSide + " = alloca %struct.Boxed");
             addLine("call void @" + BinOpASTNode.BinOp.PLUS
                     + "(%struct.Boxed* " + rightSide
                     + ", %struct.Boxed* " + var
@@ -191,7 +191,6 @@ public class ProgramPrinter {
 
         @Override
         public String visit(ProgramASTNode n) {
-            addLine("@line.number = global i32 -1");
             llvmProgram.append("; variables\n");
             for (IdentifierASTNode id : symbols.getSymbols(IdentifierASTNode.class))
                 addLine("@" + symbols.getBinding(id) + " = global %struct.Boxed { i2 0, i64 0 }");
