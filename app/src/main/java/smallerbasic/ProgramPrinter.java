@@ -102,6 +102,7 @@ public class ProgramPrinter {
             return newName;
         }
 
+        // Modify this to use @FLOOR and integers as indexes ?
         @Override
         public String visit(ForLoopASTNode n) {
             updateLineNumber(n);
@@ -323,12 +324,11 @@ public class ProgramPrinter {
         @Override
         public String visit(ArrayASTNode n) {
             updateLineNumber(n);
-            String res = "%" + gen.newName();
             String name = visit(n.getName());
             String index = n.getIndex().accept(this);
-            addLine("call void " + GET_ARRAY_ELEMENT
-                    + "(%struct.Boxed* " + res
-                    + ", %struct.Boxed* " + name
+            String res = "%" + gen.newName();
+            addLine(res + " = call %struct.Boxed* "
+                    + GET_ARRAY_ELEMENT + "(%struct.Boxed* " + name
                     + ", %struct.Boxed* " + index + ")");
             return res;
         }
