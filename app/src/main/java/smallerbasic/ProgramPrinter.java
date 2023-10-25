@@ -240,7 +240,6 @@ public class ProgramPrinter {
 
         @Override
         public String visit(RoutineNameASTNode n) {
-            updateLineNumber(n);
             return symbols.getBinding(n);
         }
 
