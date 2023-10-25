@@ -131,7 +131,7 @@ public class ProgramPrinter {
             n.getBody().forEach(x -> x.accept(this));
 
             // VAR += STEP
-            String step = n.getEnd().accept(this);
+            String step = n.getStep().accept(this);
             String rightSide = "%" + gen.newName();
             addLine(rightSide + " = alloca %struct.Boxed");
             addLine("call void @" + BinOpASTNode.BinOp.PLUS
@@ -240,7 +240,6 @@ public class ProgramPrinter {
 
         @Override
         public String visit(RoutineNameASTNode n) {
-            updateLineNumber(n);
             return symbols.getBinding(n);
         }
 
