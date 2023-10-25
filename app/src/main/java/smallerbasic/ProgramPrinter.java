@@ -41,6 +41,8 @@ public class ProgramPrinter {
         private final static @NotNull String COPY_FUNC = "@_COPY";
         private final static @NotNull String NULL_VALUE  = "%struct.Boxed { i2 0, i64 0 }";
 
+        private final static @NotNull String GET_ARRAY_ELEMENT  = "@_GET_ARRAY_ELEMENT";
+
         private void addLine(@NotNull String s) {
             llvmProgram.append(s).append("\n");
         }
@@ -100,6 +102,7 @@ public class ProgramPrinter {
             return newName;
         }
 
+        // Modify this to use @FLOOR and integers as indexes ?
         @Override
         public String visit(ForLoopASTNode n) {
             updateLineNumber(n);
@@ -315,6 +318,18 @@ public class ProgramPrinter {
             addLine("call void @UNARY_MINUS(%struct.Boxed* " + res
                     + ", %struct.Boxed* " + expr
                     + ")");
+            return res;
+        }
+
+        @Override
+        public String visit(ArrayASTNode n) {
+            updateLineNumber(n);
+            String name = visit(n.getName());
+            String index = n.getIndex().accept(this);
+            String res = "%" + gen.newName();
+            addLine(res + " = call %struct.Boxed* "
+                    + GET_ARRAY_ELEMENT + "(%struct.Boxed* " + name
+                    + ", %struct.Boxed* " + index + ")");
             return res;
         }
     }

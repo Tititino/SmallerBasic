@@ -24,4 +24,6 @@ public interface ASTVisitor<T> {
 
     T visit(UnaryMinusASTNode n);
 
+    T visit(ArrayASTNode n);
+
 }

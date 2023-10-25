@@ -6,7 +6,7 @@ import smallerbasic.symbolTable.HasSymbol;
 
 import java.util.Objects;
 
-public class IdentifierASTNode extends AbstractASTNode implements ExpressionASTNode, HasSymbol {
+public class IdentifierASTNode extends AbstractASTNode implements ExpressionASTNode, VariableASTNode, HasSymbol {
     private final @NotNull String name;
 
     public IdentifierASTNode(@NotNull String name) {

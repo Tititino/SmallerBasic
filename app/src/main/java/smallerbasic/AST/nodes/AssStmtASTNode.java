@@ -6,15 +6,15 @@ import smallerbasic.AST.ASTVisitor;
 import java.util.Objects;
 
 public class AssStmtASTNode extends AbstractASTNode implements StatementASTNode {
-    private final @NotNull IdentifierASTNode varName;
+    private final @NotNull VariableASTNode varName;
     private final @NotNull ExpressionASTNode value;
 
-    public AssStmtASTNode(@NotNull IdentifierASTNode varName, @NotNull ExpressionASTNode value) {
+    public AssStmtASTNode(@NotNull VariableASTNode varName, @NotNull ExpressionASTNode value) {
         this.varName = varName;
         this.value = value;
     }
 
-    public @NotNull IdentifierASTNode getVarName() {
+    public @NotNull VariableASTNode getVarName() {
         return varName;
     }
 

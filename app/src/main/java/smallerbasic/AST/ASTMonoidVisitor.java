@@ -127,4 +127,8 @@ public interface ASTMonoidVisitor<T> extends ASTVisitor<T> {
         return n.getExpr().accept(this);
     }
 
+    default T visit(ArrayASTNode n) {
+        return compose(visit(n.getName()), n.getIndex().accept(this));
+    }
+
 }

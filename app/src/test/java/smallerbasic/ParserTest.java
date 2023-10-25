@@ -65,7 +65,7 @@ public class ParserTest {
         assertThat(tree.toStringTree(parser))
                 .isEqualTo(
                         // ((1 + (2 * 3)) < 5) Or (0 = ((1 + 1) + 2))
-                        "(booleanExpression (booleanExpression (arithExpression (arithExpression 1) + (arithExpression (arithExpression 2) * (arithExpression 3))) < (arithExpression 5)) Or (booleanExpression (arithExpression a) = (arithExpression (arithExpression (arithExpression 1) + (arithExpression b)) + (arithExpression 2))))"
+                        "(booleanExpression (booleanExpression (arithExpression (arithExpression 1) + (arithExpression (arithExpression 2) * (arithExpression 3))) < (arithExpression 5)) Or (booleanExpression (arithExpression (variable a)) = (arithExpression (arithExpression (arithExpression 1) + (arithExpression (variable b))) + (arithExpression 2))))"
                 );
     }
 
@@ -77,7 +77,7 @@ public class ParserTest {
 
         assertThat(tree.toStringTree(parser))
                 .isEqualTo(
-                        "(assignmentStmt a = (expression (arithExpression 10)))"
+                        "(assignmentStmt (variable a) = (expression (arithExpression 10)))"
                 );
     }
 
