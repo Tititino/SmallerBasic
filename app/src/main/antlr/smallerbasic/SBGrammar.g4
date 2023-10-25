@@ -10,7 +10,7 @@ assignmentStmt : var=variable '=' expr=expression
                ;
 
 variable : name=Ident                                   # Var
-         | name=ArrayAccess expr=arithExpression ']'    # Array
+         | name=Ident ('[' expr+=arithExpression ']')+  # Array
          ;
 
 label : Ident ':' ;
@@ -97,4 +97,3 @@ WS     : [ \t]+ -> skip ;
 NL     : '\r'? '\n' ;
 FunctionCall : Ident'('WS*')' ;             // no spaces between brackets
 ExternalFunctionCall : Ident'.'Ident'(' ;   // no spaces between brackets
-ArrayAccess : Ident'[' ;                    // no spaces between brackets

@@ -39,7 +39,7 @@ public class ProgramPrinter {
         private final static @NotNull String STRING_SETTER = "@_SET_STR_VALUE";
         private final static @NotNull String OVERLOADED_PLUS = "@OVERLOADED_PLUS";
         private final static @NotNull String COPY_FUNC = "@_COPY";
-        private final static @NotNull String NULL_VALUE  = "%struct.Boxed { i2 0, i64 0 }";
+        private final static @NotNull String NULL_VALUE  = "%struct.Boxed { i3 0, i64 0 }";
 
         private final static @NotNull String GET_ARRAY_ELEMENT  = "@_GET_ARRAY_ELEMENT";
 
@@ -197,7 +197,7 @@ public class ProgramPrinter {
         public String visit(ProgramASTNode n) {
             llvmProgram.append("; variables\n");
             for (IdentifierASTNode id : symbols.getSymbols(IdentifierASTNode.class))
-                addLine("@" + symbols.getBinding(id) + " = global %struct.Boxed { i2 0, i64 0 }");
+                addLine("@" + symbols.getBinding(id) + " = global " + NULL_VALUE);
 
             llvmProgram.append("; boxed constants\n");
             for (LiteralASTNode lit : symbols.getSymbols(LiteralASTNode.class))
@@ -325,11 +325,19 @@ public class ProgramPrinter {
         public String visit(ArrayASTNode n) {
             updateLineNumber(n);
             String name = visit(n.getName());
-            String index = n.getIndex().accept(this);
-            String res = "%" + gen.newName();
-            addLine(res + " = call %struct.Boxed* "
-                    + GET_ARRAY_ELEMENT + "(%struct.Boxed* " + name
-                    + ", %struct.Boxed* " + index + ")");
+            List<String> indexes = n.getIndexes()
+                    .stream()
+                    .map(x -> x.accept(this))
+                    .toList();
+            String res = "";
+            String prev = name;
+            for (String index : indexes) {
+                res = "%" + gen.newName();
+                addLine(res + " = call %struct.Boxed* "
+                        + GET_ARRAY_ELEMENT + "(%struct.Boxed* " + prev
+                        + ", %struct.Boxed* " + index + ")");
+                prev = res;
+            }
             return res;
         }
     }

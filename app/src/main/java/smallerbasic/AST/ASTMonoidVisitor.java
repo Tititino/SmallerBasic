@@ -128,7 +128,10 @@ public interface ASTMonoidVisitor<T> extends ASTVisitor<T> {
     }
 
     default T visit(ArrayASTNode n) {
-        return compose(visit(n.getName()), n.getIndex().accept(this));
+        return n.getIndexes()
+                .stream()
+                .map(x -> x.accept(this))
+                .reduce(visit(n.getName()), this::compose);
     }
 
 }

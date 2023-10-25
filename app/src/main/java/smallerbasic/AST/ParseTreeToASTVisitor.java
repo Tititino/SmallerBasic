@@ -65,7 +65,10 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
                         ctx.name.getText().replaceAll("\\[", "")),
                 ctx.name
         );
-        ExpressionASTNode expr = (ExpressionASTNode) ctx.arithExpression().accept(this);
+        List<ExpressionASTNode> expr = ctx.expr
+                .stream()
+                .map(x -> (ExpressionASTNode) x.accept(this))
+                .toList();
         return setTokens(new ArrayASTNode(name, expr), ctx);
     }
 
