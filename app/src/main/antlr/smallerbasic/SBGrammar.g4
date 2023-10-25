@@ -3,7 +3,7 @@ grammar SBGrammar;
 package smallerbasic;
 }
 
-program : (statement | subroutineDecl | NL)* EOF
+program : (statement | subroutineDecl)* EOF
         ;
 
 assignmentStmt : var=variable '=' expr=expression
@@ -15,23 +15,23 @@ variable : name=Ident                                   # Var
 
 label : Ident ':' ;
 
-statement : assignmentStmt          NL
-          | ifStmt                  NL
-          | forStmt                 NL
-          | whileStmt               NL
-          | gotoStmt                NL
-          | callRoutine             NL
-          | callExternalFunction    NL
-          | label                   NL
+statement : assignmentStmt
+          | ifStmt
+          | forStmt
+          | whileStmt
+          | gotoStmt
+          | callRoutine
+          | callExternalFunction
+          | label
           ;
 
 callRoutine : FunctionCall ;
 
 callExternalFunction : name=ExternalFunctionCall args+=expression? (',' args+=expression)* ')' ;
 
-subroutineDecl : 'Sub' name=Ident NL
+subroutineDecl : 'Sub' name=Ident
                      body+=statement*
-                 'EndSub' NL ;
+                 'EndSub' ;
 
 expression : variable
            | arithExpression
@@ -39,20 +39,20 @@ expression : variable
            | booleanExpression
            ;
 
-ifStmt : 'If' '(' cond=booleanExpression ')' 'Then' NL
+ifStmt : 'If' '(' cond=booleanExpression ')' 'Then'
              bodyTrue+=statement*
-          ('Else' NL
+          ('Else'
              bodyFalse+=statement*
           )?
           'EndIf'
        ;
 
-forStmt : 'For' var=Ident '=' from=arithExpression 'To' to=arithExpression ('Step' step=arithExpression)? NL
+forStmt : 'For' var=Ident '=' from=arithExpression 'To' to=arithExpression ('Step' step=arithExpression)?
               body+=statement*
           'EndFor'
         ;
 
-whileStmt : 'While' '(' cond=booleanExpression ')' NL
+whileStmt : 'While' '(' cond=booleanExpression ')'
                 body+=statement*
             'EndWhile'
           ;
@@ -93,7 +93,6 @@ Bool   : 'true' | 'false' ;
 Number : [+-]?(DIGIT+('.'DIGIT*)?|'.'DIGIT+)([eE][-+]?DIGIT+)? ;
 String : '"'PRINTABLE*'"' ;
 Ident  : [A-Za-z_][A-Za-z0-9_]* ;
-WS     : [ \t]+ -> skip ;
-NL     : '\r'? '\n' ;
+WS     : [ \t\r\n]+ -> skip ;
 FunctionCall : Ident'('WS*')' ;             // no spaces between brackets
 ExternalFunctionCall : Ident'.'Ident'(' ;   // no spaces between brackets

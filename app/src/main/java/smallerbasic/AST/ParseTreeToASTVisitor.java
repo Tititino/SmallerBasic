@@ -37,8 +37,7 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
 
     @Override
     public @NotNull ProgramASTNode visitProgram(SBGrammarParser.@NotNull ProgramContext ctx) {
-        List<DeclOrStmtASTNode> body = IntStream.range(0, ctx.getChildCount())
-                .filter(i -> !(ctx.getChild(i) instanceof TerminalNode))
+        List<DeclOrStmtASTNode> body = IntStream.range(0, ctx.getChildCount() - 1)
                 .mapToObj(i ->
                     (DeclOrStmtASTNode) visit(ctx.getChild(i))
                 ).toList();
