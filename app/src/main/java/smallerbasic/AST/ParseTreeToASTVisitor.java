@@ -36,7 +36,7 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
     }
 
     @Override
-    public @NotNull ASTNode visitProgram(SBGrammarParser.@NotNull ProgramContext ctx) {
+    public @NotNull ProgramASTNode visitProgram(SBGrammarParser.@NotNull ProgramContext ctx) {
         List<DeclOrStmtASTNode> body = IntStream.range(0, ctx.getChildCount())
                 .filter(i -> !(ctx.getChild(i) instanceof TerminalNode))
                 .mapToObj(i ->
@@ -46,7 +46,7 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
     }
 
     @Override
-    public @NotNull ASTNode visitAssignmentStmt(SBGrammarParser.@NotNull AssignmentStmtContext ctx) {
+    public @NotNull AssStmtASTNode visitAssignmentStmt(SBGrammarParser.@NotNull AssignmentStmtContext ctx) {
         VariableASTNode left = (VariableASTNode) ctx.var.accept(this);
         ExpressionASTNode right = (ExpressionASTNode) ctx.expression().accept(this);
         return setTokens(new AssStmtASTNode(left, right), ctx);
@@ -54,15 +54,14 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
 
 
     @Override
-    public @NotNull ASTNode visitVar(SBGrammarParser.@NotNull VarContext ctx) {
+    public @NotNull IdentifierASTNode visitVar(SBGrammarParser.@NotNull VarContext ctx) {
         return setToken(new IdentifierASTNode(ctx.name.getText()), ctx.name);
     }
 
     @Override
-    public @NotNull ASTNode visitArray(SBGrammarParser.@NotNull ArrayContext ctx) {
+    public @NotNull ArrayASTNode visitArray(SBGrammarParser.@NotNull ArrayContext ctx) {
         IdentifierASTNode name = setToken(
-                new IdentifierASTNode(
-                        ctx.name.getText().replaceAll("\\[", "")),
+                new IdentifierASTNode(ctx.name.getText()),
                 ctx.name
         );
         List<ExpressionASTNode> expr = ctx.expr
@@ -73,13 +72,13 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
     }
 
     @Override
-    public @NotNull ASTNode visitLabel(SBGrammarParser.@NotNull LabelContext ctx) {
+    public @NotNull LabelDeclASTNode visitLabel(SBGrammarParser.@NotNull LabelContext ctx) {
         LabelNameASTNode label = setToken(new LabelNameASTNode(ctx.Ident().getText()), ctx.Ident().getSymbol());
         return setTokens(new LabelDeclASTNode(label), ctx);
     }
 
     @Override
-    public @NotNull ASTNode visitIfStmt(SBGrammarParser.@NotNull IfStmtContext ctx) {
+    public @NotNull IfThenASTNode visitIfStmt(SBGrammarParser.@NotNull IfStmtContext ctx) {
         ExpressionASTNode condition = (ExpressionASTNode) visit(ctx.cond);
         List<StatementASTNode> trueBody = childrenToAST(ctx.bodyTrue);
         if (ctx.bodyFalse.isEmpty())
@@ -89,7 +88,7 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
     }
 
     @Override
-    public @NotNull ASTNode visitForStmt(SBGrammarParser.@NotNull ForStmtContext ctx) {
+    public @NotNull ForLoopASTNode visitForStmt(SBGrammarParser.@NotNull ForStmtContext ctx) {
         IdentifierASTNode varName = setToken(new IdentifierASTNode(ctx.var.getText()), ctx.var);
         ExpressionASTNode from = (ExpressionASTNode) visit(ctx.from);
         ExpressionASTNode to   = (ExpressionASTNode) visit(ctx.to);
@@ -107,7 +106,7 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
     }
 
     @Override
-    public @NotNull ASTNode visitWhileStmt(SBGrammarParser.@NotNull WhileStmtContext ctx) {
+    public @NotNull WhileLoopASTNode visitWhileStmt(SBGrammarParser.@NotNull WhileStmtContext ctx) {
         return setTokens(
                 new WhileLoopASTNode(
                         (ExpressionASTNode) visit(ctx.cond),
@@ -118,7 +117,7 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
     }
 
     @Override
-    public @NotNull ASTNode visitGotoStmt(SBGrammarParser.@NotNull GotoStmtContext ctx) {
+    public @NotNull GotoStmtASTNode visitGotoStmt(SBGrammarParser.@NotNull GotoStmtContext ctx) {
         LabelNameASTNode label = setToken(new LabelNameASTNode(ctx.Ident().getText()), ctx.Ident().getSymbol());
         return setTokens(new GotoStmtASTNode(label), ctx);
     }
@@ -129,7 +128,7 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
     }
 
     @Override
-    public @NotNull ASTNode visitStringComparison(SBGrammarParser.@NotNull StringComparisonContext ctx) {
+    public @NotNull BinOpASTNode visitStringComparison(SBGrammarParser.@NotNull StringComparisonContext ctx) {
         return setTokens(
                 new BinOpASTNode(
                         BinOpASTNode.BinOp.parse(ctx.relop.getText()),
@@ -141,7 +140,7 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
     }
 
     @Override
-    public @NotNull ASTNode visitBoolLiteral(SBGrammarParser.@NotNull BoolLiteralContext ctx) {
+    public @NotNull BoolLiteralASTNode visitBoolLiteral(SBGrammarParser.@NotNull BoolLiteralContext ctx) {
         return setTokens(
                 BoolLiteralASTNode.parse(ctx.Bool().getText()),
                 ctx
@@ -154,7 +153,7 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
     }
 
     @Override
-    public @NotNull ASTNode visitNumberComparison(SBGrammarParser.@NotNull NumberComparisonContext ctx) {
+    public @NotNull BinOpASTNode visitNumberComparison(SBGrammarParser.@NotNull NumberComparisonContext ctx) {
         return setTokens(
                 new BinOpASTNode(
                         BinOpASTNode.BinOp.parse(ctx.relop.getText()),
@@ -166,7 +165,7 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
     }
 
     @Override
-    public @NotNull ASTNode visitBoolOp(SBGrammarParser.@NotNull BoolOpContext ctx) {
+    public @NotNull BinOpASTNode visitBoolOp(SBGrammarParser.@NotNull BoolOpContext ctx) {
         return setTokens(
                 new BinOpASTNode(
                         BinOpASTNode.BinOp.parse(ctx.binop.getText()),
@@ -183,7 +182,7 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
     }
 
     @Override
-    public @NotNull ASTNode visitStringConcat(SBGrammarParser.@NotNull StringConcatContext ctx) {
+    public @NotNull BinOpASTNode visitStringConcat(SBGrammarParser.@NotNull StringConcatContext ctx) {
         return setTokens(
                 new BinOpASTNode(
                         BinOpASTNode.BinOp.CONCAT,
@@ -200,7 +199,7 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
     }
 
     @Override
-    public @NotNull ASTNode visitStringLiteral(SBGrammarParser.@NotNull StringLiteralContext ctx) {
+    public @NotNull StringLiteralASTNode visitStringLiteral(SBGrammarParser.@NotNull StringLiteralContext ctx) {
         String str = ctx.getText();
         return setTokens(new StringLiteralASTNode(str.substring(1, str.length() - 1)), ctx);
     }
@@ -233,13 +232,13 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
     }
 
     @Override
-    public @NotNull ASTNode visitUnaryMinus(SBGrammarParser.@NotNull UnaryMinusContext ctx) {
+    public @NotNull UnaryMinusASTNode visitUnaryMinus(SBGrammarParser.@NotNull UnaryMinusContext ctx) {
         ExpressionASTNode expr = (ExpressionASTNode) visit(ctx.expr);
         return setTokens(new UnaryMinusASTNode(expr), ctx);
     }
 
     @Override
-    public @NotNull ASTNode visitDivMul(SBGrammarParser.@NotNull DivMulContext ctx) {
+    public @NotNull BinOpASTNode visitDivMul(SBGrammarParser.@NotNull DivMulContext ctx) {
         return setTokens(
                 new BinOpASTNode(
                         BinOpASTNode.BinOp.parse(ctx.op.getText()),
@@ -251,7 +250,7 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
     }
 
     @Override
-    public @NotNull ASTNode visitPlusMin(@NotNull SBGrammarParser.PlusMinContext ctx) {
+    public @NotNull BinOpASTNode visitPlusMin(@NotNull SBGrammarParser.PlusMinContext ctx) {
         return setTokens(
                 new BinOpASTNode(
                         BinOpASTNode.BinOp.parse(ctx.op.getText()),
@@ -268,12 +267,12 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
     }
 
     @Override
-    public @NotNull ASTNode visitNumberLiteral(SBGrammarParser.@NotNull NumberLiteralContext ctx) {
+    public @NotNull NumberLiteralASTNode visitNumberLiteral(SBGrammarParser.@NotNull NumberLiteralContext ctx) {
         return setTokens(NumberLiteralASTNode.parse(ctx.Number().getText()), ctx);
     }
 
     @Override
-    public @NotNull ASTNode visitCallRoutine(SBGrammarParser.@NotNull CallRoutineContext ctx) {
+    public @NotNull RoutineCallASTNode visitCallRoutine(SBGrammarParser.@NotNull CallRoutineContext ctx) {
         RoutineNameASTNode name = setToken(
                 new RoutineNameASTNode(
                         ctx.getText().replaceAll("\\([\\t ]*\\)", "")
@@ -283,7 +282,7 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
     }
 
     @Override
-    public @NotNull ASTNode visitCallExternalFunction(SBGrammarParser.@NotNull CallExternalFunctionContext ctx) {
+    public @NotNull ExternalFunctionCallASTNode visitCallExternalFunction(SBGrammarParser.@NotNull CallExternalFunctionContext ctx) {
         String[] funcCall = ctx.name.getText().split("\\.");
         return setTokens(
                 new ExternalFunctionCallASTNode(
@@ -302,7 +301,7 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
     }
 
     @Override
-    public @NotNull ASTNode visitSubroutineDecl(SBGrammarParser.@NotNull SubroutineDeclContext ctx) {
+    public @NotNull RoutineDeclASTNode visitSubroutineDecl(SBGrammarParser.@NotNull SubroutineDeclContext ctx) {
         RoutineNameASTNode name = setToken(
                 new RoutineNameASTNode(ctx.name.getText()),
                 ctx.name
