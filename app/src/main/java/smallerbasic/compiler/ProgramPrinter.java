@@ -1,4 +1,4 @@
-package smallerbasic;
+package smallerbasic.compiler;
 
 import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.NotNull;
@@ -9,6 +9,7 @@ import smallerbasic.symbolTable.SymbolTable;
 import smallerbasic.symbolTable.VarNameGenerator;
 
 import java.util.List;
+import java.util.Optional;
 
 public class ProgramPrinter {
 
@@ -39,18 +40,20 @@ public class ProgramPrinter {
         private final static @NotNull String STRING_SETTER = "@_SET_STR_VALUE";
         private final static @NotNull String OVERLOADED_PLUS = "@OVERLOADED_PLUS";
         private final static @NotNull String COPY_FUNC = "@_COPY";
-        private final static @NotNull String NULL_VALUE  = "%struct.Boxed { i3 0, i64 0 }";
+        private final static @NotNull String NULL_VALUE = "%struct.Boxed { i3 0, i64 0 }";
 
-        private final static @NotNull String GET_ARRAY_ELEMENT  = "@_GET_ARRAY_ELEMENT";
+        private final static @NotNull String GET_ARRAY_ELEMENT = "@_GET_ARRAY_ELEMENT";
         private final static @NotNull String TRUE = "i1 1";
-        private final static @NotNull String FALSE  = "i1 0";
+        private final static @NotNull String FALSE = "i1 0";
 
         private void addLine(@NotNull String s) {
             llvmProgram.append(s).append("\n");
         }
+
         private void updateLineNumber(@NotNull ASTNode node) {
-            int line = node.getStartToken().map(Token::getLine).orElse(-1);
-            if (line != lastLine) {
+            Optional<Token> startToken = node.getStartToken();
+            if (startToken.isPresent() && startToken.get().getLine() != lastLine) {
+                int line = startToken.get().getLine();
                 lastLine = line;
                 addLine("store i32 " + line + ", ptr @line.number");
             }
@@ -72,9 +75,9 @@ public class ProgramPrinter {
             String right = n.getRight().accept(this);
 
             String res = "%" + gen.newName();
-            String op  = (n.getOp() == BinOpASTNode.BinOp.PLUS || n.getOp() == BinOpASTNode.BinOp.CONCAT)
-                            ? OVERLOADED_PLUS
-                            : "@" + n.getOp();
+            String op = (n.getOp() == BinOpASTNode.BinOp.PLUS || n.getOp() == BinOpASTNode.BinOp.CONCAT)
+                    ? OVERLOADED_PLUS
+                    : "@" + n.getOp();
             addLine(res + " = alloca %struct.Boxed");
             addLine("call void " + op
                     + "(%struct.Boxed* " + res
@@ -195,23 +198,48 @@ public class ProgramPrinter {
             return "@" + symbols.getBinding(n);
         }
 
-        @Override
-        public String visit(ProgramASTNode n) {
-            llvmProgram.append("; variables\n");
-            for (IdentifierASTNode id : symbols.getSymbols(IdentifierASTNode.class))
+        private void prealloc(CollectNodes c) {
+            for (IdentifierASTNode id : c.getIdents())
                 addLine("@" + symbols.getBinding(id) + " = global " + NULL_VALUE);
-
-            llvmProgram.append("; boxed constants\n");
-            for (LiteralASTNode lit : symbols.getSymbols(LiteralASTNode.class))
-                addLine("@" + symbols.getBinding(lit) + " = global " + NULL_VALUE);
-
-            llvmProgram.append("; string constants\n");
-            for (StringLiteralASTNode lit : symbols.getSymbols(StringLiteralASTNode.class)) {
-                String text = lit.getValue();
-                addLine("@" + symbols.getBinding(lit)
+            for (NumberLiteralASTNode num : c.getNumberConstants())
+                addLine("@" + symbols.getBinding(num) + " = global " + NULL_VALUE);
+            for (BoolLiteralASTNode bool : c.getBoolConstants())
+                addLine("@" + symbols.getBinding(bool) + " = global " + NULL_VALUE);
+            for (StringLiteralASTNode str : c.getStringConstants()) {
+                addLine("@" + symbols.getBinding(str) + " = global " + NULL_VALUE);
+                String text = str.getValue();
+                addLine("@" + symbols.getBinding(str)
                         + ".value = constant [" + (text.length() + 1)
                         + " x i8] c\"" + text + "\\00\"");
             }
+        }
+
+        private void initConstants(CollectNodes c) {
+            for (StringLiteralASTNode str : c.getStringConstants()) {
+                String text = str.getValue();
+                String arrayType = "[" + (text.length() + 1) + " x i8]";
+                String ptr = "%" + gen.newName();
+                addLine(ptr + " = getelementptr "
+                        + arrayType + ", "
+                        + arrayType + "* @"
+                        + symbols.getBinding(str) + ".value, i32 0, i32 0");
+                addLine("call void " + STRING_SETTER + "(%struct.Boxed* @" + symbols.getBinding(str) + ", i8* " + ptr + ")");
+            }
+            for (NumberLiteralASTNode n : c.getNumberConstants()) {
+                String text = Double.toString(n.getValue());
+                addLine("call void " + NUMBER_SETTER + "(%struct.Boxed* @" + symbols.getBinding(n) + ", double " + text + ")");
+            }
+            for (BoolLiteralASTNode b : c.getBoolConstants()) {
+                addLine("call void " + BOOL_SETTER + "(%struct.Boxed* @" + symbols.getBinding(b)
+                        + ", " + (b.getValue() ? TRUE : FALSE) + ")");
+            }
+        }
+
+        @Override
+        public String visit(ProgramASTNode n) {
+            CollectNodes constants = new CollectNodes(n);
+
+            prealloc(constants);
 
             n.getContents()
                     .stream()
@@ -220,8 +248,7 @@ public class ProgramPrinter {
                     .forEach(x -> x.accept(this));
 
             addLine("define i32 @main() {");
-            for (LiteralASTNode lit : symbols.getSymbols(LiteralASTNode.class))
-                prealloc(lit);
+            initConstants(constants);
             updateLineNumber(n);
 
             n.getContents()
@@ -245,31 +272,11 @@ public class ProgramPrinter {
             return symbols.getBinding(n);
         }
 
-        private void prealloc(LiteralASTNode n) {
-            if (n instanceof StringLiteralASTNode s) {
-                String text = s.getValue();
-                String arrayType = "[" + (text.length() + 1) + " x i8]";
-                String ptr = "%" + gen.newName();
-                addLine(ptr + " = getelementptr "
-                        + arrayType + ", "
-                        + arrayType + "* @"
-                        + symbols.getBinding(n) + ".value, i32 0, i32 0");
-                addLine("call void " + STRING_SETTER + "(%struct.Boxed* @" + symbols.getBinding(s) + ", i8* " + ptr + ")");
-            }
-            else if (n instanceof NumberLiteralASTNode f) {
-                String text = Double.toString(f.getValue());
-                addLine("call void " + NUMBER_SETTER + "(%struct.Boxed* @" + symbols.getBinding(f) + ", double " + text + ")");
-            }
-            else if (n instanceof BoolLiteralASTNode b){
-                addLine("call void " + BOOL_SETTER + "(%struct.Boxed* @" + symbols.getBinding(b)
-                        + ", " + (b.getValue() ? TRUE : FALSE) + ")");
-            }
-        }
 
         @Override
         public String visit(RoutineCallASTNode n) {
-            updateLineNumber(n);
             String name = visit(n.getFunction());
+            updateLineNumber(n);
             addLine("call void @" + name + "()");
             return null;
         }
@@ -312,7 +319,7 @@ public class ProgramPrinter {
         @Override
         public String visit(UnaryMinusASTNode n) {
             updateLineNumber(n);
-            String expr  = n.getExpr().accept(this);
+            String expr = n.getExpr().accept(this);
             String res = "%" + gen.newName();
 
             addLine(res + " = alloca %struct.Boxed");

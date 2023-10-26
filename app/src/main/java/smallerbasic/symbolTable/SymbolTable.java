@@ -9,7 +9,6 @@ import java.util.*;
 public class SymbolTable {
 
     private final @NotNull VarNameGenerator gen;
-    private final @NotNull List<@NotNull ScopedName<HasSymbol>> symbols;
     private final @NotNull Map<ScopedName<HasSymbol>, String> bindings = new HashMap<>();
 
     public @NotNull String getBinding(@NotNull HasSymbol n) {
@@ -25,21 +24,9 @@ public class SymbolTable {
 
     public SymbolTable(@NotNull ASTNode node, @NotNull VarNameGenerator gen) {
         this.gen = gen;
-        this.symbols = node.accept(new GetSymbols()).stream().toList();
+        List<ScopedName<HasSymbol>> symbols = node.accept(new GetSymbols()).stream().toList();
         for (ScopedName<HasSymbol> id : symbols)
             newBinding(id);
-    }
-
-    public @NotNull List<ScopedName<HasSymbol>> getSymbols() {
-        return symbols;
-    }
-    public <T extends HasSymbol> @NotNull List<? extends T> getSymbols(Class<? extends T> c) {
-        return symbols
-                .stream()
-                .map(ScopedName::node)
-                .filter(c::isInstance)
-                .map(c::cast)
-                .toList();
     }
 
     private static class GetSymbols implements ASTMonoidVisitor<Set<ScopedName<HasSymbol>>> {

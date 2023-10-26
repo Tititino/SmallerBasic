@@ -4,6 +4,7 @@ import smallerbasic.AST.nodes.ASTNode;
 import smallerbasic.AST.staticChecks.DoubleLabelCheck;
 import smallerbasic.AST.staticChecks.LabelScopeCheck;
 import smallerbasic.AST.staticChecks.Check;
+import smallerbasic.compiler.ProgramPrinter;
 import smallerbasic.symbolTable.SymbolTable;
 import smallerbasic.symbolTable.VarNameGenerator;
 
