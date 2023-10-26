@@ -3,6 +3,9 @@ package smallerbasic.AST;
 import smallerbasic.AST.nodes.*;
 
 public interface ASTVisitor<T> {
+    /**
+     * Visitor over and AST.
+     */
 
     T visit(AssStmtASTNode n);
     T visit(BinOpASTNode n);

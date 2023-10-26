@@ -5,6 +5,10 @@ import smallerbasic.AST.nodes.*;
 import java.util.List;
 
 public interface ASTMonoidVisitor<T> extends ASTVisitor<T> {
+    /**
+     * This class, given an identity and an associative function to compose results, provides a
+     * default implementation of ASTVisitor that traverses the tree composing the results.
+     */
 
      default T visitChildren(List<? extends ASTNode> l) {
         return l.stream()

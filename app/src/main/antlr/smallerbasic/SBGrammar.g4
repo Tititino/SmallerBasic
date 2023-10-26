@@ -6,14 +6,21 @@ package smallerbasic;
 program : (statement | subroutineDecl)* EOF
         ;
 
-assignmentStmt : var=variable '=' expr=expression
+assignmentStmt : var=variable Equal expr=expression
                ;
 
-variable : name=Ident                                   # Var
-         | name=Ident ('[' expr+=arithExpression ']')+  # Array
+variable : name=varName                                   # Var
+         | name=varName ('[' expr+=arithExpression ']')+  # Array
          ;
 
-label : Ident ':' ;
+label : labelName ':' ;
+
+// these three rules may seem useless, but they simplify the process of conversion to an AST
+varName : Ident ;
+
+labelName : Ident ;
+
+functionName : Ident ;
 
 statement : assignmentStmt
           | ifStmt
@@ -25,11 +32,11 @@ statement : assignmentStmt
           | label
           ;
 
-callRoutine : FunctionCall ;
+callRoutine : functionName '(' ')' ;
 
-callExternalFunction : name=ExternalFunctionCall args+=expression? (',' args+=expression)* ')' ;
+callExternalFunction : name=ExternalFunctionName '(' args+=expression? (',' args+=expression)* ')' ;
 
-subroutineDecl : 'Sub' name=Ident
+subroutineDecl : 'Sub' name=functionName
                      body+=statement*
                  'EndSub' ;
 
@@ -47,7 +54,7 @@ ifStmt : 'If' '(' cond=booleanExpression ')' 'Then'
           'EndIf'
        ;
 
-forStmt : 'For' var=Ident '=' from=arithExpression 'To' to=arithExpression ('Step' step=arithExpression)?
+forStmt : 'For' var=variable Equal from=arithExpression 'To' to=arithExpression ('Step' step=arithExpression)?
               body+=statement*
           'EndFor'
         ;
@@ -57,16 +64,16 @@ whileStmt : 'While' '(' cond=booleanExpression ')'
             'EndWhile'
           ;
 
-gotoStmt  : 'Goto' lbl=Ident
+gotoStmt  : 'Goto' lbl=labelName
           ;
 
-booleanExpression : left=arithExpression relop=('<='|'='|'<>'|'<'|'>'|'>=') right=arithExpression       # NumberComparison
-                  | left=stringExpression relop=('<='|'='|'<>'|'<'|'>'|'>=') right=stringExpression     # StringComparison
-                  | left=booleanExpression binop=('And'|'Or') right=booleanExpression                   # BoolOp
-                  | '(' expr=booleanExpression ')'                                                      # BParens
-                  | Bool                                                                                # BoolLiteral
-                  | callExternalFunction                                                                # BoolReturningFunc
-                  | variable                                                                            # BoolVar
+booleanExpression : left=arithExpression   relop=(Relop|Equal) right=arithExpression           # NumberComparison
+                  | left=stringExpression  relop=(Relop|Equal) right=stringExpression          # StringComparison
+                  | left=booleanExpression binop=Boolop right=booleanExpression         # BoolOp
+                  | '(' expr=booleanExpression ')'                                      # BParens
+                  | Bool                                                                # BoolLiteral
+                  | callExternalFunction                                                # BoolReturningFunc
+                  | variable                                                            # BoolVar
                   ;
 
 stringExpression : left=stringExpression '+' right=stringExpression                         # StringConcat
@@ -78,21 +85,25 @@ stringExpression : left=stringExpression '+' right=stringExpression             
 
 arithExpression : left=arithExpression op=('/' | '*') right=arithExpression                 # DivMul
                 | left=arithExpression op=('+' | '-') right=arithExpression                 # PlusMin
-                | '(' expr=arithExpression ')'                                              # NParens
-                | op='-' var=Ident                                                          # MinusVar
-                | op='-' '(' expr=arithExpression ')'                                       # UnaryMinus
-                | Number                                                                    # NumberLiteral
-                | callExternalFunction                                                      # NumberReturningFunc
-                | variable                                                                  # NumberVar
+                | op='-' arithAtom                                                          # UnaryMinus
+                | arithAtom                                                                 # Atom
                 ;
+
+arithAtom : variable                                                                        # VariableAtom
+          | callExternalFunction                                                            # ExternalFuncAtom
+          | '(' arithExpression ')'                                                         # ParensAtom
+          | Number                                                                          # LiteralAtom
+          ;
 
 fragment DIGIT : [0-9] ;
 fragment PRINTABLE : ~["] ;
 
 Bool   : 'true' | 'false' ;
+Equal  : '=' ;
+Relop  : ('<='|'<>'|'<'|'>'|'>=') ;
+Boolop : ('And'|'Or') ;
 Number : [+-]?(DIGIT+('.'DIGIT*)?|'.'DIGIT+)([eE][-+]?DIGIT+)? ;
 String : '"'PRINTABLE*'"' ;
+ExternalFunctionName : Ident'.'Ident ;
 Ident  : [A-Za-z_][A-Za-z0-9_]* ;
 WS     : [ \t\r\n]+ -> skip ;
-FunctionCall : Ident'('WS*')' ;             // no spaces between brackets
-ExternalFunctionCall : Ident'.'Ident'(' ;   // no spaces between brackets

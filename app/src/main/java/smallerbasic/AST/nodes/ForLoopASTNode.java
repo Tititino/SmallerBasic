@@ -8,14 +8,14 @@ import java.util.List;
 import java.util.Objects;
 
 public class ForLoopASTNode extends AbstractASTNode implements StatementASTNode {
-    private final @NotNull IdentifierASTNode varName;
+    private final @NotNull VariableASTNode varName;
     private final @NotNull ExpressionASTNode start;
     private final @NotNull ExpressionASTNode end;
     private final @NotNull ExpressionASTNode step;
     private final @NotNull List<@NotNull StatementASTNode> body;
 
     public ForLoopASTNode(
-            @NotNull IdentifierASTNode varName,
+            @NotNull VariableASTNode varName,
             @NotNull ExpressionASTNode start,
             @NotNull ExpressionASTNode end,
             @NotNull  ExpressionASTNode step,
@@ -29,7 +29,7 @@ public class ForLoopASTNode extends AbstractASTNode implements StatementASTNode 
 
 
     public ForLoopASTNode(
-            @NotNull IdentifierASTNode varName,
+            @NotNull VariableASTNode varName,
             @NotNull ExpressionASTNode start,
             @NotNull ExpressionASTNode end,
             @NotNull List<@NotNull StatementASTNode> body) {
@@ -41,7 +41,7 @@ public class ForLoopASTNode extends AbstractASTNode implements StatementASTNode 
         return v.visit(this);
     }
 
-    public @NotNull IdentifierASTNode getVarName() {
+    public @NotNull VariableASTNode getVarName() {
         return varName;
     }
 

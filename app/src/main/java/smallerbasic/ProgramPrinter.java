@@ -42,6 +42,8 @@ public class ProgramPrinter {
         private final static @NotNull String NULL_VALUE  = "%struct.Boxed { i3 0, i64 0 }";
 
         private final static @NotNull String GET_ARRAY_ELEMENT  = "@_GET_ARRAY_ELEMENT";
+        private final static @NotNull String TRUE = "i1 1";
+        private final static @NotNull String FALSE  = "i1 0";
 
         private void addLine(@NotNull String s) {
             llvmProgram.append(s).append("\n");
@@ -109,7 +111,7 @@ public class ProgramPrinter {
             String label = gen.newName();
 
             // VAR = START
-            String var = visit(n.getVarName());
+            String var = n.getVarName().accept(this);
             String start = n.getStart().accept(this);
             addLine("call void " + COPY_FUNC + "(%struct.Boxed* " + var + ", %struct.Boxed* " + start + ")");
 
@@ -260,7 +262,7 @@ public class ProgramPrinter {
             }
             else if (n instanceof BoolLiteralASTNode b){
                 addLine("call void " + BOOL_SETTER + "(%struct.Boxed* @" + symbols.getBinding(b)
-                        + ", " + (b.getValue() ? "TRUE" : "FALSE") + ")");
+                        + ", " + (b.getValue() ? TRUE : FALSE) + ")");
             }
         }
 

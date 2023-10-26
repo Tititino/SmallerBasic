@@ -5,7 +5,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.jetbrains.annotations.NotNull;
-import smallerbasic.AST.ParseTreeToASTVisitor;
+import smallerbasic.AST.ParseTreeToASTVisitorWithTokens;
 import smallerbasic.AST.nodes.ASTNode;
 import smallerbasic.AST.staticChecks.Check;
 
@@ -28,7 +28,7 @@ public class CompilationUtils {
     }
 
     public static @NotNull ASTNode clean(@NotNull ParseTree tree) {
-        return (new ParseTreeToASTVisitor()).visit(tree);
+        return (new ParseTreeToASTVisitorWithTokens()).visit(tree);
     }
 
     public static @NotNull Optional<ASTNode> check(@NotNull ASTNode tree, @NotNull List<Check> checks) {

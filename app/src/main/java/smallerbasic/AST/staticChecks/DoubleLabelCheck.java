@@ -10,7 +10,9 @@ import smallerbasic.symbolTable.ScopedName;
 import java.util.*;
 
 public class DoubleLabelCheck implements Check {
-
+    /**
+     * This check verifies whether a program defines a label more than once in the same scope.
+     */
     @Override
     public boolean check(@NotNull ASTNode n) {
         boolean isOk = true;
