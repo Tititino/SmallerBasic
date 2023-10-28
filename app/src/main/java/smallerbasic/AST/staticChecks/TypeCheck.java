@@ -18,9 +18,9 @@ public class TypeCheck extends AbstractCheck {
     }
 
     @Override
-    public void reportError(@NotNull String msg) {
+    public void reportError(@NotNull ASTNode n, @NotNull String msg) {
         isOk = false;
-        super.reportError(msg);
+        super.reportError(n, msg);
     }
 
     public enum TYPE {
@@ -57,11 +57,13 @@ public class TypeCheck extends AbstractCheck {
     private void reportMismatch(@NotNull ASTNode n, @NotNull TYPE got, @NotNull TYPE expected) {
         if (!got.matches(expected)) {
             String position = "";
-            if (n.getStartToken().isPresent()) {
+            if (n.getStartToken().isPresent() && n.getEndToken().isPresent()) {
                 Token start = n.getStartToken().get();
-                position = " at line " + start.getLine() + ":" + start.getCharPositionInLine();
+                Token end   = n.getEndToken().get();
+                position = " at line " + start.getLine() + ":" + start.getCharPositionInLine()
+                        + "-" + (end.getCharPositionInLine() + end.getText().length());
             }
-            reportError("*** TypeError: expected value of type "
+            reportError(n, "*** TypeError: expected value of type "
                     + expected + " but got "
                     + got + position);
         }
@@ -70,11 +72,13 @@ public class TypeCheck extends AbstractCheck {
     private void reportMismatch(@NotNull ASTNode n, @NotNull TYPE got, @NotNull List<TYPE> expected) {
         if (!got.matches(expected)) {
             String position = "";
-            if (n.getStartToken().isPresent()) {
+            if (n.getStartToken().isPresent() && n.getEndToken().isPresent()) {
                 Token start = n.getStartToken().get();
-                position = " at line " + start.getLine() + ":" + start.getCharPositionInLine();
+                Token end = n.getEndToken().get();
+                position = " at line " + start.getLine() + ":" + start.getCharPositionInLine()
+                + "-" + (end.getCharPositionInLine() + end.getText().length());
             }
-            reportError("*** TypeError: expected value of type "
+            reportError(n, "*** TypeError: expected value of type "
                     + expected + " but got "
                     + got + position);
         }
@@ -100,30 +104,30 @@ public class TypeCheck extends AbstractCheck {
             TYPE right = n.getRight().accept(this);
             switch (n.getOp()) {
                 case AND, OR -> {
-                    reportMismatch(n, left, TYPE.BOOL);
-                    reportMismatch(n, right, TYPE.BOOL);
+                    reportMismatch(n.getLeft(), left, TYPE.BOOL);
+                    reportMismatch(n.getRight(), right, TYPE.BOOL);
                     return TYPE.BOOL;
                 }
                 case MINUS, DIV, MULT -> {
-                    reportMismatch(n, left, TYPE.NUMBER);
-                    reportMismatch(n, right, TYPE.NUMBER);
+                    reportMismatch(n.getLeft(), left, TYPE.NUMBER);
+                    reportMismatch(n.getRight(), right, TYPE.NUMBER);
                     return TYPE.NUMBER;
                 }
                 case LEQ, GEQ, LT, GT -> {
-                    reportMismatch(n, left, List.of(TYPE.NUMBER, TYPE.STRING));
-                    reportMismatch(n, right, List.of(TYPE.NUMBER, TYPE.STRING));
-                    reportMismatch(n, left, right);
+                    reportMismatch(n.getLeft(), left, List.of(TYPE.NUMBER, TYPE.STRING));
+                    reportMismatch(n.getRight(), right, List.of(TYPE.NUMBER, TYPE.STRING));
+                    reportMismatch(n.getLeft(), left, right);
                     return TYPE.BOOL;
                 }
                 case EQ, NEQ -> {
-                    reportMismatch(n, left, List.of(TYPE.NUMBER, TYPE.STRING));
-                    reportMismatch(n, right, List.of(TYPE.NUMBER, TYPE.STRING));
+                    reportMismatch(n.getLeft(), left, List.of(TYPE.NUMBER, TYPE.STRING));
+                    reportMismatch(n.getRight(), right, List.of(TYPE.NUMBER, TYPE.STRING));
                     return TYPE.BOOL;
                 }
                 case PLUS -> {
-                    reportMismatch(n, left, List.of(TYPE.NUMBER, TYPE.STRING));
-                    reportMismatch(n, right, List.of(TYPE.NUMBER, TYPE.STRING));
-                    reportMismatch(n, left, right);
+                    reportMismatch(n.getLeft(), left, List.of(TYPE.NUMBER, TYPE.STRING));
+                    reportMismatch(n.getRight(), right, List.of(TYPE.NUMBER, TYPE.STRING));
+                    reportMismatch(n.getLeft(), left, right);
                     if (left.equals(TYPE.STRING))
                         return TYPE.STRING;
                     return TYPE.NUMBER;
@@ -144,9 +148,9 @@ public class TypeCheck extends AbstractCheck {
 
         @Override
         public TYPE visit(ForLoopASTNode n) {
-            reportMismatch(n, n.getStart().accept(this), TYPE.NUMBER);
-            reportMismatch(n, n.getStart().accept(this), TYPE.NUMBER);
-            reportMismatch(n, n.getStep().accept(this), TYPE.NUMBER);
+            reportMismatch(n.getStart(), n.getStart().accept(this), TYPE.NUMBER);
+            reportMismatch(n.getEnd(), n.getStart().accept(this), TYPE.NUMBER);
+            reportMismatch(n.getStep(), n.getStep().accept(this), TYPE.NUMBER);
             return visitChildren(n.getBody());
         }
 
@@ -162,7 +166,7 @@ public class TypeCheck extends AbstractCheck {
 
         @Override
         public TYPE visit(IfThenASTNode n) {
-            reportMismatch(n, n.getCondition().accept(this), TYPE.BOOL);
+            reportMismatch(n.getCondition(), n.getCondition().accept(this), TYPE.BOOL);
             visitChildren(n.getTrueBody());
             return n.getFalseBody().map(this::visitChildren).orElse(TYPE.NONE);
         }
@@ -209,13 +213,13 @@ public class TypeCheck extends AbstractCheck {
 
         @Override
         public TYPE visit(WhileLoopASTNode n) {
-            reportMismatch(n, n.getCondition().accept(this), TYPE.BOOL);
+            reportMismatch(n.getCondition(), n.getCondition().accept(this), TYPE.BOOL);
             return visitChildren(n.getBody());
         }
 
         @Override
         public TYPE visit(UnaryMinusASTNode n) {
-            reportMismatch(n, n.getExpr().accept(this), TYPE.NUMBER);
+            reportMismatch(n.getExpr(), n.getExpr().accept(this), TYPE.NUMBER);
             return TYPE.NUMBER;
         }
 

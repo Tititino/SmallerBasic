@@ -18,7 +18,7 @@ public class RoutineCallCheck extends AbstractCheck {
         for (RoutineNameASTNode l : called)
             if (!declared.contains(l)) {
                 isOk = false;
-                reportError(String.format(
+                reportError(l, String.format(
                                 "*** RoutineCallError: routine \"%s\" called at line %d is not defined",
                                 l.getText(),
                                 l.getStartToken().map(Token::getLine).orElse(-1)

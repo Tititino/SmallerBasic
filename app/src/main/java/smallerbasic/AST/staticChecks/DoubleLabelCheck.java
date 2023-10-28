@@ -19,7 +19,7 @@ public class DoubleLabelCheck extends AbstractCheck {
         for (LabelNameASTNode s : labels.keySet())
             if (labels.get(s) > 1) {
                 isOk = false;
-                reportError(String.format(
+                reportError(s, String.format(
                         "*** DoubleLabelError: label \"%s\" defined at line %d already defined in the same scope (%s)",
                         s.getText(),
                         s.getStartToken().map(Token::getLine).orElse(-1),

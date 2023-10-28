@@ -1,5 +1,6 @@
 package smallerbasic;
 
+import org.antlr.v4.runtime.TokenStream;
 import smallerbasic.AST.nodes.ASTNode;
 import smallerbasic.AST.staticChecks.*;
 import smallerbasic.compiler.ProgramPrinter;
@@ -29,20 +30,26 @@ public class App {
             List<Check> warnings = List.of(
                     new UninitializedVariableCheck()
             );
+
+            TokenStream tokens = lex(Paths.get(args[0]));
+
+            errors.forEach(x -> x.setErrorReporter(new PrettyErrorPrinter(tokens)));
+            warnings.forEach(x -> x.setErrorReporter(new PrettyErrorPrinter(tokens)));
+
             ASTNode ast = check(
                     clean(
-                            parse(lex(Paths.get(args[0]))).orElseThrow(() -> new RuntimeException("Compilation failed"))
+                            parse(tokens).orElseThrow(() -> new CompilationError("Compilation failed"))
                     ),
                     errors,
                     warnings
-            ).orElseThrow(() -> new RuntimeException("Static checks failed"));
+            ).orElseThrow(() -> new CompilationError("Static checks failed"));
 
             String program = ProgramPrinter.compile(ast);
 
             System.out.println(program);
         } catch (IOException e) {
             System.out.println("Error reading file \"" + args[0] + "\"");
-        } catch (RuntimeException e) {
+        } catch (CompilationError e) {
             System.out.println(e.getMessage());
         }
     }
