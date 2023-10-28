@@ -13,6 +13,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
+/**
+ * A class to convert a {@link ParseTree} made by {@link SBGrammarParser} to an AST.
+ * This class accepts only well-formed parse trees.
+ */
 public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
 
     private @NotNull List<StatementASTNode> childrenToAST(@NotNull List<SBGrammarParser.StatementContext> ctxs) {

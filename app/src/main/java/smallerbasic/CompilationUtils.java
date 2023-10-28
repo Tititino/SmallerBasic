@@ -14,6 +14,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * This class groups together some utility methods to lex, compile and check a SmallerBasic program..
+ */
 public class CompilationUtils {
     public static @NotNull TokenStream lex(@NotNull Path path) throws IOException {
         return new CommonTokenStream(new SBGrammarLexer(CharStreams.fromFileName(path.toString())));
@@ -29,6 +32,7 @@ public class CompilationUtils {
         parser.removeErrorListeners();
         parser.addErrorListener(listener);
         ParseTree tree = parser.program();
+        System.out.println("result: " + listener.hasFailed());
         if (listener.hasFailed())
             return Optional.empty();
         return Optional.of(tree);

@@ -1,10 +1,14 @@
 package smallerbasic.AST.nodes;
 
 import org.jetbrains.annotations.NotNull;
+
 import smallerbasic.AST.ASTVisitor;
 
 import java.util.Objects;
 
+/**
+ * An {@link ASTNode} representing a goto statement.
+ */
 public class GotoStmtASTNode extends AbstractASTNode implements StatementASTNode {
     private final @NotNull LabelNameASTNode label;
 

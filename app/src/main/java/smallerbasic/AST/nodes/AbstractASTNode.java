@@ -6,6 +6,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
+/**
+ * Each node in the AST MAY come with a Token (or Tokens).
+ * If a node is a leaf the start token and the end token will be the same.
+ */
 public abstract class AbstractASTNode implements ASTNode {
 
     private @Nullable Token start = null;

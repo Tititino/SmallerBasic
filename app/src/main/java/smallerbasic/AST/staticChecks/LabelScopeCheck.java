@@ -9,10 +9,11 @@ import smallerbasic.symbolTable.ScopedName;
 
 import java.util.*;
 
+/**
+ * This check verifies whether in a program each referenced label is also defined in the same scope.
+ */
 public class LabelScopeCheck implements Check {
-    /**
-     * This check verifies whether in a program each referenced label is also defined in the same scope.
-     */
+
 
     public boolean check(@NotNull ASTNode n) {
         boolean isOk = true;

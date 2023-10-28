@@ -5,6 +5,11 @@ import smallerbasic.AST.ASTVisitor;
 
 import java.util.Objects;
 
+/**
+ * An {@link ASTNode} representing a binary operation.
+ * The binary operation is composed of a left {@link ExpressionASTNode}, a binary operator, and a
+ * right {@link ExpressionASTNode}.
+ */
 public class BinOpASTNode extends AbstractASTNode implements ExpressionASTNode {
 
     private final @NotNull BinOp op;

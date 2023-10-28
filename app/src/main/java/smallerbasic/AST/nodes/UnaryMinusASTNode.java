@@ -6,6 +6,9 @@ import smallerbasic.symbolTable.HasSymbol;
 
 import java.util.Objects;
 
+/**
+ * An {@link ASTNode} representing a unary minus.
+ */
 public class UnaryMinusASTNode extends AbstractASTNode implements ExpressionASTNode, HasSymbol {
 
     private final @NotNull ExpressionASTNode expr;

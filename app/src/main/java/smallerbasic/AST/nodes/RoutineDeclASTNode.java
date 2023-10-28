@@ -7,6 +7,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * An {@link ASTNode} representing a declaration of a subroutine.
+ */
 public class RoutineDeclASTNode extends AbstractASTNode implements DeclOrStmtASTNode {
     private final @NotNull RoutineNameASTNode name;
     private final @NotNull List<@NotNull StatementASTNode> body;

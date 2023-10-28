@@ -7,6 +7,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * An {@link ASTNode} representing an array access.
+ * The array itself is identified by an {@link IdentifierASTNode} and the indexes are
+ * determined by a series of {@link ExpressionASTNode}.
+ */
 public class ArrayASTNode extends AbstractASTNode implements ExpressionASTNode, VariableASTNode {
     private final @NotNull IdentifierASTNode name;
     private final @NotNull List<@NotNull ExpressionASTNode> indexes;

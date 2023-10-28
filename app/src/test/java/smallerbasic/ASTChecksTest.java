@@ -10,13 +10,12 @@ import smallerbasic.symbolTable.SymbolTable;
 import smallerbasic.symbolTable.VarNameGenerator;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 import static smallerbasic.CompilationUtils.*;
 
 public class ASTChecksTest {
     @Test
     public void labelScopeCheckingTest() {
-        ASTNode tree = clean(parse(lex("Goto label\nlabel:\n")));
+        ASTNode tree = clean(parse(lex("Goto label\nlabel:\n")).get());
         LabelScopeCheck checkScope = new LabelScopeCheck() {
             @Override
             public void reportError(@NotNull String msg) {
@@ -30,7 +29,7 @@ public class ASTChecksTest {
 
     @Test
     public void fromGlobalToRoutineTest() {
-        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nGoto label\n")));
+        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nGoto label\n")).get());
 
         LabelScopeCheck checkScope = new LabelScopeCheck() {
             @Override
@@ -45,7 +44,7 @@ public class ASTChecksTest {
 
     @Test
     public void fromRoutineToGlobalTest() {
-        ASTNode tree = clean(parse(lex("Sub test\nGoto label1\nEndSub\nlabel1:\n")));
+        ASTNode tree = clean(parse(lex("Sub test\nGoto label1\nEndSub\nlabel1:\n")).get());
 
         LabelScopeCheck checkScope = new LabelScopeCheck() {
             @Override
@@ -60,7 +59,7 @@ public class ASTChecksTest {
 
     @Test
     public void doubleLabelTest() {
-        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nlabel:\nEndSub\n")));
+        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nlabel:\nEndSub\n")).get());
 
         DoubleLabelCheck checkDoubles = new DoubleLabelCheck();
 
@@ -69,7 +68,7 @@ public class ASTChecksTest {
 
     @Test
     public void doubleLabelDifferentScopeTest() {
-        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nlabel:\n")));
+        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nlabel:\n")).get());
 
         DoubleLabelCheck checkDoubles = new DoubleLabelCheck();
 
@@ -117,7 +116,7 @@ public class ASTChecksTest {
                        EndSub
                        label:
                        A = 2
-                       """)));
+                       """)).get());
 
         SymbolTable symbols = new SymbolTable(tree, new VarNameGenerator());
 
