@@ -1,5 +1,6 @@
 package smallerbasic.AST.staticChecks;
 
+import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTMonoidVisitor;
 import smallerbasic.AST.nodes.*;
@@ -8,9 +9,18 @@ import java.util.*;
 
 public class UninitializedVariableCheck implements Check {
 
+    private boolean isOk = true;
     @Override
     public boolean check(@NotNull ASTNode n) {
-        return false;
+        isOk = true;
+        n.accept(new UninitializedVisitor());
+        return isOk;
+    }
+
+    @Override
+    public void reportError(@NotNull String msg) {
+        isOk = false;
+        Check.super.reportError(msg);
     }
 
     private class UninitializedVisitor implements ASTMonoidVisitor<Set<IdentifierASTNode>> {
@@ -19,7 +29,7 @@ public class UninitializedVariableCheck implements Check {
 
         @Override
         public Set<IdentifierASTNode> empty() {
-            return null;
+            return Collections.emptySet();
         }
 
         @Override
@@ -54,15 +64,31 @@ public class UninitializedVariableCheck implements Check {
             Set<IdentifierASTNode> composed = compose(usedLeft, usedRight);
             for (IdentifierASTNode i : composed)
                 if (!setVars.contains(i)) {
-                    reportError("this variable " + i + " may not have been initialized");
+                    String pos = "";
+                    if (i.getStartToken().isPresent()) {
+                        Token start = i.getStartToken().get();
+                        int startIndex = start.getCharPositionInLine();
+                        pos = "used at " + start.getLine() + ":"
+                                + startIndex + "-"
+                                + (start.getText().length() + startIndex - 1) + " ";
+                    }
+                    reportError("*** UninitializedWarning: variable \""
+                            + i.getName() + "\" " + pos + "may not have been initialized");
                     composed.remove(i);     // no new errors
                 }
-            return composed;
+            return empty();
         }
 
         @Override
         public Set<IdentifierASTNode> visit(IdentifierASTNode n) {
             return Set.of(n);
+        }
+
+        @Override
+        public Set<IdentifierASTNode> visit(ArrayASTNode n) {
+            // does not make sense to check arrays since indexes could be not known statically
+            visitChildren(n.getIndexes());
+            return empty();
         }
     }
 

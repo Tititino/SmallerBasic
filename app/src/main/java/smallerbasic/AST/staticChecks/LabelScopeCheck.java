@@ -21,7 +21,7 @@ public class LabelScopeCheck implements Check {
         for (ScopedName<LabelNameASTNode> l : labels.gotoLabels()) {
             isOk = false;
             reportError(String.format(
-                            "*** LabelScopeCheck: label \"%s\" referenced at the goto of line %d is not defined in this scope (%s)",
+                            "*** LabelScopeError: label \"%s\" referenced at the goto of line %d is not defined in this scope (%s)",
                             l.node().getText(),
                             l.node().getStartToken().map(Token::getLine).orElse(-1),
                             l.scope()

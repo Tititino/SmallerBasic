@@ -38,12 +38,16 @@ public class CompilationUtils {
         return (new ParseTreeToASTVisitorWithTokens()).visit(tree);
     }
 
-    public static @NotNull Optional<ASTNode> check(@NotNull ASTNode tree, @NotNull List<Check> checks) {
+    public static @NotNull Optional<ASTNode> check(@NotNull ASTNode tree,
+                                                   @NotNull List<Check> errors,
+                                                   @NotNull List<Check> warnings) {
         // directly using allMatch stops the checks at the first failed one
-        List<Boolean> allPass = checks
+        List<Boolean> allPass = errors
                 .stream()
                 .map(x -> x.check(tree))
                 .toList();
+        // warning do not end compilation
+        warnings.forEach(x -> x.check(tree));
         return allPass.stream().allMatch(x -> x) ? Optional.of(tree) : Optional.empty();
     }
 }

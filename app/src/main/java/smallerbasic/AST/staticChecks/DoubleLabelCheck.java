@@ -21,7 +21,7 @@ public class DoubleLabelCheck implements Check {
             if (labels.get(s) > 1) {
                 isOk = false;
                 reportError(String.format(
-                        "*** DoubleLabelCheck: label \"%s\" defined at line %d already defined in the same scope (%s)",
+                        "*** DoubleLabelError: label \"%s\" defined at line %d already defined in the same scope (%s)",
                         s.node().getText(),
                         s.node().getStartToken().map(Token::getLine).orElse(-1),
                         s.scope()
