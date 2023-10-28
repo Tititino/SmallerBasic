@@ -13,6 +13,10 @@ public class IdentifierASTNode extends AbstractASTNode implements ExpressionASTN
         this.name = name;
     }
 
+    public @NotNull String getName() {
+        return name;
+    }
+
     @Override
     public <T> T accept(ASTVisitor<T> v) {
         return v.visit(this);
