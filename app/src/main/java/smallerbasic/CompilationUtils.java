@@ -32,7 +32,6 @@ public class CompilationUtils {
         parser.removeErrorListeners();
         parser.addErrorListener(listener);
         ParseTree tree = parser.program();
-        System.out.println("result: " + listener.hasFailed());
         if (listener.hasFailed())
             return Optional.empty();
         return Optional.of(tree);

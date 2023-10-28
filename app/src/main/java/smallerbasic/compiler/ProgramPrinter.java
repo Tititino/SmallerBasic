@@ -4,7 +4,6 @@ import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTVisitor;
 import smallerbasic.AST.nodes.*;
-import smallerbasic.symbolTable.Scope;
 import smallerbasic.symbolTable.SymbolTable;
 import smallerbasic.symbolTable.VarNameGenerator;
 
@@ -47,7 +46,6 @@ public class ProgramPrinter {
     private class ProgramPrinterVisitor implements ASTVisitor<String> {
 
         private int lastLine = -1;
-        private @NotNull Scope currentScope = Scope.TOPLEVEL;
         private final static @NotNull String BOOL_GETTER = "@_GET_BOOL_VALUE";
         private final static @NotNull String NUMBER_SETTER = "@_SET_NUM_VALUE";
         private final static @NotNull String BOOL_SETTER = "@_SET_BOOL_VALUE";
@@ -277,7 +275,7 @@ public class ProgramPrinter {
         @Override
         public String visit(LabelNameASTNode n) {
             updateLineNumber(n);
-            return symbols.getBinding(n, currentScope);
+            return symbols.getBinding(n);
         }
 
         @Override
@@ -297,12 +295,10 @@ public class ProgramPrinter {
         @Override
         public String visit(RoutineDeclASTNode n) {
             String name = visit(n.getName());
-            currentScope = new Scope(n.getName().getText());
             addLine("define void @" + name + "() {");
             updateLineNumber(n);
             n.getBody().forEach(x -> x.accept(this));
             addLine("ret void\n}");
-            currentScope = Scope.TOPLEVEL;
             return null;
         }
 

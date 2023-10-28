@@ -6,6 +6,7 @@ import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.jupiter.api.Test;
 import smallerbasic.AST.ParseTreeToASTVisitor;
+import smallerbasic.AST.Scope;
 import smallerbasic.AST.nodes.*;
 
 import java.io.IOException;
@@ -143,14 +144,15 @@ public class ASTConversionTest {
     @Test
     public void routineAndStatementTest() {
         ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nGoto label\n")).get());
+        RoutineNameASTNode name = new RoutineNameASTNode("test");
         ASTNode expected = new ProgramASTNode(List.of(
                 new RoutineDeclASTNode(
-                        new RoutineNameASTNode("test"),
+                        name,
                         List.of(
-                                new LabelDeclASTNode(new LabelNameASTNode("label"))
+                                new LabelDeclASTNode(new LabelNameASTNode("label", Scope.ofRoutine(name)))
                         )
                 ),
-                new GotoStmtASTNode(new LabelNameASTNode("label"))
+                new GotoStmtASTNode(new LabelNameASTNode("label", Scope.TOPLEVEL))
         ));
 
         assertThat(tree).isEqualTo(expected);
