@@ -28,9 +28,9 @@ public class ProgramPrinter {
      */
     private final @NotNull StringBuilder llvmProgram;
 
-    public static String compile(@NotNull SymbolTable symbols,
-                                         @NotNull VarNameGenerator gen,
-                                         @NotNull ASTNode root) {
+    public static String compile(@NotNull ASTNode root) {
+        VarNameGenerator gen = new VarNameGenerator();
+        SymbolTable symbols = new SymbolTable(root, gen);
         return new ProgramPrinter(symbols, gen, root).llvmProgram.toString();
     }
 

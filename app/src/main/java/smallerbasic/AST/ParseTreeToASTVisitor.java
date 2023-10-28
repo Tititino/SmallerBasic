@@ -19,6 +19,10 @@ import java.util.stream.IntStream;
  */
 public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
 
+    /**
+     * The current scope being visited: {@code Scope.ofRoutine(<routine name>)} if inside a routine declaration,
+     * {@code Scope.TOPLEVEL} otherwise.
+     */
     private @NotNull Scope currentScope = Scope.TOPLEVEL;
 
     private @NotNull List<StatementASTNode> childrenToAST(@NotNull List<SBGrammarParser.StatementContext> ctxs) {
