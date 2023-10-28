@@ -22,9 +22,9 @@ public class UninitializedVariableCheck extends AbstractCheck {
     }
 
     @Override
-    public void reportError(@NotNull String msg) {
+    public void reportError(@NotNull ASTNode n, @NotNull String msg) {
         isOk = false;
-        super.reportError(msg);
+        super.reportError(n, msg);
     }
 
     private class UninitializedVisitor implements ASTMonoidVisitor<Set<IdentifierASTNode>> {
@@ -76,9 +76,9 @@ public class UninitializedVariableCheck extends AbstractCheck {
                                 + startIndex + "-"
                                 + (start.getText().length() + startIndex - 1) + " ";
                     }
-                    reportError("*** UninitializedWarning: variable \""
+                    reportError(n, "*** UninitializedWarning: variable \""
                             + i.getName() + "\" " + pos + "may not have been initialized");
-                    composed.remove(i);     // no new errors
+                    composed.remove(i);     // no new errors about this variable
                 }
             return empty();
         }

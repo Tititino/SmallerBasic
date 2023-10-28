@@ -50,7 +50,6 @@ public class ProgramPrinter {
         private final static @NotNull String NUMBER_SETTER = "@_SET_NUM_VALUE";
         private final static @NotNull String BOOL_SETTER = "@_SET_BOOL_VALUE";
         private final static @NotNull String STRING_SETTER = "@_SET_STR_VALUE";
-        private final static @NotNull String OVERLOADED_PLUS = "@OVERLOADED_PLUS";
         private final static @NotNull String COPY_FUNC = "@_COPY";
         private final static @NotNull String NULL_VALUE = "%struct.Boxed { i3 0, i64 0 }";
 
@@ -87,11 +86,8 @@ public class ProgramPrinter {
             String right = n.getRight().accept(this);
 
             String res = "%" + gen.newName();
-            String op = (n.getOp() == BinOpASTNode.BinOp.PLUS)
-                    ? OVERLOADED_PLUS
-                    : "@" + n.getOp();
             addLine(res + " = alloca %struct.Boxed");
-            addLine("call void " + op
+            addLine("call void " + n.getOp()
                     + "(%struct.Boxed* " + res
                     + ", %struct.Boxed* " + left
                     + ", %struct.Boxed* " + right + ")");

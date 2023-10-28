@@ -1,0 +1,14 @@
+label1:
+label1:
+Goto nonExisting
+
+X = 10 + true
+
+Sub nome
+    X = 10
+EndSub
+Sub nome
+    X = 2
+EndSub
+
+nonExisting()

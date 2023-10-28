@@ -17,7 +17,7 @@ public class DoubleRoutineDeclCheck extends AbstractCheck {
         for (RoutineNameASTNode s : labels.keySet())
             if (labels.get(s) > 1) {
                 isOk = false;
-                reportError(String.format(
+                reportError(s, String.format(
                                 "*** DoubleRoutineDeclError: routine \"%s\" defined at line %d is already defined",
                                 s.getText(),
                                 s.getStartToken().map(Token::getLine).orElse(-1)

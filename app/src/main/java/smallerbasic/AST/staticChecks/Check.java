@@ -12,7 +12,7 @@ public interface Check {
 
     boolean check(@NotNull ASTNode n);
 
-    void reportError(@NotNull String msg);
+    void reportError(@NotNull ASTNode n, @NotNull String msg);
 
     void setErrorReporter(@NotNull ErrorReporter e);
 
