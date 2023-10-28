@@ -24,7 +24,10 @@ public class CompilationUtils {
     }
 
     public static @NotNull ParseTree parse(@NotNull TokenStream tokens) {
-        return (new SBGrammarParser(tokens)).program();
+        SBGrammarParser parser = new SBGrammarParser(tokens);
+        parser.removeErrorListeners();
+        parser.addErrorListener(new PrettyErrorListener());
+        return parser.program();
     }
 
     public static @NotNull ASTNode clean(@NotNull ParseTree tree) {

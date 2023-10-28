@@ -1,0 +1,5 @@
+For X = 3 Ti 10
+    Y = 4
+EndFor
+
+X = XYZ 3
