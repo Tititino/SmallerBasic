@@ -66,8 +66,8 @@ whileStmt : 'While' '(' cond=booleanExpression ')'
 gotoStmt  : 'Goto' lbl=labelName
           ;
 
-booleanExpression : left=arithExpression   relop=(Relop|Equal) right=arithExpression           # NumberComparison
-                  | left=stringExpression  relop=(Relop|Equal) right=stringExpression          # StringComparison
+booleanExpression : left=arithExpression   relop=(Relop|Equal) right=arithExpression    # NumberComparison
+                  | left=stringExpression  relop=(Relop|Equal) right=stringExpression   # StringComparison
                   | left=booleanExpression binop=Boolop right=booleanExpression         # BoolOp
                   | '(' expr=booleanExpression ')'                                      # BParens
                   | Bool                                                                # BoolLiteral
@@ -101,7 +101,7 @@ Bool   : 'true' | 'false' ;
 Equal  : '=' ;
 Relop  : ('<='|'<>'|'<'|'>'|'>=') ;
 Boolop : ('And'|'Or') ;
-Number : [+-]?(DIGIT+('.'DIGIT*)?|'.'DIGIT+)([eE][-+]?DIGIT+)? ;
+Number : '+'?(DIGIT+('.'DIGIT*)?|'.'DIGIT+)([eE][-+]?DIGIT+)? ;
 String : '"'PRINTABLE*'"' ;
 ExternalFunctionName : Ident'.'Ident ;
 Ident  : [A-Za-z_][A-Za-z0-9_]* ;
