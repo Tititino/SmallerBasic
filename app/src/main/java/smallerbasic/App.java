@@ -20,6 +20,7 @@ public class App {
 
         try {
             List<Check> errors = List.of(
+                    new TypeCheck(),
                     new LabelScopeCheck(),
                     new DoubleLabelCheck(),
                     new DoubleRoutineDeclCheck(),

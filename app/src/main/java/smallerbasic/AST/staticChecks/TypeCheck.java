@@ -89,6 +89,8 @@ public class TypeCheck extends AbstractCheck {
 
         @Override
         public TYPE visit(AssStmtASTNode n) {
+            n.getVarName().accept(this);
+            n.getValue().accept(this);
             return TYPE.NONE;
         }
 
@@ -219,6 +221,7 @@ public class TypeCheck extends AbstractCheck {
 
         @Override
         public TYPE visit(ArrayASTNode n) {
+            n.getIndexes().forEach(x -> reportMismatch(x, x.accept(this), TYPE.NUMBER));
             return TYPE.ANY;
         }
     }

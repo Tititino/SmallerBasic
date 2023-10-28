@@ -48,7 +48,7 @@ public class ParserTest {
     void arithExprTest(String expr, String expected) {
         SBGrammarLexer lexer = new SBGrammarLexer(CharStreams.fromString(expr));
         SBGrammarParser parser = new SBGrammarParser(new CommonTokenStream(lexer));
-        ParserRuleContext tree = parser.arithExpression();
+        ParserRuleContext tree = parser.expression();
 
         assertThat(tree.toStringTree(parser)).isEqualTo(expected);
     }
@@ -58,7 +58,7 @@ public class ParserTest {
     void compExprTest() {
         SBGrammarLexer lexer = new SBGrammarLexer(CharStreams.fromString("1 + 2 <= 3 * 4"));
         SBGrammarParser parser = new SBGrammarParser(new CommonTokenStream(lexer));
-        ParserRuleContext tree = parser.booleanExpression();
+        ParserRuleContext tree = parser.expression();
 
         assertThat(tree.toStringTree(parser))
                 .isEqualTo("(booleanExpression " +
@@ -71,7 +71,7 @@ public class ParserTest {
     void precedenceTest() {
         SBGrammarLexer lexer = new SBGrammarLexer(CharStreams.fromString("1 + 2 * 3 < 5 Or a = 1 + b + 2"));
         SBGrammarParser parser = new SBGrammarParser(new CommonTokenStream(lexer));
-        ParserRuleContext tree = parser.booleanExpression();
+        ParserRuleContext tree = parser.expression();
 
         assertThat(tree.toStringTree(parser))
                 .isEqualTo(
