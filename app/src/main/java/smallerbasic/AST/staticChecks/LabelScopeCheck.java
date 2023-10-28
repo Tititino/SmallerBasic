@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * This check verifies whether in a program each referenced label is also defined in the same scope.
  */
-public class LabelScopeCheck implements Check {
+public class LabelScopeCheck extends AbstractCheck {
 
 
     public boolean check(@NotNull ASTNode n) {

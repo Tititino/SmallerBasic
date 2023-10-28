@@ -1,10 +1,7 @@
 package smallerbasic;
 
 import smallerbasic.AST.nodes.ASTNode;
-import smallerbasic.AST.staticChecks.DoubleLabelCheck;
-import smallerbasic.AST.staticChecks.LabelScopeCheck;
-import smallerbasic.AST.staticChecks.Check;
-import smallerbasic.AST.staticChecks.UninitializedVariableCheck;
+import smallerbasic.AST.staticChecks.*;
 import smallerbasic.compiler.ProgramPrinter;
 
 import java.io.IOException;
@@ -24,7 +21,9 @@ public class App {
         try {
             List<Check> errors = List.of(
                     new LabelScopeCheck(),
-                    new DoubleLabelCheck()
+                    new DoubleLabelCheck(),
+                    new DoubleRoutineDeclCheck(),
+                    new RoutineCallCheck()
             );
             List<Check> warnings = List.of(
                     new UninitializedVariableCheck()

@@ -4,14 +4,13 @@ import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTMonoidVisitor;
 import smallerbasic.AST.nodes.*;
-import smallerbasic.AST.Scope;
 
 import java.util.*;
 
 /**
  * This check verifies whether a program defines a label more than once in the same scope.
  */
-public class DoubleLabelCheck implements Check {
+public class DoubleLabelCheck extends AbstractCheck {
 
     @Override
     public boolean check(@NotNull ASTNode n) {
@@ -31,7 +30,7 @@ public class DoubleLabelCheck implements Check {
         return isOk;
     }
 
-    private class DoubleLabelVisitor implements ASTMonoidVisitor<Map<LabelNameASTNode, Integer>> {
+    private static class DoubleLabelVisitor implements ASTMonoidVisitor<Map<LabelNameASTNode, Integer>> {
 
         @Override
         public Map<LabelNameASTNode, Integer> empty() {

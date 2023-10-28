@@ -11,7 +11,7 @@ import java.util.*;
  * This check verifies whether each variable has been initialized before its use.
  * It ignores completely array accesses as the indexes may depend on runtime values.
  */
-public class UninitializedVariableCheck implements Check {
+public class UninitializedVariableCheck extends AbstractCheck {
 
     private boolean isOk = true;
     @Override
@@ -24,7 +24,7 @@ public class UninitializedVariableCheck implements Check {
     @Override
     public void reportError(@NotNull String msg) {
         isOk = false;
-        Check.super.reportError(msg);
+        super.reportError(msg);
     }
 
     private class UninitializedVisitor implements ASTMonoidVisitor<Set<IdentifierASTNode>> {
