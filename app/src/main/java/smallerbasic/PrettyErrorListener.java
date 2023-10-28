@@ -1,7 +1,6 @@
 package smallerbasic;
 
 import org.antlr.v4.runtime.*;
-import java.util.Objects;
 
 public class PrettyErrorListener extends BaseErrorListener {
     // copied from "the definitive ANTLR 4 reference", pag 156
@@ -12,40 +11,9 @@ public class PrettyErrorListener extends BaseErrorListener {
                             int charPositionInLine,
                             String msg,
                             RecognitionException e) {
-        if (!Objects.isNull(e)) {
-            String ctxString = printCtx((ParserRuleContext) e.getCtx());
-            if (!Objects.isNull(ctxString)) {
-                System.err.println("*** SyntaxError [" + line + ":"
-                        + charPositionInLine + "] error while parsing " + ctxString + ": " + msg);
-                underlineError(recognizer, (Token) offendingSymbol, line, charPositionInLine);
-                return;
-            }
-        }
         System.err.println("*** SyntaxError [" + line + ":"
                     + charPositionInLine + "]: " + msg);
         underlineError(recognizer, (Token) offendingSymbol, line, charPositionInLine);
-    }
-
-    private String printCtx(ParserRuleContext ctx) {
-        if (ctx instanceof SBGrammarParser.AssignmentStmtContext)
-            return "an assignment";
-        if (ctx instanceof SBGrammarParser.ProgramContext)
-            return "the program";
-        if (ctx instanceof SBGrammarParser.IfStmtContext)
-            return "an if statement";
-        if (ctx instanceof SBGrammarParser.WhileStmtContext)
-            return "a while loop";
-        if (ctx instanceof SBGrammarParser.ForStmtContext)
-            return "a for loop";
-        if (ctx instanceof SBGrammarParser.GotoStmtContext)
-            return "a goto";
-        if (ctx instanceof SBGrammarParser.LabelContext)
-            return "a label declaration";
-        if (ctx instanceof SBGrammarParser.SubroutineDeclContext)
-            return "a subroutine declaration";
-        if (ctx instanceof SBGrammarParser.ArrayContext)
-            return "an array";
-        return null;
     }
 
     private void underlineError(Recognizer<?, ?> recognizer,
