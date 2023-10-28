@@ -23,9 +23,6 @@ public class ProgramPrinter {
     private final @NotNull SymbolTable symbols;
     private final @NotNull VarNameGenerator gen;
 
-    /**
-     *
-     */
     private final @NotNull StringBuilder llvmProgram;
 
     public static String compile(@NotNull ASTNode root) {
@@ -87,7 +84,7 @@ public class ProgramPrinter {
 
             String res = "%" + gen.newName();
             addLine(res + " = alloca %struct.Boxed");
-            addLine("call void " + n.getOp()
+            addLine("call void @" + n.getOp()
                     + "(%struct.Boxed* " + res
                     + ", %struct.Boxed* " + left
                     + ", %struct.Boxed* " + right + ")");
@@ -195,6 +192,7 @@ public class ProgramPrinter {
         public String visit(LabelDeclASTNode n) {
             updateLineNumber(n);
             String label = visit(n.getName());
+            addLine("br label %" + label);
             addLine(label + ":");
             return null;
         }
