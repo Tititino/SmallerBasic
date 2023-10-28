@@ -1,0 +1,8 @@
+X = 10 + "ciao"
+X = "ciao" + 10
+
+While (X < true)
+    IO.WriteLine(true And 2)
+EndWhile
+
+X[12]["3"][true] = false

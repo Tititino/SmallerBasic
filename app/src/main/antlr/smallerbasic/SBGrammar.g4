@@ -9,8 +9,8 @@ program : (statement | subroutineDecl)* EOF
 assignmentStmt : var=variable Equal expr=expression
                ;
 
-variable : name=varName                                   # Var
-         | name=varName ('[' expr+=arithExpression ']')+  # Array
+variable : name=varName                              # Var
+         | name=varName ('[' expr+=expression ']')+  # Array
          ;
 
 label : labelName ':' ;
@@ -39,13 +39,23 @@ subroutineDecl : 'Sub' name=functionName
                      body+=statement*
                  'EndSub' ;
 
-expression : variable
-           | arithExpression
-           | stringExpression
-           | booleanExpression
+expression : left=expression op=('*'|'/') right=expression      # MulDivExpr
+           | left=expression op=('+'|'-') right=expression      # PlusMinExpr
+           | left=expression op=(Relop|Equal) right=expression  # RelopExpr
+           | left=expression op=Boolop right=expression         # BoolopExpr
+           | '-' val=atom                                       # UnaryMinusExpr
+           | atom                                               # AtomExpr
            ;
 
-ifStmt : 'If' '(' cond=booleanExpression ')' 'Then'
+atom : String                                                   # StringLit
+     | Number                                                   # NumberLit
+     | Bool                                                     # BoolLit
+     | variable                                                 # VarExpr
+     | callExternalFunction                                     # Extern
+     | '(' body=expression ')'                                  # Parens
+     ;
+
+ifStmt : 'If' '(' cond=expression ')' 'Then'
              bodyTrue+=statement*
           ('Else'
              bodyFalse+=statement*
@@ -53,45 +63,17 @@ ifStmt : 'If' '(' cond=booleanExpression ')' 'Then'
           'EndIf'
        ;
 
-forStmt : 'For' var=variable Equal from=arithExpression 'To' to=arithExpression ('Step' step=arithExpression)?
+forStmt : 'For' var=variable Equal from=expression 'To' to=expression ('Step' step=expression)?
               body+=statement*
           'EndFor'
         ;
 
-whileStmt : 'While' '(' cond=booleanExpression ')'
+whileStmt : 'While' '(' cond=expression ')'
                 body+=statement*
             'EndWhile'
           ;
 
 gotoStmt  : 'Goto' lbl=labelName
-          ;
-
-booleanExpression : left=arithExpression   relop=(Relop|Equal) right=arithExpression    # NumberComparison
-                  | left=stringExpression  relop=(Relop|Equal) right=stringExpression   # StringComparison
-                  | left=booleanExpression binop=Boolop right=booleanExpression         # BoolOp
-                  | '(' expr=booleanExpression ')'                                      # BParens
-                  | Bool                                                                # BoolLiteral
-                  | callExternalFunction                                                # BoolReturningFunc
-                  | variable                                                            # BoolVar
-                  ;
-
-stringExpression : left=stringExpression '+' right=stringExpression                         # StringConcat
-                 | '(' expr=stringExpression ')'                                            # SParens
-                 | String                                                                   # StringLiteral
-                 | callExternalFunction                                                     # StrReturningFunc
-                 | variable                                                                 # StrVar
-                 ;
-
-arithExpression : left=arithExpression op=('/' | '*') right=arithExpression                 # DivMul
-                | left=arithExpression op=('+' | '-') right=arithExpression                 # PlusMin
-                | op='-' arithAtom                                                          # UnaryMinus
-                | arithAtom                                                                 # Atom
-                ;
-
-arithAtom : variable                                                                        # VariableAtom
-          | callExternalFunction                                                            # ExternalFuncAtom
-          | '(' arithExpression ')'                                                         # ParensAtom
-          | Number                                                                          # LiteralAtom
           ;
 
 fragment DIGIT : [0-9] ;

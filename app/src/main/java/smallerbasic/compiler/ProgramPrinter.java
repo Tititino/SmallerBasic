@@ -87,7 +87,7 @@ public class ProgramPrinter {
             String right = n.getRight().accept(this);
 
             String res = "%" + gen.newName();
-            String op = (n.getOp() == BinOpASTNode.BinOp.PLUS || n.getOp() == BinOpASTNode.BinOp.CONCAT)
+            String op = (n.getOp() == BinOpASTNode.BinOp.PLUS)
                     ? OVERLOADED_PLUS
                     : "@" + n.getOp();
             addLine(res + " = alloca %struct.Boxed");

@@ -32,7 +32,6 @@ public class BinOpASTNode extends AbstractASTNode implements ExpressionASTNode {
         MINUS,
         MULT,
         DIV,
-        CONCAT,
         GEQ,
         LEQ,
         EQ,

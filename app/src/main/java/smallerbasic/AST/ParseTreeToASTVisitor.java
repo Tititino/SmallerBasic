@@ -123,131 +123,7 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
         return new GotoStmtASTNode(label);
     }
 
-    @Override
-    public ASTNode visitBParens(SBGrammarParser.BParensContext ctx) {
-        return visit(ctx.expr);
-    }
 
-    @Override
-    public BinOpASTNode visitStringComparison(SBGrammarParser.StringComparisonContext ctx) {
-        return new BinOpASTNode(
-                BinOpASTNode.BinOp.parse(ctx.relop.getText()),
-                (ExpressionASTNode) visit(ctx.left),
-                (ExpressionASTNode) visit(ctx.right)
-        );
-    }
-
-    @Override
-    public BoolLiteralASTNode visitBoolLiteral(SBGrammarParser.BoolLiteralContext ctx) {
-        return BoolLiteralASTNode.parse(ctx.Bool().getText());
-    }
-
-    @Override
-    public ASTNode visitBoolReturningFunc(SBGrammarParser.BoolReturningFuncContext ctx) {
-        return visitCallExternalFunction(ctx.callExternalFunction());
-    }
-
-    @Override
-    public BinOpASTNode visitNumberComparison(SBGrammarParser.NumberComparisonContext ctx) {
-        return new BinOpASTNode(
-                BinOpASTNode.BinOp.parse(ctx.relop.getText()),
-                (ExpressionASTNode) visit(ctx.left),
-                (ExpressionASTNode) visit(ctx.right)
-        );
-    }
-
-    @Override
-    public BinOpASTNode visitBoolOp(SBGrammarParser.BoolOpContext ctx) {
-        return new BinOpASTNode(
-                BinOpASTNode.BinOp.parse(ctx.binop.getText()),
-                (ExpressionASTNode) visit(ctx.left),
-                (ExpressionASTNode) visit(ctx.right)
-        );
-    }
-
-    @Override
-    public ASTNode visitBoolVar(SBGrammarParser.BoolVarContext ctx) {
-        return visit(ctx.variable());
-    }
-
-    @Override
-    public BinOpASTNode visitStringConcat(SBGrammarParser.StringConcatContext ctx) {
-        return new BinOpASTNode(
-                BinOpASTNode.BinOp.CONCAT,
-                (ExpressionASTNode) visit(ctx.left),
-                (ExpressionASTNode) visit(ctx.right)
-        );
-    }
-
-    @Override
-    public ASTNode visitStrReturningFunc(SBGrammarParser.StrReturningFuncContext ctx) {
-        return visit(ctx.callExternalFunction());
-    }
-
-    @Override
-    public StringLiteralASTNode visitStringLiteral(SBGrammarParser.StringLiteralContext ctx) {
-        String str = ctx.getText();
-        return new StringLiteralASTNode(str.substring(1, str.length() - 1));
-    }
-
-    @Override
-    public ASTNode visitSParens(SBGrammarParser.SParensContext ctx) {
-        return visit(ctx.expr);
-    }
-
-    @Override
-    public ASTNode visitStrVar(SBGrammarParser.StrVarContext ctx) {
-        return visit(ctx.variable());
-    }
-
-    @Override
-    public UnaryMinusASTNode visitUnaryMinus(SBGrammarParser.UnaryMinusContext ctx) {
-        ExpressionASTNode expr = (ExpressionASTNode) visit(ctx.arithAtom());
-        return new UnaryMinusASTNode(expr);
-    }
-
-    @Override
-    public BinOpASTNode visitDivMul(SBGrammarParser.DivMulContext ctx) {
-        return new BinOpASTNode(
-                BinOpASTNode.BinOp.parse(ctx.op.getText()),
-                (ExpressionASTNode) visit(ctx.left),
-                (ExpressionASTNode) visit(ctx.right)
-        );
-    }
-
-    @Override
-    public BinOpASTNode visitPlusMin(SBGrammarParser.PlusMinContext ctx) {
-        return new BinOpASTNode(
-                BinOpASTNode.BinOp.parse(ctx.op.getText()),
-                (ExpressionASTNode) visit(ctx.left),
-                (ExpressionASTNode) visit(ctx.right)
-        );
-    }
-
-    @Override
-    public ASTNode visitAtom(SBGrammarParser.AtomContext ctx) {
-        return visit(ctx.arithAtom());
-    }
-
-    @Override
-    public ASTNode visitVariableAtom(SBGrammarParser.VariableAtomContext ctx) {
-        return visit(ctx.variable());
-    }
-
-    @Override
-    public ASTNode visitExternalFuncAtom(SBGrammarParser.ExternalFuncAtomContext ctx) {
-        return visit(ctx.callExternalFunction());
-    }
-
-    @Override
-    public ASTNode visitParensAtom(SBGrammarParser.ParensAtomContext ctx) {
-        return visit(ctx.arithExpression());
-    }
-
-    @Override
-    public ASTNode visitLiteralAtom(SBGrammarParser.LiteralAtomContext ctx) {
-        return NumberLiteralASTNode.parse(ctx.getText());
-    }
 
     @Override
     public RoutineCallASTNode visitCallRoutine(SBGrammarParser.CallRoutineContext ctx) {
@@ -281,12 +157,73 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
     }
 
     @Override
-    public ASTNode visitExpression(SBGrammarParser.ExpressionContext ctx) {
-        return visit(ctx.getChild(0));
+    public ASTNode visitPlusMinExpr(SBGrammarParser.PlusMinExprContext ctx) {
+        ExpressionASTNode left = (ExpressionASTNode) visit(ctx.left);
+        ExpressionASTNode right = (ExpressionASTNode) visit(ctx.right);
+        return new BinOpASTNode(BinOpASTNode.BinOp.parse(ctx.op.getText()), left, right);
     }
 
-    public ASTNode visitBooleanExpression(SBGrammarParser.BooleanExpressionContext ctx) {
-        return visit(ctx);
+    @Override
+    public ASTNode visitMulDivExpr(SBGrammarParser.MulDivExprContext ctx) {
+        ExpressionASTNode left = (ExpressionASTNode) visit(ctx.left);
+        ExpressionASTNode right = (ExpressionASTNode) visit(ctx.right);
+        return new BinOpASTNode(BinOpASTNode.BinOp.parse(ctx.op.getText()), left, right);
+    }
+
+    @Override
+    public ASTNode visitBoolopExpr(SBGrammarParser.BoolopExprContext ctx) {
+        ExpressionASTNode left = (ExpressionASTNode) visit(ctx.left);
+        ExpressionASTNode right = (ExpressionASTNode) visit(ctx.right);
+        return new BinOpASTNode(BinOpASTNode.BinOp.parse(ctx.op.getText()), left, right);
+    }
+
+    @Override
+    public ASTNode visitRelopExpr(SBGrammarParser.RelopExprContext ctx) {
+        ExpressionASTNode left = (ExpressionASTNode) visit(ctx.left);
+        ExpressionASTNode right = (ExpressionASTNode) visit(ctx.right);
+        return new BinOpASTNode(BinOpASTNode.BinOp.parse(ctx.op.getText()), left, right);
+    }
+
+    @Override
+    public ASTNode visitAtomExpr(SBGrammarParser.AtomExprContext ctx) {
+        return visit(ctx.atom());
+    }
+
+    @Override
+    public ASTNode visitUnaryMinusExpr(SBGrammarParser.UnaryMinusExprContext ctx) {
+        ExpressionASTNode body = (ExpressionASTNode) visit(ctx.val);
+        return new UnaryMinusASTNode(body);
+    }
+
+    @Override
+    public ASTNode visitStringLit(SBGrammarParser.StringLitContext ctx) {
+        String str = ctx.getText();
+        return new StringLiteralASTNode(str.substring(1, str.length() - 1));
+    }
+
+    @Override
+    public ASTNode visitNumberLit(SBGrammarParser.NumberLitContext ctx) {
+        return NumberLiteralASTNode.parse(ctx.getText());
+    }
+
+    @Override
+    public ASTNode visitBoolLit(SBGrammarParser.BoolLitContext ctx) {
+        return BoolLiteralASTNode.parse(ctx.Bool().getText());
+    }
+
+    @Override
+    public ASTNode visitVarExpr(SBGrammarParser.VarExprContext ctx) {
+        return visit(ctx.variable());
+    }
+
+    @Override
+    public ASTNode visitExtern(SBGrammarParser.ExternContext ctx) {
+        return visit(ctx.callExternalFunction());
+    }
+
+    @Override
+    public ASTNode visitParens(SBGrammarParser.ParensContext ctx) {
+        return visit(ctx.body);
     }
 
     @Override
