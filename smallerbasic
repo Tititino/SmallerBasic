@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-JAVA="/usr/lib/jvm/openjdk-17/bin/java"
+JAVA="/usr/lib/jvm/openjdk17/bin/java"
 APP="./app/build/libs/app.jar"
 CC=clang
 RUNTIME="./app/src/main/resources/runtime.ll" # TODO: clone it here in resources
@@ -18,6 +18,6 @@ then
   exit 1
 fi
 
-$JAVA -jar $APP "$BASENAME".sb | cat runtime.ll - > "$BASENAME".ll
+$JAVA -jar $APP "$BASENAME".sb | cat $RUNTIME - > "$BASENAME".ll
 opt -opaque-pointers "$BASENAME".ll | llc -opaque-pointers -o "$BASENAME".s
 $CC "$BASENAME".s -lm -o "$BASENAME"
