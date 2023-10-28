@@ -7,6 +7,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * An {@link ASTNode} representing a for loop.
+ * A for loop is composed of a variable name, a start value, an end value, a step and a body.
+ * If the step is not specified this is assumed to be 1.
+ * The body may be empty.
+ */
 public class ForLoopASTNode extends AbstractASTNode implements StatementASTNode {
     private final @NotNull VariableASTNode varName;
     private final @NotNull ExpressionASTNode start;

@@ -7,6 +7,10 @@ import smallerbasic.AST.nodes.*;
 
 import java.util.*;
 
+/**
+ * This check verifies whether each variable has been initialized before its use.
+ * It ignores completely array accesses as the indexes may depend on runtime values.
+ */
 public class UninitializedVariableCheck implements Check {
 
     private boolean isOk = true;

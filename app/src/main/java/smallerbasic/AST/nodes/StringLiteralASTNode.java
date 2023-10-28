@@ -5,6 +5,9 @@ import smallerbasic.AST.ASTVisitor;
 
 import java.util.Objects;
 
+/**
+ * An {@link ASTNode} representing a string literal.
+ */
 public class StringLiteralASTNode extends AbstractASTNode implements LiteralASTNode {
     private final @NotNull String value;
 

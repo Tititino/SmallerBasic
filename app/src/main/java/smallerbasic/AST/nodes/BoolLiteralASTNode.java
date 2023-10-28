@@ -5,6 +5,9 @@ import smallerbasic.AST.ASTVisitor;
 
 import java.util.Objects;
 
+/**
+ * An {@link ASTNode} representing a boolean literal.
+ */
 public class BoolLiteralASTNode extends AbstractASTNode implements LiteralASTNode {
     private final boolean value;
 

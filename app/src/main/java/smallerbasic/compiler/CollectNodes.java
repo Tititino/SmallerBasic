@@ -8,6 +8,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * This class collects different kinds of {@link ASTNode} needed to be treated differently
+ * by the compilation process.
+ * All these nodes need to be preallocated before beginning to print the program.
+ * And their values must be set before beginning the execution of the program.
+ */
 public class CollectNodes {
 
     private final @NotNull Set<NumberLiteralASTNode> numberConstants = new HashSet<>();

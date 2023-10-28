@@ -7,6 +7,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * An {@link ASTNode} representing a program.
+ * A program is made out of either routine declarations
+ * ({@link RoutineDeclASTNode}) or statements ({@link StatementASTNode}).
+ */
 public class ProgramASTNode extends AbstractASTNode implements ASTNode {
 
     private final @NotNull List<@NotNull DeclOrStmtASTNode> contents;

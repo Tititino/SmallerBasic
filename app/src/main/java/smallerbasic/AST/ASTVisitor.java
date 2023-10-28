@@ -2,10 +2,10 @@ package smallerbasic.AST;
 
 import smallerbasic.AST.nodes.*;
 
+/**
+ * Visitor over an AST.
+ */
 public interface ASTVisitor<T> {
-    /**
-     * Visitor over and AST.
-     */
 
     T visit(AssStmtASTNode n);
     T visit(BinOpASTNode n);

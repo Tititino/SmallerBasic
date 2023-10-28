@@ -5,6 +5,11 @@ import smallerbasic.AST.ASTVisitor;
 
 import java.util.Objects;
 
+/**
+ * An {@link ASTNode} representing an assignment statement.
+ * The left side may is a {@link VariableASTNode} and the
+ * right side may be any kind of {@link ExpressionASTNode}
+ */
 public class AssStmtASTNode extends AbstractASTNode implements StatementASTNode {
     private final @NotNull VariableASTNode varName;
     private final @NotNull ExpressionASTNode value;

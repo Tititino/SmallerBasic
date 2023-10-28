@@ -11,23 +11,37 @@ import smallerbasic.symbolTable.VarNameGenerator;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * This class takes a {@link ASTNode}, a {@link SymbolTable} and a {@link VarNameGenerator} and prints out the
+ * LLVM IR corresponding to the tree.
+ */
 public class ProgramPrinter {
 
+    /**
+     * The symbol table.
+     * This is queried to get the name associated with a certain node.
+     */
     private final @NotNull SymbolTable symbols;
     private final @NotNull VarNameGenerator gen;
 
-    private @NotNull StringBuilder llvmProgram = new StringBuilder();
+    /**
+     *
+     */
+    private final @NotNull StringBuilder llvmProgram;
 
-    public ProgramPrinter(@NotNull SymbolTable symbols,
-                          @NotNull VarNameGenerator gen) {
-        this.symbols = symbols;
-        this.gen = gen;
+    public static String compile(@NotNull SymbolTable symbols,
+                                         @NotNull VarNameGenerator gen,
+                                         @NotNull ASTNode root) {
+        return new ProgramPrinter(symbols, gen, root).llvmProgram.toString();
     }
 
-    public @NotNull String compile(@NotNull ASTNode n) {
+    private ProgramPrinter(@NotNull SymbolTable symbols,
+                          @NotNull VarNameGenerator gen,
+                          @NotNull ASTNode root) {
+        this.symbols = symbols;
+        this.gen = gen;
         llvmProgram = new StringBuilder();
-        n.accept(new ProgramPrinterVisitor());
-        return llvmProgram.toString();
+        root.accept(new ProgramPrinterVisitor());
     }
 
     private class ProgramPrinterVisitor implements ASTVisitor<String> {
@@ -107,7 +121,6 @@ public class ProgramPrinter {
             return newName;
         }
 
-        // Modify this to use @FLOOR and integers as indexes ?
         @Override
         public String visit(ForLoopASTNode n) {
             updateLineNumber(n);
@@ -125,7 +138,7 @@ public class ProgramPrinter {
             String end = n.getEnd().accept(this);
             String cond = "%" + gen.newName();
             addLine(cond + " = alloca %struct.Boxed");
-            addLine("call void @" + BinOpASTNode.BinOp.LT
+            addLine("call void @" + BinOpASTNode.BinOp.LEQ
                     + "(%struct.Boxed* " + cond
                     + ", %struct.Boxed* " + var
                     + ", %struct.Boxed* " + end + ")");

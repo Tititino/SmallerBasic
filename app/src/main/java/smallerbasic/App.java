@@ -44,7 +44,7 @@ public class App {
                 return;
             }
             VarNameGenerator gen = new VarNameGenerator();
-            String program = new ProgramPrinter(new SymbolTable(ast.get(), gen), gen).compile(ast.get());
+            String program = ProgramPrinter.compile(new SymbolTable(ast.get(), gen), gen, ast.get());
 
             System.out.println(program);
         } catch (IOException e) {

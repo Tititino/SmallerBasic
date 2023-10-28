@@ -9,6 +9,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * An {@link ASTNode} representing an if the statement.
+ * An if statement is made out of a condition that should evaluate to a boolean; a true body, that may be empty;
+ * and a false body that may be empty or {@code null} if not present.
+ */
 public class IfThenASTNode extends AbstractASTNode implements StatementASTNode {
     private final @NotNull ExpressionASTNode condition;
     private final @NotNull List<@NotNull StatementASTNode> trueBody;

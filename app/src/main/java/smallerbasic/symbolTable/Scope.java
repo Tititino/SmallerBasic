@@ -5,6 +5,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
+/**
+ * A class representing the scope.
+ * A scope may be toplevel, or a function name.
+ */
 public class Scope {
 
     public static @NotNull Scope TOPLEVEL = new Scope();

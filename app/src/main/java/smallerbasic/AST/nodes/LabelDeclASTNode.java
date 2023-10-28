@@ -5,6 +5,9 @@ import smallerbasic.AST.ASTVisitor;
 
 import java.util.Objects;
 
+/**
+ * An {@link ASTNode} representing a declaration of a label.
+ */
 public class LabelDeclASTNode extends AbstractASTNode implements StatementASTNode {
     private final @NotNull LabelNameASTNode name;
 

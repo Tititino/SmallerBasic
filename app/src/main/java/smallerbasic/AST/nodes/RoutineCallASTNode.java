@@ -5,6 +5,9 @@ import smallerbasic.AST.ASTVisitor;
 
 import java.util.Objects;
 
+/**
+ * An {@link ASTNode} representing a call to a subroutine.
+ */
 public class RoutineCallASTNode extends AbstractASTNode implements StatementASTNode {
     private final @NotNull RoutineNameASTNode function;
     public RoutineCallASTNode(@NotNull RoutineNameASTNode function) {

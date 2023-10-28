@@ -6,6 +6,10 @@ import smallerbasic.AST.ASTVisitor;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * An {@link ASTNode} representing a while loop.
+ * A while loop is composed of a condition that should evaluate to a boolean, and a body that may be empty.
+ */
 public class WhileLoopASTNode extends AbstractASTNode implements StatementASTNode {
     private final @NotNull ExpressionASTNode condition;
     private final @NotNull List<@NotNull StatementASTNode> body;
