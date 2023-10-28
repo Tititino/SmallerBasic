@@ -1,7 +1,8 @@
-package smallerbasic.symbolTable;
+package smallerbasic.AST;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import smallerbasic.AST.nodes.RoutineNameASTNode;
 
 import java.util.Objects;
 
@@ -12,11 +13,15 @@ import java.util.Objects;
 public class Scope {
 
     public static @NotNull Scope TOPLEVEL = new Scope();
-    private @Nullable String name = null;
+    private @Nullable RoutineNameASTNode name = null;
 
     private Scope() {}
 
-    public Scope(@NotNull String name) {
+    public static Scope ofRoutine(@NotNull RoutineNameASTNode name) {
+        return new Scope(name);
+    }
+
+    private Scope(@NotNull RoutineNameASTNode name) {
         Objects.requireNonNull(name);
         this.name = name;
     }
@@ -36,6 +41,6 @@ public class Scope {
 
     @Override
     public String toString() {
-        return (Objects.isNull(name) ? "TOPLEVEL" : name);
+        return (Objects.isNull(name) ? "TOPLEVEL" : name.getText());
     }
 }
