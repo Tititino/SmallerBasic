@@ -1,8 +1,37 @@
 package smallerbasic;
 
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.dfa.DFA;
+
+import java.util.BitSet;
 
 public class PrettyErrorListener extends BaseErrorListener {
+
+    private boolean hasFailed = false;
+
+    public boolean hasFailed() {
+        return hasFailed;
+    }
+
+    @Override
+    public void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact, BitSet ambigAlts, ATNConfigSet configs) {
+        hasFailed = true;
+        super.reportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs);
+    }
+
+    @Override
+    public void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, ATNConfigSet configs) {
+        hasFailed = true;
+        super.reportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, conflictingAlts, configs);
+    }
+
+    @Override
+    public void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, ATNConfigSet configs) {
+        hasFailed = true;
+        super.reportContextSensitivity(recognizer, dfa, startIndex, stopIndex, prediction, configs);
+    }
+
     // copied from "the definitive ANTLR 4 reference", pag 156
     @Override
     public void syntaxError(Recognizer<?, ?> recognizer,
@@ -11,6 +40,7 @@ public class PrettyErrorListener extends BaseErrorListener {
                             int charPositionInLine,
                             String msg,
                             RecognitionException e) {
+        hasFailed = true;
         System.err.println("*** SyntaxError [" + line + ":"
                     + charPositionInLine + "]: " + msg);
         underlineError(recognizer, (Token) offendingSymbol, line, charPositionInLine);

@@ -1,6 +1,7 @@
 package smallerbasic.AST;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.nodes.*;
@@ -12,9 +13,19 @@ public class ParseTreeToASTVisitorWithTokens extends ParseTreeToASTVisitor {
         return ast;
     }
 
+    private <N extends ASTNode> @NotNull N setToken(@NotNull N ast, @NotNull Token tok) {
+        ast.setStartToken(tok);
+        ast.setEndToken(tok);
+        return ast;
+    }
+
     // non sono troppo sicuro di questa cosa
     public @NotNull ASTNode visit(@NotNull ParseTree tree) {
-        return setTokens(tree.accept(this), (ParserRuleContext) tree.getPayload());
+        if (tree.getPayload() instanceof ParserRuleContext ctx)
+            return setTokens(tree.accept(this), ctx);
+        System.out.println(tree.getPayload().getClass());
+        System.out.println(tree.getPayload().toString());
+        return setToken(tree.accept(this), (Token) tree.getPayload());
     }
 
 }

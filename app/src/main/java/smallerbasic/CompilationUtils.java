@@ -23,11 +23,15 @@ public class CompilationUtils {
         return new CommonTokenStream(new SBGrammarLexer(CharStreams.fromString(text)));
     }
 
-    public static @NotNull ParseTree parse(@NotNull TokenStream tokens) {
+    public static @NotNull Optional<ParseTree> parse(@NotNull TokenStream tokens) {
         SBGrammarParser parser = new SBGrammarParser(tokens);
+        PrettyErrorListener listener = new PrettyErrorListener();
         parser.removeErrorListeners();
-        parser.addErrorListener(new PrettyErrorListener());
-        return parser.program();
+        parser.addErrorListener(listener);
+        ParseTree tree = parser.program();
+        if (listener.hasFailed())
+            return Optional.empty();
+        return Optional.of(tree);
     }
 
     public static @NotNull ASTNode clean(@NotNull ParseTree tree) {

@@ -29,8 +29,12 @@ public class App {
                     new LabelScopeCheck(),
                     new DoubleLabelCheck()
             );
-            ParseTree parseTree = parse(lex(Paths.get(args[0])));
-            Optional<ASTNode> ast = check(clean(parseTree), staticChecks);
+            Optional<ParseTree> parseTree = parse(lex(Paths.get(args[0])));
+            if (parseTree.isEmpty()) {
+                System.out.println("Compilation failed");
+                return;
+            }
+            Optional<ASTNode> ast = check(clean(parseTree.get()), staticChecks);
             if (ast.isEmpty()) {
                 System.out.println("Static checks failed");
                 return;
