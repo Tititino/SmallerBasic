@@ -15,7 +15,6 @@ variable : name=varName                                   # Var
 
 label : labelName ':' ;
 
-// these three rules may seem useless, but they simplify the process of conversion to an AST
 varName : Ident ;
 
 labelName : Ident ;
