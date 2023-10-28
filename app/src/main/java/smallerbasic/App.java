@@ -1,5 +1,6 @@
 package smallerbasic;
 
+import org.antlr.v4.runtime.tree.ParseTree;
 import smallerbasic.AST.nodes.ASTNode;
 import smallerbasic.AST.staticChecks.DoubleLabelCheck;
 import smallerbasic.AST.staticChecks.LabelScopeCheck;
@@ -28,7 +29,8 @@ public class App {
                     new LabelScopeCheck(),
                     new DoubleLabelCheck()
             );
-            Optional<ASTNode> ast = check(clean(parse(lex(Paths.get(args[0])))), staticChecks);
+            ParseTree parseTree = parse(lex(Paths.get(args[0])));
+            Optional<ASTNode> ast = check(clean(parseTree), staticChecks);
             if (ast.isEmpty()) {
                 System.out.println("Static checks failed");
                 return;

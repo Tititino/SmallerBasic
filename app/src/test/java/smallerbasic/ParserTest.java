@@ -1,14 +1,19 @@
 package smallerbasic;
 
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.io.IOException;
+import java.nio.file.Paths;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
+import static smallerbasic.CompilationUtils.lex;
 
 public class ParserTest {
 
@@ -125,4 +130,28 @@ public class ParserTest {
         assertThatNoException().isThrownBy(parser::program);
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "arraySetTest.sb",
+            "bigTest.sb",
+            "forLoopTest.sb",
+            "illegalLabelsTest.sb",
+            "multiArrayTest.sb",
+            "nestedForTest.sb",
+            "subRoutineTest.sb",
+            "test1.sb",
+            "test2.sb",
+            "test3.sb",
+            "test4.sb",
+            "uninitializedVarTest.sb",
+            "whileTest.sb"
+    })
+    void abiguityTest(String path) throws IOException {
+        TokenStream tokens = lex(Paths.get("src/test/resources/" + path));
+        SBGrammarParser parser = new SBGrammarParser(tokens);
+        parser.removeErrorListeners();
+        parser.addErrorListener(new DiagnosticErrorListener());
+        parser.getInterpreter().setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);
+        parser.program();
+    }
 }
