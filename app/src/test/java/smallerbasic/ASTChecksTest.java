@@ -1,13 +1,10 @@
 package smallerbasic;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import smallerbasic.AST.nodes.ASTNode;
 import smallerbasic.AST.staticChecks.DoubleLabelCheck;
 import smallerbasic.AST.staticChecks.LabelScopeCheck;
-import smallerbasic.symbolTable.SymbolTable;
-import smallerbasic.symbolTable.VarNameGenerator;
 
 import static org.assertj.core.api.Assertions.*;
 import static smallerbasic.CompilationUtils.*;
@@ -18,7 +15,7 @@ public class ASTChecksTest {
         ASTNode tree = clean(parse(lex("Goto label\nlabel:\n")).get());
         LabelScopeCheck checkScope = new LabelScopeCheck() {
             @Override
-            public void reportError(@NotNull String msg) {
+            public void reportError(@NotNull ASTNode n, @NotNull String msg) {
                 throw new RuntimeException();
             }
         };
@@ -31,12 +28,8 @@ public class ASTChecksTest {
     public void fromGlobalToRoutineTest() {
         ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nGoto label\n")).get());
 
-        LabelScopeCheck checkScope = new LabelScopeCheck() {
-            @Override
-            public void reportError(@NotNull String msg) {
-                throw new RuntimeException();
-            }
-        };
+        LabelScopeCheck checkScope = new LabelScopeCheck();
+        checkScope.setErrorReporter((x, y) -> {throw new RuntimeException();});
 
         assertThatThrownBy(() -> checkScope.check(tree))
                 .isInstanceOf(RuntimeException.class);
@@ -46,12 +39,8 @@ public class ASTChecksTest {
     public void fromRoutineToGlobalTest() {
         ASTNode tree = clean(parse(lex("Sub test\nGoto label1\nEndSub\nlabel1:\n")).get());
 
-        LabelScopeCheck checkScope = new LabelScopeCheck() {
-            @Override
-            public void reportError(@NotNull String msg) {
-                throw new RuntimeException();
-            }
-        };
+        LabelScopeCheck checkScope = new LabelScopeCheck();
+        checkScope.setErrorReporter((x, y) -> {throw new RuntimeException();});
 
         assertThatThrownBy(() -> checkScope.check(tree))
                 .isInstanceOf(RuntimeException.class);
@@ -62,6 +51,7 @@ public class ASTChecksTest {
         ASTNode tree = clean(parse(lex("Sub test\nlabel:\nlabel:\nEndSub\n")).get());
 
         DoubleLabelCheck checkDoubles = new DoubleLabelCheck();
+        checkDoubles.setErrorReporter((n, msg) -> {});
 
         assertThat(checkDoubles.check(tree)).isFalse();
     }
@@ -73,53 +63,5 @@ public class ASTChecksTest {
         DoubleLabelCheck checkDoubles = new DoubleLabelCheck();
 
         assertThat(checkDoubles.check(tree)).isTrue();
-    }
-
-    @Test
-    @Disabled
-    public void symbolTableTest() {
-        /*
-        ASTNode tree = clean(parse(lex("""
-                       For A = 1 To 10
-                          For B = 1 To 10
-                            C = 3 * A
-                            Goto fine
-                          EndFor
-                       EndFor
-                       B = C + B
-                       fine:
-                       D = 4
-                       """)));
-
-        VarNameGenerator gen = mock(VarNameGenerator.class);
-        SymbolTable symbols = new SymbolTable(tree, gen);
-
-        // breaks with .containsExactlyInAnyOrder
-        assertThat(new HashSet<>(symbols.getSymbols(IdentifierASTNode.class))).isEqualTo(
-                Set.of(
-                        new IdentifierASTNode("A"),
-                        new IdentifierASTNode("B"),
-                        new IdentifierASTNode("C"),
-                        new IdentifierASTNode("D")
-                )
-        );
-         */
-    }
-
-    @Test
-    @Disabled
-    public void doubleLabelDifferentScopeSymbolTableTest() {
-        ASTNode tree = clean(parse(lex("""
-                       Sub test
-                          label:
-                          A = 1
-                       EndSub
-                       label:
-                       A = 2
-                       """)).get());
-
-        SymbolTable symbols = new SymbolTable(tree, new VarNameGenerator());
-
-        // assertThat(symbols.getSymbols(LabelNameASTNode.class)).hasSize(2);
     }
 }
