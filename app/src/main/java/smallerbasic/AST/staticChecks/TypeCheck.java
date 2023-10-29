@@ -7,6 +7,11 @@ import smallerbasic.AST.nodes.*;
 
 import java.util.List;
 
+/**
+ * This check verifies whether a program is well-typed.
+ * Variables and arrays are assigned a type of {@code ANY} and no effort is made to try to
+ * guess the type of a variable through assignments.
+ */
 public class TypeCheck extends AbstractCheck {
     private boolean isOk = true;
 
@@ -23,6 +28,10 @@ public class TypeCheck extends AbstractCheck {
         super.reportError(n, msg);
     }
 
+    /**
+     * Something in a Smaller Basic program may have one of three types: NUMBER, BOOL or STRING.
+     * A statement has type NONE, and a variable has type ANY.
+     */
     public enum TYPE {
         NONE,
         ANY,
@@ -30,6 +39,9 @@ public class TypeCheck extends AbstractCheck {
         STRING,
         BOOL;
 
+        /**
+         * Returns whether a {@link TYPE} matches another.
+         */
         public boolean matches(@NotNull TYPE expected) {
             if (this.equals(ANY))
                 return true;
@@ -38,6 +50,9 @@ public class TypeCheck extends AbstractCheck {
             return (this.equals(expected));
         }
 
+        /**
+         * Returns whether a {@link TYPE} matches any in the expected list.
+         */
         public boolean matches(@NotNull List<TYPE> expected) {
             return expected.stream().anyMatch(this::matches);
         }
@@ -54,6 +69,10 @@ public class TypeCheck extends AbstractCheck {
         }
     }
 
+    /**
+     * Report an error mismatch if {@code got} is different {@code expected}.
+     * The {@link ASTNode} is needed for positional information.
+     */
     private void reportMismatch(@NotNull ASTNode n, @NotNull TYPE got, @NotNull TYPE expected) {
         if (!got.matches(expected)) {
             String position = "";
@@ -69,6 +88,10 @@ public class TypeCheck extends AbstractCheck {
         }
     }
 
+    /**
+     * Report an error mismatch if {@code got} is not in the {@code expected} list.
+     * The {@link ASTNode} is needed for positional information.
+     */
     private void reportMismatch(@NotNull ASTNode n, @NotNull TYPE got, @NotNull List<TYPE> expected) {
         if (!got.matches(expected)) {
             String position = "";
@@ -84,6 +107,9 @@ public class TypeCheck extends AbstractCheck {
         }
     }
 
+    /**
+     * A {@link ASTVisitor} to assign types to each {@link ASTNode}.
+     */
     private class TypingVisitor implements ASTVisitor<TYPE> {
 
         private TYPE visitChildren(List<? extends ASTNode> l) {

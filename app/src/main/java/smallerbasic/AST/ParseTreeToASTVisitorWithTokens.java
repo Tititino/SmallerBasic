@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.nodes.*;
 
 /**
- * A decorator over {@link ParseTreeToASTVisitor} that associates start and end token to each {@link ASTNode} created.
+ * This class extends {@link ParseTreeToASTVisitor} by associating start and end tokens to each {@link ASTNode} created.
  */
 public class ParseTreeToASTVisitorWithTokens extends ParseTreeToASTVisitor {
     private <N extends ASTNode> @NotNull N setTokens(@NotNull N ast, @NotNull ParserRuleContext ctx) {
@@ -22,7 +22,11 @@ public class ParseTreeToASTVisitorWithTokens extends ParseTreeToASTVisitor {
         return ast;
     }
 
-    // non sono troppo sicuro di questa cosa
+
+    /**
+     * The payload of a {@link ParseTree} may be either a {@link org.antlr.v4.runtime.RuleContext}
+     * or a {@link Token} ({@see ParseTree::getPayload()}).
+     */
     public @NotNull ASTNode visit(@NotNull ParseTree tree) {
         if (tree.getPayload() instanceof ParserRuleContext ctx)
             return setTokens(tree.accept(this), ctx);

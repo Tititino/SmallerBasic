@@ -4,13 +4,15 @@ import org.antlr.v4.runtime.*;
 
 /**
  * This class prints out the errors with carets underneath the offending characters.
- * There is also a method, {@see hasFailed}, that {@code true} if there have been any errors.
- * This is used to prevent passing a malformed parse tree to {@link smallerbasic.AST.ParseTreeToASTVisitor}.
  */
 public class PrettyErrorListener extends BaseErrorListener {
 
     private boolean hasFailed = false;
 
+    /**
+     * Query if any syntaxError has happened during the parsing.
+     * @return {@code true} if {@see syntaxError} was called at least once.
+     */
     public boolean hasFailed() {
         return hasFailed;
     }

@@ -6,6 +6,9 @@ import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.nodes.ASTNode;
 import smallerbasic.AST.staticChecks.ErrorReporter;
 
+/**
+ * {@link ErrorReporter} that prints error in a similar fashion to {@link PrettyErrorListener}.
+ */
 public class PrettyErrorPrinter implements ErrorReporter {
     private final @NotNull String[] lines;
 

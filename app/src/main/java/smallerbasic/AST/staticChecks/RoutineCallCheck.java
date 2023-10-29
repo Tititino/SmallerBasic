@@ -8,8 +8,6 @@ import smallerbasic.AST.nodes.*;
 import java.util.HashSet;
 
 public class RoutineCallCheck extends AbstractCheck {
-
-
     public boolean check(@NotNull ASTNode n) {
         boolean isOk = true;
         HashSet<RoutineNameASTNode> declared = new HashSet<>();

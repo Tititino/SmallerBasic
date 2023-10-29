@@ -88,6 +88,9 @@ public class UninitializedVariableCheck extends AbstractCheck {
             return Set.of(n);
         }
 
+        /**
+         * Array identifiers are ignored since indexes may be dependant on runtime values.
+         */
         @Override
         public Set<IdentifierASTNode> visit(ArrayASTNode n) {
             // does not make sense to check arrays since indexes could be not known statically
