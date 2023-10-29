@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import smallerbasic.AST.nodes.ASTNode;
 import smallerbasic.AST.staticChecks.DoubleLabelCheck;
 import smallerbasic.AST.staticChecks.LabelScopeCheck;
+import smallerbasic.AST.staticChecks.MaxNameLengthCheck;
 
 import static org.assertj.core.api.Assertions.*;
 import static smallerbasic.CompilationUtils.*;
@@ -56,6 +57,26 @@ public class ASTChecksTest {
         ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nlabel:\n")).get());
 
         DoubleLabelCheck checkDoubles = new DoubleLabelCheck();
+
+        assertThat(checkDoubles.check(tree)).isTrue();
+    }
+
+    @Test
+    public void maxNameLengthTest() {
+        ASTNode tree = clean(parse(lex("Sub " + "a".repeat(41) + "\n" +
+                "b".repeat(41) + ":\nEndSub\n" +
+                "c".repeat(41) + " = 0\n")).get());
+
+        MaxNameLengthCheck checkDoubles = new MaxNameLengthCheck();
+
+        assertThat(checkDoubles.check(tree)).isFalse();
+    }
+
+    @Test
+    public void maxNameLengthLimitTest() {
+        ASTNode tree = clean(parse(lex("c".repeat(40) + " = 0\n")).get());
+
+        MaxNameLengthCheck checkDoubles = new MaxNameLengthCheck();
 
         assertThat(checkDoubles.check(tree)).isTrue();
     }

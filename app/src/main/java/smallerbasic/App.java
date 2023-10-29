@@ -21,6 +21,7 @@ public class App {
 
         try {
             List<Check> errors = List.of(
+                    new MaxNameLengthCheck(),
                     new TypeCheck(),
                     new LabelScopeCheck(),
                     new DoubleLabelCheck(),
