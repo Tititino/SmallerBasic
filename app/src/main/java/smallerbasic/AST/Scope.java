@@ -8,7 +8,10 @@ import java.util.Objects;
 
 /**
  * A class representing the scope.
- * A scope may be toplevel, or a function name.
+ * Since in SmallerBasic all variables are global, scope is only applied to labels.
+ * And since subroutines cannot be nested, only two types of scopes are needed:
+ *   - top-level
+ *   - inside a routine
  */
 public class Scope {
 

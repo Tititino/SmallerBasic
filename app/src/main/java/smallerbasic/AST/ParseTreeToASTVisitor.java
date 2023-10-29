@@ -16,6 +16,7 @@ import java.util.stream.IntStream;
 /**
  * A class to convert a {@link ParseTree} made by {@link SBGrammarParser} to an AST.
  * This class accepts only well-formed parse trees.
+ * The behaviour is undefined if the parse is generated from a wrong input.
  */
 public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
 

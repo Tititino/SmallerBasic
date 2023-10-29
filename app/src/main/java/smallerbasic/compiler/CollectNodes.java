@@ -11,8 +11,8 @@ import java.util.Set;
 /**
  * This class collects different kinds of {@link ASTNode} needed to be treated differently
  * by the compilation process.
- * All these nodes need to be preallocated before beginning to print the program.
- * And their values must be set before beginning the execution of the program.
+ * All these nodes need to be preallocated before beginning to print the program and
+ * their values must be set before beginning the execution of the program.
  */
 public class CollectNodes {
 

@@ -45,23 +45,18 @@ public class SymbolTable {
 
         @Override
         public Set<HasSymbol> visit(RoutineDeclASTNode n) {
-            Set<HasSymbol> body = n.getBody()
-                    .stream()
-                    .map(x -> x.accept(this))
-                    .reduce(empty(), this::compose);
-            return compose(Set.of(n.getName()), body);
+            Set<HasSymbol> body = visitChildren(n.getBody());
+            return compose(visit(n.getName()), body);
         }
 
         @Override
         public Set<HasSymbol> visit(RoutineCallASTNode n) {
             return empty();
         }
-
         @Override
         public Set<HasSymbol> visit(GotoStmtASTNode n) {
             return empty();
         }
-
         @Override
         public Set<HasSymbol> visit(LabelNameASTNode n) {
             return Set.of(n);

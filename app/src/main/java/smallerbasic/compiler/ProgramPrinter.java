@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * This class takes a {@link ASTNode}, a {@link SymbolTable} and a {@link VarNameGenerator} and prints out the
- * LLVM IR corresponding to the tree.
+ * This class takes a {@link ASTNode}, a {@link SymbolTable} and a {@link VarNameGenerator} and returns the
+ * corresponding LLVM IR as a String.
  */
 public class ProgramPrinter {
 
@@ -23,6 +23,9 @@ public class ProgramPrinter {
     private final @NotNull SymbolTable symbols;
     private final @NotNull VarNameGenerator gen;
 
+    /**
+     * This StringBuilder accumulates the lines of LLVM IR generated.
+     */
     private final @NotNull StringBuilder llvmProgram;
 
     public static String compile(@NotNull ASTNode root) {
@@ -40,8 +43,14 @@ public class ProgramPrinter {
         root.accept(new ProgramPrinterVisitor());
     }
 
+    /**
+     * A {@link ASTVisitor} that prints the tree in LLVM IR format.
+     */
     private class ProgramPrinterVisitor implements ASTVisitor<String> {
 
+        /**
+         * Last line printed.
+         */
         private int lastLine = -1;
         private final static @NotNull String BOOL_GETTER = "@_GET_BOOL_VALUE";
         private final static @NotNull String NUMBER_SETTER = "@_SET_NUM_VALUE";
@@ -58,6 +67,12 @@ public class ProgramPrinter {
             llvmProgram.append(s).append("\n");
         }
 
+        /**
+         * Line information is threaded inside the program using a global variable that is updated at each line change.
+         * If {@link ASTNode}s do not have tokens associated with them the line will remain -1.
+         * To avoid adding lots of {@code store}s for the same line number, this method checks that the new line
+         * number is different from the last line printed {@see lastLine}.
+         */
         private void updateLineNumber(@NotNull ASTNode node) {
             Optional<Token> startToken = node.getStartToken();
             if (startToken.isPresent() && startToken.get().getLine() != lastLine) {
