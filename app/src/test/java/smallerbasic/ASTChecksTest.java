@@ -1,6 +1,5 @@
 package smallerbasic;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import smallerbasic.AST.nodes.ASTNode;
 import smallerbasic.AST.staticChecks.DoubleLabelCheck;
@@ -13,12 +12,8 @@ public class ASTChecksTest {
     @Test
     public void labelScopeCheckingTest() {
         ASTNode tree = clean(parse(lex("Goto label\nlabel:\n")).get());
-        LabelScopeCheck checkScope = new LabelScopeCheck() {
-            @Override
-            public void reportError(@NotNull ASTNode n, @NotNull String msg) {
-                throw new RuntimeException();
-            }
-        };
+        LabelScopeCheck checkScope = new LabelScopeCheck();
+        checkScope.setErrorReporter((x, y) -> {throw new RuntimeException();});
 
         assertThat(checkScope.check(tree)).isTrue();
         assertThatNoException().isThrownBy(() -> checkScope.check(tree));
