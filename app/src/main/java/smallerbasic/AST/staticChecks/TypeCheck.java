@@ -143,6 +143,7 @@ public class TypeCheck extends AbstractCheck {
 
         @Override
         public TYPE visit(ExternalFunctionCallASTNode n) {
+            visitChildren(n.getArgs());
             return TYPE.ANY;
         }
 
