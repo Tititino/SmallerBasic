@@ -8,6 +8,9 @@ import smallerbasic.AST.nodes.IdentifierASTNode;
 import smallerbasic.AST.nodes.LabelNameASTNode;
 import smallerbasic.AST.nodes.RoutineNameASTNode;
 
+/**
+ * Check for max identifier length.
+ */
 public class MaxNameLengthCheck extends AbstractCheck {
 
     private boolean isOk = true;
