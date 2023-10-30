@@ -1,14 +1,28 @@
 package smallerbasic.AST.nodes;
 
+import org.jetbrains.annotations.NotNull;
+import smallerbasic.AST.ASTVisitor;
+
 import java.util.Objects;
 
-public class LabelDeclASTNode implements StatementASTNode {
-    private final String name;
+/**
+ * An {@link ASTNode} representing a declaration of a label.
+ */
+public class LabelDeclASTNode extends AbstractASTNode implements StatementASTNode {
+    private final @NotNull LabelNameASTNode name;
 
-    public LabelDeclASTNode(String name) {
+    public LabelDeclASTNode(@NotNull LabelNameASTNode name) {
         this.name = name;
     }
 
+    public @NotNull LabelNameASTNode getName() {
+        return name;
+    }
+
+    @Override
+    public <T> T accept(ASTVisitor<T> v) {
+        return v.visit(this);
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -28,4 +42,5 @@ public class LabelDeclASTNode implements StatementASTNode {
                 "name='" + name + '\'' +
                 '}';
     }
+
 }

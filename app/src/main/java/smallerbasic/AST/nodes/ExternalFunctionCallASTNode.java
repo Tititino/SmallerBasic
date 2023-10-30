@@ -1,11 +1,18 @@
 package smallerbasic.AST.nodes;
 
 import org.jetbrains.annotations.NotNull;
+import smallerbasic.AST.ASTVisitor;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class ExternalFunctionCallASTNode implements ExpressionASTNode, StatementASTNode {
+/**
+ * An {@link ASTNode} representing a call to an external function.
+ * An external function may be used as a statement (e.g. {@code IO.WriteLine("ciao")}) or as an expression
+ * (e.g. {@code X = IO.ReadLine()}).
+ */
+public class ExternalFunctionCallASTNode extends AbstractASTNode implements StatementASTNode, ExpressionASTNode {
 
     private final @NotNull String module;
     private final @NotNull String function;
@@ -19,6 +26,23 @@ public class ExternalFunctionCallASTNode implements ExpressionASTNode, Statement
         this.module = module;
         this.function = function;
         this.args = args;
+    }
+
+    public @NotNull String getModule() {
+        return module;
+    }
+
+    public @NotNull String getFunction() {
+        return function;
+    }
+
+    public @NotNull List<ExpressionASTNode> getArgs() {
+        return Collections.unmodifiableList(args);
+    }
+
+    @Override
+    public <T> T accept(ASTVisitor<T> v) {
+        return v.visit(this);
     }
 
     @Override

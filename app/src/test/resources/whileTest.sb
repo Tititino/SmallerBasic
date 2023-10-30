@@ -1,0 +1,5 @@
+B = 0
+While (B < 10)
+    IO.WriteLine(B)
+    B = B + 1
+EndWhile

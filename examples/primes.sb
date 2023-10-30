@@ -1,0 +1,34 @@
+Max = 1000
+Num = 2
+
+Sub init
+  If (Num > Max) Then
+    Goto fine
+  EndIf
+  Numbers[Num - 2] = Num
+  Num = Num + 1
+  init()
+  fine:
+EndSub
+
+Sub filter
+  For X = 1 To Max
+    For Y = 0 To (Math.Sqrt(Numbers[X]))
+      If ((Numbers[Y] <> -1) And (Numbers[X] / Numbers[Y] = Math.Floor(Numbers[X] / Numbers[Y]))) Then
+        Numbers[X] = -1
+        Goto endloop
+      EndIf
+    EndFor
+    endloop:
+  EndFor
+EndSub
+
+init()
+
+filter()
+
+For X = 0 To Max
+  If (Numbers[X] <> -1) Then
+    IO.WriteLine(Numbers[X])
+  EndIf
+EndFor

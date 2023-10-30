@@ -1,12 +1,28 @@
 package smallerbasic.AST.nodes;
 
+import org.jetbrains.annotations.NotNull;
+import smallerbasic.AST.ASTVisitor;
+import smallerbasic.symbolTable.HasSymbol;
+
 import java.util.Objects;
 
-public class IdentifierASTNode implements ExpressionASTNode {
-    private final String name;
+/**
+ * An {@link ASTNode} representing an identifier.
+ */
+public class IdentifierASTNode extends AbstractASTNode implements ExpressionASTNode, VariableASTNode, HasSymbol {
+    private final @NotNull String name;
 
-    public IdentifierASTNode(String name) {
+    public IdentifierASTNode(@NotNull String name) {
         this.name = name;
+    }
+
+    public @NotNull String getName() {
+        return name;
+    }
+
+    @Override
+    public <T> T accept(ASTVisitor<T> v) {
+        return v.visit(this);
     }
 
     @Override

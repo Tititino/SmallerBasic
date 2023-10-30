@@ -1,0 +1,8 @@
+A = "ciao"
+B = 1 + 2
+C = true
+IO.WriteLine(A)
+Goto inizio
+IO.WriteLine(B)
+IO.WriteLine(C)
+inizio:

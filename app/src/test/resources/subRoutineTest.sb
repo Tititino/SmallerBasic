@@ -1,0 +1,9 @@
+Sub Add2
+    B = B + 2
+EndSub
+
+B = -10
+While (B <= 10)
+    IO.WriteLine(B)
+    Add2()
+EndWhile

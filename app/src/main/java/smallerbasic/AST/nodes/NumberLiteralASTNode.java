@@ -1,15 +1,26 @@
 package smallerbasic.AST.nodes;
 
+import org.jetbrains.annotations.NotNull;
+import smallerbasic.AST.ASTVisitor;
+
 import java.util.Objects;
 
-public class NumberLiteralASTNode implements LiteralASTNode {
+/**
+ * An {@link ASTNode} representing a number literal.
+ * A number is SmallerBasic is a double.
+ */
+public class NumberLiteralASTNode extends AbstractASTNode implements LiteralASTNode {
     private final double value;
 
-    public static NumberLiteralASTNode parse(String text) {
+    public static @NotNull NumberLiteralASTNode parse(@NotNull String text) {
         return new NumberLiteralASTNode(Double.parseDouble(text));
     }
     public NumberLiteralASTNode(double value) {
         this.value = value;
+    }
+
+    public double getValue() {
+        return value;
     }
 
     @Override
@@ -18,6 +29,11 @@ public class NumberLiteralASTNode implements LiteralASTNode {
         if (o == null || getClass() != o.getClass()) return false;
         NumberLiteralASTNode that = (NumberLiteralASTNode) o;
         return Double.compare(that.value, value) == 0;
+    }
+
+    @Override
+    public <T> T accept(ASTVisitor<T> v) {
+        return v.visit(this);
     }
 
     @Override

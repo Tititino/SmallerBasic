@@ -1,15 +1,34 @@
 package smallerbasic.AST.nodes;
 
+import org.jetbrains.annotations.NotNull;
+import smallerbasic.AST.ASTVisitor;
+
 import java.util.List;
 import java.util.Objects;
 
-public class WhileLoopASTNode implements StatementASTNode {
-    private final ExpressionASTNode condition;
-    private final List<StatementASTNode> body;
+/**
+ * An {@link ASTNode} representing a while loop.
+ * A while loop is composed of a condition that should evaluate to a boolean, and a body that may be empty.
+ */
+public class WhileLoopASTNode extends AbstractASTNode implements StatementASTNode {
+    private final @NotNull ExpressionASTNode condition;
+    private final @NotNull List<@NotNull StatementASTNode> body;
 
-    public WhileLoopASTNode(ExpressionASTNode condition, List<StatementASTNode> body) {
+    public WhileLoopASTNode(@NotNull ExpressionASTNode condition, @NotNull List<StatementASTNode> body) {
         this.condition = condition;
         this.body = body;
+    }
+    @Override
+    public <T> T accept(ASTVisitor<T> v) {
+        return v.visit(this);
+    }
+
+    public @NotNull ExpressionASTNode getCondition() {
+        return condition;
+    }
+
+    public @NotNull List<@NotNull StatementASTNode> getBody() {
+        return body;
     }
 
     @Override

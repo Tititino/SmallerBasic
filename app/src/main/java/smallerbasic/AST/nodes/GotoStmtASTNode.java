@@ -1,11 +1,18 @@
 package smallerbasic.AST.nodes;
 
+import org.jetbrains.annotations.NotNull;
+
+import smallerbasic.AST.ASTVisitor;
+
 import java.util.Objects;
 
-public class GotoStmtASTNode implements StatementASTNode {
-    private final String label;
+/**
+ * An {@link ASTNode} representing a goto statement.
+ */
+public class GotoStmtASTNode extends AbstractASTNode implements StatementASTNode {
+    private final @NotNull LabelNameASTNode label;
 
-    public GotoStmtASTNode(String label) {
+    public GotoStmtASTNode(@NotNull LabelNameASTNode label) {
         this.label = label;
     }
 
@@ -15,6 +22,15 @@ public class GotoStmtASTNode implements StatementASTNode {
         if (o == null || getClass() != o.getClass()) return false;
         GotoStmtASTNode that = (GotoStmtASTNode) o;
         return label.equals(that.label);
+    }
+
+    public @NotNull LabelNameASTNode getLabel() {
+        return label;
+    }
+
+    @Override
+    public <T> T accept(ASTVisitor<T> v) {
+        return v.visit(this);
     }
 
     @Override
@@ -28,4 +44,6 @@ public class GotoStmtASTNode implements StatementASTNode {
                 "label='" + label + '\'' +
                 '}';
     }
+
+
 }

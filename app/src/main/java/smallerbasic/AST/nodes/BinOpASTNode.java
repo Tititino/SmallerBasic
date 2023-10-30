@@ -1,20 +1,30 @@
 package smallerbasic.AST.nodes;
 
+import org.jetbrains.annotations.NotNull;
+import smallerbasic.AST.ASTVisitor;
+
 import java.util.Objects;
 
-public class BinOpASTNode implements ExpressionASTNode {
+/**
+ * An {@link ASTNode} representing a binary operation.
+ * The binary operation is composed of a left {@link ExpressionASTNode}, a binary operator, and a
+ * right {@link ExpressionASTNode}.
+ */
+public class BinOpASTNode extends AbstractASTNode implements ExpressionASTNode {
 
-    private final BinOp op;
-    private final ExpressionASTNode left;
-    private final ExpressionASTNode right;
+    private final @NotNull BinOp op;
+    private final @NotNull ExpressionASTNode left;
+    private final @NotNull ExpressionASTNode right;
 
-    public BinOpASTNode(BinOp op, ExpressionASTNode left, ExpressionASTNode right) {
-        Objects.requireNonNull(op);
-        Objects.requireNonNull(left);
-        Objects.requireNonNull(right);
+    public BinOpASTNode(@NotNull BinOp op, @NotNull ExpressionASTNode left, @NotNull ExpressionASTNode right) {
         this.op = op;
         this.left = left;
         this.right = right;
+    }
+
+    @Override
+    public <T> T accept(ASTVisitor<T> v) {
+        return v.visit(this);
     }
 
     public enum BinOp {
@@ -22,7 +32,6 @@ public class BinOpASTNode implements ExpressionASTNode {
         MINUS,
         MULT,
         DIV,
-        CONCAT,
         GEQ,
         LEQ,
         EQ,
@@ -32,7 +41,7 @@ public class BinOpASTNode implements ExpressionASTNode {
         AND,
         OR;
 
-        public static BinOp parse(String s) {
+        public static BinOp parse(@NotNull String s) {
             return switch (s) {
                 case "+" -> PLUS;
                 case "-" -> MINUS;
@@ -49,6 +58,17 @@ public class BinOpASTNode implements ExpressionASTNode {
                 default -> throw new IllegalArgumentException("The string \"" + s + "\" is no a valid operator");
             };
         }
+    }
+    public @NotNull BinOp getOp() {
+        return op;
+    }
+
+    public @NotNull ExpressionASTNode getLeft() {
+        return left;
+    }
+
+    public @NotNull ExpressionASTNode getRight() {
+        return right;
     }
 
     @Override

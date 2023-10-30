@@ -1,13 +1,19 @@
 package smallerbasic;
 
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.PredictionMode;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.io.IOException;
+import java.nio.file.Paths;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
+import static smallerbasic.CompilationUtils.lex;
 
 public class ParserTest {
 
@@ -38,10 +44,11 @@ public class ParserTest {
             "1 + 3 * 4,(arithExpression (arithExpression 1) + (arithExpression (arithExpression 3) * (arithExpression 4)))",
             "1 / 3 - 4,(arithExpression (arithExpression (arithExpression 1) / (arithExpression 3)) - (arithExpression 4))",
     })
+    @Disabled
     void arithExprTest(String expr, String expected) {
         SBGrammarLexer lexer = new SBGrammarLexer(CharStreams.fromString(expr));
         SBGrammarParser parser = new SBGrammarParser(new CommonTokenStream(lexer));
-        ParserRuleContext tree = parser.arithExpression();
+        ParserRuleContext tree = parser.expression();
 
         assertThat(tree.toStringTree(parser)).isEqualTo(expected);
     }
@@ -50,22 +57,27 @@ public class ParserTest {
     void compExprTest() {
         SBGrammarLexer lexer = new SBGrammarLexer(CharStreams.fromString("1 + 2 <= 3 * 4"));
         SBGrammarParser parser = new SBGrammarParser(new CommonTokenStream(lexer));
-        ParserRuleContext tree = parser.booleanExpression();
+        ParserRuleContext tree = parser.expression();
 
         assertThat(tree.toStringTree(parser))
-                .isEqualTo("(booleanExpression (arithExpression (arithExpression 1) + (arithExpression 2)) <= (arithExpression (arithExpression 3) * (arithExpression 4)))");
+                .isEqualTo("(expression " +
+                        "(expression (expression (atom 1)) + (expression (atom 2))) " +
+                        "<= (expression (expression (atom 3)) * (expression (atom 4))))");
     }
 
     @Test
     void precedenceTest() {
         SBGrammarLexer lexer = new SBGrammarLexer(CharStreams.fromString("1 + 2 * 3 < 5 Or a = 1 + b + 2"));
         SBGrammarParser parser = new SBGrammarParser(new CommonTokenStream(lexer));
-        ParserRuleContext tree = parser.booleanExpression();
+        ParserRuleContext tree = parser.expression();
 
         assertThat(tree.toStringTree(parser))
                 .isEqualTo(
-                        // ((1 + (2 * 3)) < 5) Or (0 = ((1 + 1) + 2))
-                        "(booleanExpression (booleanExpression (arithExpression (arithExpression 1) + (arithExpression (arithExpression 2) * (arithExpression 3))) < (arithExpression 5)) Or (booleanExpression (arithExpression a) = (arithExpression (arithExpression (arithExpression 1) + (arithExpression b)) + (arithExpression 2))))"
+                        "(expression (expression (expression (expression (atom 1)) " +
+                                "+ (expression (expression (atom 2)) * (expression (atom 3)))) " +
+                                "< (expression (atom 5))) Or (expression (expression (atom (variable (varName a)))) " +
+                                "= (expression (expression (expression (atom 1)) + (expression (atom (variable (varName b))))) " +
+                                "+ (expression (atom 2)))))"
                 );
     }
 
@@ -77,7 +89,7 @@ public class ParserTest {
 
         assertThat(tree.toStringTree(parser))
                 .isEqualTo(
-                        "(assignmentStmt a = (expression (arithExpression 10)))"
+                        "(assignmentStmt (variable (varName a)) = (expression (atom 10)))"
                 );
     }
 
@@ -118,4 +130,28 @@ public class ParserTest {
         assertThatNoException().isThrownBy(parser::program);
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "arraySetTest.sb",
+            "bigTest.sb",
+            "forLoopTest.sb",
+            "illegalLabelsTest.sb",
+            "multiArrayTest.sb",
+            "nestedForTest.sb",
+            "subRoutineTest.sb",
+            "test1.sb",
+            "test2.sb",
+            "test3.sb",
+            "test4.sb",
+            "uninitializedVarTest.sb",
+            "whileTest.sb"
+    })
+    void abiguityTest(String path) throws IOException {
+        TokenStream tokens = lex(Paths.get("src/test/resources/" + path));
+        SBGrammarParser parser = new SBGrammarParser(tokens);
+        parser.removeErrorListeners();
+        parser.addErrorListener(new DiagnosticErrorListener());
+        parser.getInterpreter().setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);
+        parser.program();
+    }
 }

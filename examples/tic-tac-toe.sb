@@ -1,0 +1,54 @@
+Sub Atoi_col
+  If (ColStr = "0") Then Col = 0 EndIf
+  If (ColStr = "1") Then Col = 1 EndIf
+  If (ColStr = "2") Then Col = 2 EndIf
+EndSub
+
+Sub Atoi_row
+  If (RowStr = "0") Then Row = 0 EndIf
+  If (RowStr = "1") Then Row = 1 EndIf
+  If (RowStr = "2") Then Row = 2 EndIf
+EndSub
+
+
+For X = 0 To 2
+  For Y = 0 To 2
+    Board[X][Y] = " "
+  EndFor
+EndFor
+
+Sub Print_game
+  For X = 0 To 2
+    IO.WriteLine(Board[X][0] + "|" + Board[X][1] + "|" + Board[X][2])
+    If (X <> 2) Then
+      IO.WriteLine("-+-+-")
+    EndIf
+  EndFor
+EndSub
+
+
+While (true)
+  IO.WriteLine("=P1===")
+  IO.WriteLine("row:")
+  RowStr = IO.ReadLine()
+  IO.WriteLine("column:")
+  ColStr = IO.ReadLine()
+  Atoi_row()
+  Atoi_col()
+
+  Board[Row][Col] = "X"
+
+  Print_game()
+
+  IO.WriteLine("=P2===")
+  IO.WriteLine("row:")
+  RowStr = IO.ReadLine()
+  IO.WriteLine("column:")
+  ColStr = IO.ReadLine()
+  Atoi_row()
+  Atoi_col()
+
+  Board[Row][Col] = "O"
+
+  Print_game()
+EndWhile

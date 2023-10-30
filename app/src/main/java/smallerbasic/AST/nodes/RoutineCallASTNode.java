@@ -1,14 +1,26 @@
 package smallerbasic.AST.nodes;
 
 import org.jetbrains.annotations.NotNull;
+import smallerbasic.AST.ASTVisitor;
 
 import java.util.Objects;
 
-public class RoutineCallASTNode implements StatementASTNode {
-    private final @NotNull String function;
-    public RoutineCallASTNode(@NotNull String function) {
-        Objects.requireNonNull(function);
+/**
+ * An {@link ASTNode} representing a call to a subroutine.
+ */
+public class RoutineCallASTNode extends AbstractASTNode implements StatementASTNode {
+    private final @NotNull RoutineNameASTNode function;
+    public RoutineCallASTNode(@NotNull RoutineNameASTNode function) {
         this.function = function;
+    }
+
+    public @NotNull RoutineNameASTNode getFunction() {
+        return function;
+    }
+
+    @Override
+    public <T> T accept(ASTVisitor<T> v) {
+        return v.visit(this);
     }
 
     @Override

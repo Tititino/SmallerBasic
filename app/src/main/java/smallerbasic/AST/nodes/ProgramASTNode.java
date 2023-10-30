@@ -1,17 +1,34 @@
 package smallerbasic.AST.nodes;
 
+import org.jetbrains.annotations.NotNull;
+import smallerbasic.AST.ASTVisitor;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class ProgramASTNode implements ASTNode {
+/**
+ * An {@link ASTNode} representing a program.
+ * A program is made out of either routine declarations
+ * ({@link RoutineDeclASTNode}) or statements ({@link StatementASTNode}).
+ */
+public class ProgramASTNode extends AbstractASTNode implements ASTNode {
 
-    private final List<DeclOrStmtASTNode> contents;
+    private final @NotNull List<@NotNull DeclOrStmtASTNode> contents;
 
-    public ProgramASTNode(List<DeclOrStmtASTNode> contents) {
+    public ProgramASTNode(@NotNull List<@NotNull DeclOrStmtASTNode> contents) {
         Objects.requireNonNull(contents);
         this.contents = contents;
     }
 
+    public @NotNull List<@NotNull DeclOrStmtASTNode> getContents() {
+        return Collections.unmodifiableList(contents);
+    }
+
+    @Override
+    public <T> T accept(ASTVisitor<T> v) {
+        return v.visit(this);
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -19,6 +36,7 @@ public class ProgramASTNode implements ASTNode {
         ProgramASTNode that = (ProgramASTNode) o;
         return contents.equals(that.contents);
     }
+
 
     @Override
     public int hashCode() {
@@ -31,4 +49,6 @@ public class ProgramASTNode implements ASTNode {
                 "contents=" + contents +
                 '}';
     }
+
+
 }

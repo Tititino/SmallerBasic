@@ -10,11 +10,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LexerTest {
     @Test
     void numberLiteralTest() {
-        SBGrammarLexer lexer = new SBGrammarLexer(CharStreams.fromString("+9e-18 3 1.3 -12 3.14E12"));
+        SBGrammarLexer lexer = new SBGrammarLexer(CharStreams.fromString("+9e-18 3 1.3 12 3.14E12"));
 
         assertThat(lexer.getAllTokens())
                 .extracting(Token::getText)
-                .containsExactly("+9e-18", "3", "1.3", "-12", "3.14E12");
+                .containsExactly("+9e-18", "3", "1.3", "12", "3.14E12");
     }
 
     @Test

@@ -1,0 +1,12 @@
+A = U1 + 0
+B = U2 + "ciao"
+C = U3 And true
+D = 0 + U4
+E = "ciao" + U5
+F = false Or U6
+IO.WriteLine(A)
+IO.WriteLine(B)
+IO.WriteLine(C)
+IO.WriteLine(D)
+IO.WriteLine(E)
+IO.WriteLine(F)

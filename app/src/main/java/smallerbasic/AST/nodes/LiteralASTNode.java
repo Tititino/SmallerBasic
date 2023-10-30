@@ -1,3 +1,8 @@
 package smallerbasic.AST.nodes;
 
-public interface LiteralASTNode extends ExpressionASTNode { }
+import smallerbasic.symbolTable.HasSymbol;
+
+/**
+ * An {@link ASTNode} representing a literal.
+ */
+public interface LiteralASTNode extends ExpressionASTNode, HasSymbol { }

@@ -1,17 +1,35 @@
 package smallerbasic.AST.nodes;
 
+import org.jetbrains.annotations.NotNull;
+import smallerbasic.AST.ASTVisitor;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class RoutineDeclASTNode implements DeclOrStmtASTNode {
-    private final String name;
-    private final List<StatementASTNode> body;
+/**
+ * An {@link ASTNode} representing a declaration of a subroutine.
+ */
+public class RoutineDeclASTNode extends AbstractASTNode implements DeclOrStmtASTNode {
+    private final @NotNull RoutineNameASTNode name;
+    private final @NotNull List<@NotNull StatementASTNode> body;
 
-    public RoutineDeclASTNode(String name, List<StatementASTNode> body) {
-        Objects.requireNonNull(name);
-        Objects.requireNonNull(body);
+    public RoutineDeclASTNode(@NotNull RoutineNameASTNode name, @NotNull List<@NotNull StatementASTNode> body) {
         this.name = name;
         this.body = body;
+    }
+
+    public @NotNull RoutineNameASTNode getName() {
+        return name;
+    }
+
+    public @NotNull List<@NotNull StatementASTNode> getBody() {
+        return Collections.unmodifiableList(body);
+    }
+
+    @Override
+    public <T> T accept(ASTVisitor<T> v) {
+        return v.visit(this);
     }
 
     @Override

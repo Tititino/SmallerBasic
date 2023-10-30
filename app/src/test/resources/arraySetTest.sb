@@ -1,0 +1,5 @@
+IO.WriteLine(1)
+A[0] = 2
+IO.WriteLine(2)
+IO.WriteLine(A[0])
+IO.WriteLine(3)

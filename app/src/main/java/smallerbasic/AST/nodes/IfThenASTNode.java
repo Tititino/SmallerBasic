@@ -1,34 +1,54 @@
 package smallerbasic.AST.nodes;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import smallerbasic.AST.ASTVisitor;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public class IfThenASTNode implements StatementASTNode {
-    private final ExpressionASTNode condition;
+/**
+ * An {@link ASTNode} representing an if the statement.
+ * An if statement is made out of a condition that should evaluate to a boolean; a true body, that may be empty;
+ * and a false body that may be empty or {@code null} if not present.
+ */
+public class IfThenASTNode extends AbstractASTNode implements StatementASTNode {
+    private final @NotNull ExpressionASTNode condition;
+    private final @NotNull List<@NotNull StatementASTNode> trueBody;
+    private final @Nullable List<@NotNull StatementASTNode> falseBody;
 
-
-
-    private final List<StatementASTNode> trueBody;
-    private final Optional<List<StatementASTNode>> falseBody;
-
-    public IfThenASTNode(ExpressionASTNode condition, List<StatementASTNode> trueBody) {
-        Objects.requireNonNull(condition);
-        Objects.requireNonNull(trueBody);
-        this.condition = condition;
-        this.trueBody = trueBody;
-        this.falseBody = Optional.empty();
+    public IfThenASTNode(
+            @NotNull ExpressionASTNode condition,
+            @NotNull List<@NotNull StatementASTNode> trueBody) {
+        this(condition, trueBody, null);
     }
 
-    public IfThenASTNode(ExpressionASTNode condition
-            , List<StatementASTNode> trueBody
-            , List<StatementASTNode> falseBody) {
-        Objects.requireNonNull(condition);
-        Objects.requireNonNull(trueBody);
-        Objects.requireNonNull(falseBody);
+    public IfThenASTNode(
+            @NotNull ExpressionASTNode condition,
+            @NotNull List<@NotNull StatementASTNode> trueBody,
+            @Nullable List<@NotNull StatementASTNode> falseBody) {
         this.condition = condition;
         this.trueBody = trueBody;
-        this.falseBody = Optional.of(falseBody);
+        this.falseBody = falseBody;
+    }
+
+    public @NotNull ExpressionASTNode getCondition() {
+        return condition;
+    }
+
+    public @NotNull List<@NotNull StatementASTNode> getTrueBody() {
+        return Collections.unmodifiableList(trueBody);
+    }
+
+    public @NotNull Optional<@NotNull List<@NotNull StatementASTNode>> getFalseBody() {
+        return Optional.ofNullable(falseBody).map(Collections::unmodifiableList);
+    }
+
+    @Override
+    public <T> T accept(ASTVisitor<T> v) {
+        return v.visit(this);
     }
 
     @Override
@@ -36,7 +56,9 @@ public class IfThenASTNode implements StatementASTNode {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         IfThenASTNode that = (IfThenASTNode) o;
-        return condition.equals(that.condition) && trueBody.equals(that.trueBody) && falseBody.equals(that.falseBody);
+        return condition.equals(that.condition)
+                && trueBody.equals(that.trueBody)
+                && Objects.equals(falseBody, that.falseBody);
     }
 
     @Override
@@ -49,7 +71,7 @@ public class IfThenASTNode implements StatementASTNode {
         return "IfThenASTNode{" +
                 "condition=" + condition +
                 ", trueBody=" + trueBody +
-                ", falseBody=" + falseBody +
+                (Objects.isNull(falseBody) ? "" : "falseBody=" + falseBody) +
                 '}';
     }
 
