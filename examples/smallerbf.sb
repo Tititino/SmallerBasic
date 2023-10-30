@@ -1,0 +1,52 @@
+Ptr = 0
+Memory[0] = 0
+Num = 0
+
+Sub atoi
+  If (NumInput = "0") Then Num = 0 EndIf
+  If (NumInput = "1") Then Num = 1 EndIf
+  If (NumInput = "2") Then Num = 2 EndIf
+  If (NumInput = "3") Then Num = 3 EndIf
+  If (NumInput = "4") Then Num = 4 EndIf
+  If (NumInput = "5") Then Num = 5 EndIf
+  If (NumInput = "6") Then Num = 6 EndIf
+  If (NumInput = "7") Then Num = 7 EndIf
+  If (NumInput = "8") Then Num = 8 EndIf
+  If (NumInput = "9") Then Num = 9 EndIf
+EndSub
+
+Sub interpret
+  If (Input = ">") Then
+    Ptr = Ptr + 1
+  EndIf
+  If (Input = "<") Then
+    Ptr = Ptr - 1
+  EndIf
+  If (Input = "+") Then
+    Memory[Ptr] = Memory[Ptr] + 1
+  EndIf
+  If (Input = "-") Then
+    Memory[Ptr] = Memory[Ptr] - 1
+  EndIf
+  If (Input = ".") Then
+    IO.WriteLine(Memory[Ptr])
+  EndIf
+  If (Input = ",") Then
+    IO.WriteLine("Input (0-9):")
+    NumInput = IO.ReadLine()
+    atoi()
+    Memory[Ptr] = Num
+  EndIf
+EndSub
+
+For X = 0 To 100
+  Memory[X] = 0
+EndFor
+
+While (true)
+  Input = IO.ReadLine()
+  If (Input = "q") Then Goto end EndIf
+  interpret()
+EndWhile
+
+end:
