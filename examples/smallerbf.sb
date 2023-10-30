@@ -1,6 +1,13 @@
 Ptr = 0
 Memory[0] = 0
 Num = 0
+MaxMem = 10
+
+Sub printmem
+  For X = 0 To MaxMem
+    IO.WriteLine(Memory[X])
+  EndFor
+EndSub
 
 Sub atoi
   If (NumInput = "0") Then Num = 0 EndIf
@@ -39,13 +46,14 @@ Sub interpret
   EndIf
 EndSub
 
-For X = 0 To 100
+For X = 0 To MaxMem
   Memory[X] = 0
 EndFor
 
 While (true)
   Input = IO.ReadLine()
   If (Input = "q") Then Goto end EndIf
+  If (Input = "p") Then printmem() EndIf
   interpret()
 EndWhile
 

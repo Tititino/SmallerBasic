@@ -12,7 +12,7 @@ $ java -jar <path to jar> <path to file>
 
 The repository also comes with a small bash script, called `smallerbasic`, which simplifies the compilation process.
 Once the path to the jar and the runtime are specified the script will take as an argument a file: let `<dir>/<file>` be the path to it, the generated artifacts are:
-  - `./<file>.ll` the LLVM IR file of the file appended to the runtime
+  - `./<file>.ll` the LLVM IR of the file appended to the runtime
   - `./<file>.s` the assembly code generated
   - `./<file>` the executable
 
