@@ -1,2 +1,9 @@
+Sub test
+  IO.WriteLine(X)
+  IO.WriteLine(Y)
+EndSub
+
+X[0][X] = X[1][X]
 Y = X + 3
 Y = X + 3
+test()

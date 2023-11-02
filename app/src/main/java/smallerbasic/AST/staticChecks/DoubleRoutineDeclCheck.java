@@ -1,6 +1,5 @@
 package smallerbasic.AST.staticChecks;
 
-import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTMonoidVisitor;
 import smallerbasic.AST.nodes.*;
@@ -18,9 +17,8 @@ public class DoubleRoutineDeclCheck extends AbstractCheck {
             if (labels.get(s) > 1) {
                 isOk = false;
                 reportError(s, String.format(
-                                "*** DoubleRoutineDeclError: routine \"%s\" defined at line %d is already defined",
-                                s.getText(),
-                                s.getStartToken().map(Token::getLine).orElse(-1)
+                                "*** DoubleRoutineDeclError: routine \"%s\" is redefined",
+                                s.getText()
                         )
                 );
             }
