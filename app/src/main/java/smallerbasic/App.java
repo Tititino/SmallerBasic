@@ -13,6 +13,19 @@ import static smallerbasic.CompilationUtils.*;
 
 public class App {
 
+    private static final List<Check> errors = List.of(
+            new MaxNameLengthCheck(),
+            new TypeCheck(),
+            new LabelScopeCheck(),
+            new DoubleLabelCheck(),
+            new DoubleRoutineDeclCheck(),
+            new RoutineCallCheck()
+    );
+
+    private static final List<Check> warnings = List.of(
+            new UninitializedVariableCheck()
+    );
+
     public static void main(String[] args) {
         if (args.length != 1) {
             System.out.println("No file provided");
@@ -20,20 +33,7 @@ public class App {
         }
 
         try {
-            List<Check> errors = List.of(
-                    new MaxNameLengthCheck(),
-                    new TypeCheck(),
-                    new LabelScopeCheck(),
-                    new DoubleLabelCheck(),
-                    new DoubleRoutineDeclCheck(),
-                    new RoutineCallCheck()
-            );
-            List<Check> warnings = List.of(
-                    new UninitializedVariableCheck()
-            );
-
             TokenStream tokens = lex(Paths.get(args[0]));
-
             errors.forEach(x -> x.setErrorReporter(new PrettyErrorPrinter(tokens)));
             warnings.forEach(x -> x.setErrorReporter(new PrettyErrorPrinter(tokens)));
 

@@ -1,6 +1,5 @@
 package smallerbasic.AST.staticChecks;
 
-import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTVisitor;
 import smallerbasic.AST.nodes.*;
@@ -9,8 +8,7 @@ import java.util.List;
 
 /**
  * This check verifies whether a program is well-typed.
- * Variables and arrays are assigned a type of {@code ANY} and no effort is made to try to
- * guess the type of a variable through assignments.
+ * Variables and arrays are assigned a type of {@code TYPE.ANY} and no effort is made to try and guess the type of a variable through assignments.
  */
 public class TypeCheck extends AbstractCheck {
     private boolean isOk = true;
@@ -72,39 +70,31 @@ public class TypeCheck extends AbstractCheck {
     /**
      * Report an error mismatch if {@code got} is different {@code expected}.
      * The {@link ASTNode} is needed for positional information.
+     * @return {@code true} if a mismatch has been reported.
      */
-    private void reportMismatch(@NotNull ASTNode n, @NotNull TYPE got, @NotNull TYPE expected) {
-        if (!got.matches(expected)) {
-            String position = "";
-            if (n.getStartToken().isPresent() && n.getEndToken().isPresent()) {
-                Token start = n.getStartToken().get();
-                Token end   = n.getEndToken().get();
-                position = " at line " + start.getLine() + ":" + start.getCharPositionInLine()
-                        + "-" + (end.getCharPositionInLine() + end.getText().length());
-            }
+    private boolean reportMismatch(@NotNull ASTNode n, @NotNull TYPE got, @NotNull TYPE expected) {
+        boolean matches = got.matches(expected);
+        if (!matches) {
             reportError(n, "*** TypeError: expected value of type "
                     + expected + " but got "
-                    + got + position);
+                    + got);
         }
+        return !matches;
     }
 
     /**
      * Report an error mismatch if {@code got} is not in the {@code expected} list.
      * The {@link ASTNode} is needed for positional information.
+     * @return {@code true} if a mismatch has been reported.
      */
-    private void reportMismatch(@NotNull ASTNode n, @NotNull TYPE got, @NotNull List<TYPE> expected) {
-        if (!got.matches(expected)) {
-            String position = "";
-            if (n.getStartToken().isPresent() && n.getEndToken().isPresent()) {
-                Token start = n.getStartToken().get();
-                Token end = n.getEndToken().get();
-                position = " at line " + start.getLine() + ":" + start.getCharPositionInLine()
-                + "-" + (end.getCharPositionInLine() + end.getText().length());
-            }
+    private boolean reportMismatch(@NotNull ASTNode n, @NotNull TYPE got, @NotNull List<TYPE> expected) {
+        boolean matches = got.matches(expected);
+        if (!matches) {
             reportError(n, "*** TypeError: expected value of type "
                     + expected + " but got "
-                    + got + position);
+                    + got);
         }
+        return !matches;
     }
 
     /**
@@ -140,8 +130,10 @@ public class TypeCheck extends AbstractCheck {
                     return TYPE.NUMBER;
                 }
                 case LEQ, GEQ, LT, GT -> {
-                    reportMismatch(n.getLeft(), left, List.of(TYPE.NUMBER, TYPE.STRING));
-                    reportMismatch(n.getRight(), right, List.of(TYPE.NUMBER, TYPE.STRING));
+                    boolean leftMatch = reportMismatch(n.getLeft(), left, List.of(TYPE.NUMBER, TYPE.STRING));
+                    boolean rightMatch = reportMismatch(n.getRight(), right, List.of(TYPE.NUMBER, TYPE.STRING));
+                    if (!(leftMatch && rightMatch))
+                        return TYPE.ANY;
                     reportMismatch(n.getLeft(), left, right);
                     return TYPE.BOOL;
                 }
@@ -151,12 +143,12 @@ public class TypeCheck extends AbstractCheck {
                     return TYPE.BOOL;
                 }
                 case PLUS -> {
-                    reportMismatch(n.getLeft(), left, List.of(TYPE.NUMBER, TYPE.STRING));
-                    reportMismatch(n.getRight(), right, List.of(TYPE.NUMBER, TYPE.STRING));
+                    boolean leftMatch = reportMismatch(n.getLeft(), left, List.of(TYPE.NUMBER, TYPE.STRING));
+                    boolean rightMatch = reportMismatch(n.getRight(), right, List.of(TYPE.NUMBER, TYPE.STRING));
+                    if (!(leftMatch && rightMatch))
+                        return TYPE.ANY;
                     reportMismatch(n.getLeft(), left, right);
-                    if (left.equals(TYPE.STRING))
-                        return TYPE.STRING;
-                    return TYPE.NUMBER;
+                    return left;
                 }
             }
             return null;

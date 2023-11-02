@@ -19,7 +19,7 @@ import java.util.Optional;
  */
 public class CompilationUtils {
     /**
-     * Lex a source given a path to the file.
+     * Lex a source given as path to the file.
      * @param path The path of the file.
      * @return The {@link TokenStream} generated.
      * @throws IOException propagates any exception risen by the file handling.
@@ -77,7 +77,7 @@ public class CompilationUtils {
                 .stream()
                 .map(x -> x.check(tree))
                 .toList();
-        // warning do not end compilation
+        // warnings do not halt compilation
         warnings.forEach(x -> x.check(tree));
         return allPass.stream().allMatch(x -> x) ? Optional.of(tree) : Optional.empty();
     }

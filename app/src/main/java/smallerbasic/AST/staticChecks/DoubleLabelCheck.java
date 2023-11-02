@@ -1,6 +1,5 @@
 package smallerbasic.AST.staticChecks;
 
-import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTMonoidVisitor;
 import smallerbasic.AST.nodes.*;
@@ -20,9 +19,8 @@ public class DoubleLabelCheck extends AbstractCheck {
             if (labels.get(s) > 1) {
                 isOk = false;
                 reportError(s, String.format(
-                        "*** DoubleLabelError: label \"%s\" defined at line %d already defined in the same scope (%s)",
+                        "*** DoubleLabelError: label \"%s\" is redefined in the same scope (%s)",
                         s.getText(),
-                        s.getStartToken().map(Token::getLine).orElse(-1),
                         s.getScope()
                         )
                 );

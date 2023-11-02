@@ -16,7 +16,13 @@ public class PrettyErrorPrinter implements ErrorReporter {
         lines = tokens.getTokenSource().getInputStream().toString().split("\n");
     }
 
+    /**
+     * Prints an error spanning multiple lines.
+     * @param start the start token.
+     * @param end the end token.
+     */
     private void printDifferentLines(@NotNull Token start, @NotNull Token end) {
+        System.err.println("    from line " + start.getLine() + " to line " + end.getLine());
         String startLine = lines[start.getLine() - 1];
         String endLine   = lines[end.getLine() - 1];
         System.err.println(startLine);
@@ -25,7 +31,14 @@ public class PrettyErrorPrinter implements ErrorReporter {
         System.err.println();
     }
 
+    /**
+     * Prints an error located on a single line.
+     * @param start the start token.
+     * @param end the end token.
+     */
     private void printSameLines(@NotNull Token start, @NotNull Token end) {
+        String position = start.getLine() + ":" + start.getCharPositionInLine() + "-" + (end.getCharPositionInLine() + end.getText().length() - 1);
+        System.err.println("    at line " + position);
         String errorLine = lines[start.getLine() - 1];
         System.err.println(errorLine);
         System.err.print(" ".repeat(start.getCharPositionInLine()));
