@@ -36,7 +36,7 @@ Y = 3 - X
 `X` will be considered as 0.0.
 The default values are:
   - 0.0 for numbers
-  - `false` for 
+  - `false` for booleans
   - `""` for strings
   - an empty array for arrays
 
@@ -102,5 +102,11 @@ Alternatively the single files can be found at [this repository](https://github.
   X[0][1] = 2
   Y = X
   ```
+  and
+  ```
+  X[0][1] = 2
+  IO.WriteLine(X)
+  ```
   will throw a runtime exception.
+  - There is not an easy and convenient way to compile a program, other than the primitive script `smallerbasic` 
   
