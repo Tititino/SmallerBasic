@@ -28,7 +28,7 @@ public class App {
 
     public static void main(String[] args) {
         if (args.length != 1) {
-            System.out.println("No file provided");
+            System.err.println("No file provided");
             return;
         }
 
@@ -49,9 +49,9 @@ public class App {
 
             System.out.println(program);
         } catch (IOException e) {
-            System.out.println("Error reading file \"" + args[0] + "\"");
+            System.err.println("Error reading file \"" + args[0] + "\"");
         } catch (CompilationError e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
         }
     }
 }
