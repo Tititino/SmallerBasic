@@ -1,6 +1,5 @@
 package smallerbasic.AST.staticChecks;
 
-import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTMonoidVisitor;
 import smallerbasic.AST.nodes.ASTNode;
@@ -41,37 +40,24 @@ public class MaxNameLengthCheck extends AbstractCheck {
             return null;
         }
 
-        private String pos(ASTNode n) {
-            if (n.getStartToken().isPresent() && n.getEndToken().isPresent()) {
-                Token start = n.getStartToken().get();
-                Token end   = n.getEndToken().get();
-                return " at line " + start.getLine() + ":" + start.getCharPositionInLine() + "-"
-                        + (end.getCharPositionInLine() + end.getText().length() - 1);
-            }
-            return "";
-        }
-
         @Override
         public Void visit(LabelNameASTNode n) {
             if (n.getText().length() > MAX_LEN)
-                reportError(n, "*** NameMaxLenError: label \"" + n.getText() + "\""
-                        + pos(n) + " exceeds max length (" + MAX_LEN + ")");
+                reportError(n, "*** NameMaxLenError: label \"" + n.getText() + "\" exceeds max length (" + MAX_LEN + ")");
             return null;
         }
 
         @Override
         public Void visit(RoutineNameASTNode n) {
             if (n.getText().length() > MAX_LEN)
-                reportError(n, "*** NameMaxLenError: routine name \"" + n.getText() + "\""
-                        + pos(n) + " exceeds max length (" + MAX_LEN + ")");
+                reportError(n, "*** NameMaxLenError: routine name \"" + n.getText() + "\" exceeds max length (" + MAX_LEN + ")");
             return null;
         }
 
         @Override
         public Void visit(IdentifierASTNode n) {
             if (n.getName().length() > MAX_LEN)
-                reportError(n, "*** NameMaxLenError: variable name \"" + n.getName() + "\""
-                        + pos(n) + " exceeds max length (" + MAX_LEN + ")");
+                reportError(n, "*** NameMaxLenError: variable name \"" + n.getName() + "\" exceeds max length (" + MAX_LEN + ")");
             return null;
         }
     }

@@ -1,6 +1,5 @@
 package smallerbasic.AST.staticChecks;
 
-import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTMonoidVisitor;
 import smallerbasic.AST.nodes.*;
@@ -17,9 +16,8 @@ public class RoutineCallCheck extends AbstractCheck {
             if (!declared.contains(l)) {
                 isOk = false;
                 reportError(l, String.format(
-                                "*** RoutineCallError: routine \"%s\" called at line %d is not defined",
-                                l.getText(),
-                                l.getStartToken().map(Token::getLine).orElse(-1)
+                                "*** RoutineCallError: routine \"%s\" is called but not defined",
+                                l.getText()
                         )
                 );
             }

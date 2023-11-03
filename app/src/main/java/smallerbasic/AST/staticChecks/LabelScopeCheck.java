@@ -1,6 +1,5 @@
 package smallerbasic.AST.staticChecks;
 
-import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTMonoidVisitor;
 import smallerbasic.AST.nodes.*;
@@ -20,9 +19,8 @@ public class LabelScopeCheck extends AbstractCheck {
         for (LabelNameASTNode l : labels.gotoLabels()) {
             isOk = false;
             reportError(l, String.format(
-                            "*** LabelScopeError: label \"%s\" referenced at the goto of line %d is not defined in this scope (%s)",
+                            "*** LabelScopeError: the label \"%s\" referenced in this goto statement is not defined in this scope (%s)",
                             l.getText(),
-                            l.getStartToken().map(Token::getLine).orElse(-1),
                             l.getScope()
                     )
             );
