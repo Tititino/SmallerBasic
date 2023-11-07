@@ -24,10 +24,18 @@ EndSub
 
 Sub interpret
   If (Input = ">") Then
-    Ptr = Ptr + 1
+    If (Ptr = MaxMem) Then
+      Ptr = 0
+    Else
+      Ptr = Ptr + 1
+    EndIf
   EndIf
   If (Input = "<") Then
-    Ptr = Ptr - 1
+    If (Ptr = 0) Then
+      Ptr = MaxMem
+    Else
+      Ptr = Ptr - 1
+    EndIf
   EndIf
   If (Input = "+") Then
     Memory[Ptr] = Memory[Ptr] + 1
