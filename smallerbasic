@@ -1,12 +1,25 @@
-#!/usr/bin/bash
+#!/usr/bin/sh
+# should be POSIX compliant
 
-function help() {
-  echo "smallerbasic <filename> [-c <path-to-compiler-jar>] [-r <path-to-runtime>] [-o <output-dir>]"
+help() {
+  echo "usage:"
+  echo "  smallerbasic <filename> [-c <path-to-compiler-jar>] [-r <path-to-runtime>] [-o <output-dir>]"
+  echo "  smallerbasic -h"
+  echo ""
+  echo "options:"
+  echo "-c|--compiler"
+  echo "  compiler location, overrides default ('APP')"
+  echo "-r|--runtime"
+  echo "  runtime location, overrides default ('RUNTIME')"
+  echo "-o|--output"
+  echo "  output directory without trailing slash, overrides default ('.')"
+  echo "-h|--help"
+  echo "  print this message"
   echo ""
 }
 
-# where is java (>= 16)
-JAVA="/usr/lib/jvm/openjdk17/bin/java"
+# java bin (>= 16)
+JAVA="java"
 # default location of the compiler
 APP="./app/build/libs/app.jar"
 # where is the runtime llvm library
@@ -14,12 +27,15 @@ RUNTIME="./app/src/main/resources/runtime.ll"
 # where all the artifacts will be put
 OUTPUT_DIR="."
 
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]
+then
+	help
+	exit 0
+fi
+
 BASENAME=$(basename "$1" .sb)
 DIRNAME=$(dirname "$1")
 shift
-
-ARGS=$(getopt --options 'c:r:o:h' --longoptions 'compiler:,runtime:,output:,help' -- "${@}") || exit
-eval "set -- ${ARGS}"
 
 while true
 do
@@ -36,12 +52,11 @@ do
       OUTPUT_DIR="${2}"
       shift 2
       ;;
-    -h | --help)
-      help
-      exit 0
+    --|'')
+      break
       ;;
     *)
-      echo "unrecognized option ${1}"
+      echo "unrecognized option '${1}'"
       help
       exit 1
       ;;
