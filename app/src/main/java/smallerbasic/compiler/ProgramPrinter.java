@@ -259,12 +259,13 @@ public class ProgramPrinter {
         @Override
         public String visit(ProgramASTNode n) {
             CollectNodes nodes = new CollectNodes(n);
+            addLine("");    // empty line
             prealloc(nodes);
             nodes.getDecls().forEach(x -> x.accept(this));
             addLine("define i32 @main() {");
             initConstants(nodes);
             updateLineNumber(n);
-            nodes.getProgram().forEach(x -> x.accept(this));
+            nodes.getMain().forEach(x -> x.accept(this));
             addLine("ret i32 0");
             addLine("}");
             return null;

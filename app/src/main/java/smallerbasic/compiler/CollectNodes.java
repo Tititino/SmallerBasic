@@ -21,18 +21,19 @@ public class CollectNodes {
     /**
      * In the case of statements the order is important so a list is used.
      */
-    private final @NotNull List<StatementASTNode> program = new LinkedList<>();
+    private final @NotNull List<StatementASTNode> main = new LinkedList<>();
 
     public CollectNodes(@NotNull ASTNode n) {
         n.accept(new CollectVisitor());
+        n.accept(new ProgramVisitor());
     }
 
     public @NotNull Set<RoutineDeclASTNode> getDecls() {
         return Collections.unmodifiableSet(decls);
     }
 
-    public @NotNull List<StatementASTNode> getProgram() {
-        return Collections.unmodifiableList(program);
+    public @NotNull List<StatementASTNode> getMain() {
+        return Collections.unmodifiableList(main);
     }
 
     public @NotNull Set<NumberLiteralASTNode> getNumberConstants() {
@@ -57,72 +58,32 @@ public class CollectNodes {
             boolConstants.add(n);
             return empty();
         }
-
-        @Override
-        public Void visit(RoutineDeclASTNode n) {
-            decls.add(n);
-            return empty();
-        }
-
         @Override
         public Void visit(IdentifierASTNode n) {
             idents.add(n);
             return empty();
         }
-
         @Override
         public Void visit(NumberLiteralASTNode n) {
             numberConstants.add(n);
             return empty();
         }
-
         @Override
         public Void visit(StringLiteralASTNode n) {
             stringConstants.add(n);
             return empty();
         }
-
         @Override
-        public Void visit(AssStmtASTNode n) {
-            program.add(n);
-            return empty();
+        public Void empty() {
+            return null;
         }
-
         @Override
-        public Void visit(ExternalFunctionCallASTNode n) {
-            program.add(n);
-            return empty();
+        public Void compose(Void o1, Void o2) {
+            return null;
         }
+    }
 
-        @Override
-        public Void visit(ForLoopASTNode n) {
-            program.add(n);
-            return empty();
-        }
-
-        @Override
-        public Void visit(GotoStmtASTNode n) {
-            program.add(n);
-            return empty();
-        }
-
-        @Override
-        public Void visit(IfThenASTNode n) {
-            program.add(n);
-            return empty();
-        }
-
-        @Override
-        public Void visit(WhileLoopASTNode n) {
-            program.add(n);
-            return empty();
-        }
-
-        @Override
-        public Void visit(RoutineCallASTNode n) {
-            program.add(n);
-            return empty();
-        }
+    private class ProgramVisitor implements ASTMonoidVisitor<Void> {
 
         @Override
         public Void empty() {
@@ -134,5 +95,64 @@ public class CollectNodes {
             return null;
         }
 
+        @Override
+        public Void visit(AssStmtASTNode n) {
+            main.add(n);
+            return empty();
+        }
+
+        @Override
+        public Void visit(ExternalFunctionCallASTNode n) {
+            main.add(n);
+            return empty();
+        }
+
+        @Override
+        public Void visit(ForLoopASTNode n) {
+            main.add(n);
+            return empty();
+        }
+
+        @Override
+        public Void visit(GotoStmtASTNode n) {
+            main.add(n);
+            return empty();
+        }
+
+        @Override
+        public Void visit(IfThenASTNode n) {
+            main.add(n);
+            return empty();
+        }
+
+        @Override
+        public Void visit(LabelDeclASTNode n) {
+            main.add(n);
+            return empty();
+        }
+
+        @Override
+        public Void visit(ProgramASTNode n) {
+            visitChildren(n.getContents());
+            return empty();
+        }
+
+        @Override
+        public Void visit(RoutineCallASTNode n) {
+            main.add(n);
+            return empty();
+        }
+
+        @Override
+        public Void visit(RoutineDeclASTNode n) {
+            decls.add(n);
+            return empty();
+        }
+
+        @Override
+        public Void visit(WhileLoopASTNode n) {
+            main.add(n);
+            return empty();
+        }
     }
 }
