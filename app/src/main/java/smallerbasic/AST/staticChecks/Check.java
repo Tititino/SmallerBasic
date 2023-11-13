@@ -12,8 +12,6 @@ public interface Check {
 
     boolean check(@NotNull ASTNode n);
 
-    void reportError(@NotNull ASTNode n, @NotNull String msg);
-
     void setErrorReporter(@NotNull ErrorReporter e);
 
 }

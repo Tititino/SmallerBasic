@@ -20,14 +20,13 @@ public class TypeCheck extends AbstractCheck {
         return isOk;
     }
 
-    @Override
-    public void reportError(@NotNull ASTNode n, @NotNull String msg) {
+    private void reportError(@NotNull ASTNode n, @NotNull String msg) {
         isOk = false;
-        super.reportError(n, msg);
+        super.reporter.reportError(n, msg);
     }
 
     /**
-     * Something in a Smaller Basic program may have one of three types: NUMBER, BOOL or STRING.
+     * Something in a SmallerBasic program may have one of three types: NUMBER, BOOL or STRING.
      * A statement has type NONE, and a variable has type ANY.
      */
     public enum TYPE {
@@ -151,7 +150,7 @@ public class TypeCheck extends AbstractCheck {
                     return left;
                 }
             }
-            return null;
+            return TYPE.ANY;
         }
 
         @Override

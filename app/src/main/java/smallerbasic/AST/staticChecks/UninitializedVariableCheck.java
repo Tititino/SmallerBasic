@@ -39,10 +39,9 @@ public class UninitializedVariableCheck extends AbstractCheck {
         return isOk;
     }
 
-    @Override
-    public void reportError(@NotNull ASTNode n, @NotNull String msg) {
+    private void reportError(@NotNull ASTNode n, @NotNull String msg) {
         isOk = false;
-        super.reportError(n, msg);
+        super.reporter.reportError(n, msg);
     }
 
     /**

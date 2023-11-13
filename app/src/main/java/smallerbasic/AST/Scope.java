@@ -14,7 +14,6 @@ import java.util.Objects;
  *   - inside a routine
  */
 public class Scope {
-
     public static @NotNull Scope TOPLEVEL = new Scope();
     private @Nullable RoutineNameASTNode name = null;
 
@@ -25,7 +24,6 @@ public class Scope {
     }
 
     private Scope(@NotNull RoutineNameASTNode name) {
-        Objects.requireNonNull(name);
         this.name = name;
     }
 

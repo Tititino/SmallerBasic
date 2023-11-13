@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * This class, given an identity and an associative function to compose results, provides a
- * default implementation of {@link ASTVisitor} that traverses the AST composing the results.
+ * default implementation of {@link ASTVisitor} that traverses the AST composing the results from left to right.
  */
 public interface ASTMonoidVisitor<T> extends ASTVisitor<T> {
 

@@ -6,6 +6,10 @@ import smallerbasic.AST.nodes.*;
 
 import java.util.*;
 
+/**
+ * The symbol table is a map associating entities in the AST to unique names.
+ * Since the nodes are more or less immutable, the nodes themselves are put into the symbol table as keys.
+ */
 public class SymbolTable {
 
     private final @NotNull VarNameGenerator gen;

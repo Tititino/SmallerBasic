@@ -16,7 +16,7 @@ public class DoubleRoutineDeclCheck extends AbstractCheck {
         for (RoutineNameASTNode s : labels.keySet())
             if (labels.get(s) > 1) {
                 isOk = false;
-                reportError(s, String.format(
+                super.reporter.reportError(s, String.format(
                                 "*** DoubleRoutineDeclError: routine \"%s\" is redefined",
                                 s.getText()
                         )

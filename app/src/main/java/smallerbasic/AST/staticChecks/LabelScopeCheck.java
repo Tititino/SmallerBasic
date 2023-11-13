@@ -18,7 +18,7 @@ public class LabelScopeCheck extends AbstractCheck {
         labels.gotoLabels().removeAll(labels.definedLabels());
         for (LabelNameASTNode l : labels.gotoLabels()) {
             isOk = false;
-            reportError(l, String.format(
+            super.reporter.reportError(l, String.format(
                             "*** LabelScopeError: the label \"%s\" referenced in this goto statement is not defined in this scope (%s)",
                             l.getText(),
                             l.getScope()

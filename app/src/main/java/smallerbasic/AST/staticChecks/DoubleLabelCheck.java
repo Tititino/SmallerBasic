@@ -18,7 +18,7 @@ public class DoubleLabelCheck extends AbstractCheck {
         for (LabelNameASTNode s : labels.keySet())
             if (labels.get(s) > 1) {
                 isOk = false;
-                reportError(s, String.format(
+                super.reporter.reportError(s, String.format(
                         "*** DoubleLabelError: label \"%s\" is redefined in the same scope (%s)",
                         s.getText(),
                         s.getScope()

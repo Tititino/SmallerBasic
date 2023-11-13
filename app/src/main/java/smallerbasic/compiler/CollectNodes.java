@@ -4,15 +4,11 @@ import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTMonoidVisitor;
 import smallerbasic.AST.nodes.*;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
- * This class collects different kinds of {@link ASTNode} needed to be treated differently
- * by the compilation process.
- * All these nodes need to be preallocated before beginning to print the program and
- * their values must be set before beginning the execution of the program.
+ * This class neatly separates different nodes in the AST that need to be treated differently.
+ * For example string constants need to have a box allocated and also to have the string allocated.
  */
 public class CollectNodes {
 
@@ -20,9 +16,23 @@ public class CollectNodes {
     private final @NotNull Set<StringLiteralASTNode> stringConstants = new HashSet<>();
     private final @NotNull Set<BoolLiteralASTNode> boolConstants = new HashSet<>();
     private final @NotNull Set<IdentifierASTNode> idents = new HashSet<>();
+    private final @NotNull Set<RoutineDeclASTNode> decls = new HashSet<>();
+
+    /**
+     * In the case of statements the order is important so a list is used.
+     */
+    private final @NotNull List<StatementASTNode> program = new LinkedList<>();
 
     public CollectNodes(@NotNull ASTNode n) {
         n.accept(new CollectVisitor());
+    }
+
+    public @NotNull Set<RoutineDeclASTNode> getDecls() {
+        return Collections.unmodifiableSet(decls);
+    }
+
+    public @NotNull List<StatementASTNode> getProgram() {
+        return Collections.unmodifiableList(program);
     }
 
     public @NotNull Set<NumberLiteralASTNode> getNumberConstants() {
@@ -45,25 +55,73 @@ public class CollectNodes {
         @Override
         public Void visit(BoolLiteralASTNode n) {
             boolConstants.add(n);
-            return null;
+            return empty();
+        }
+
+        @Override
+        public Void visit(RoutineDeclASTNode n) {
+            decls.add(n);
+            return empty();
         }
 
         @Override
         public Void visit(IdentifierASTNode n) {
             idents.add(n);
-            return null;
+            return empty();
         }
 
         @Override
         public Void visit(NumberLiteralASTNode n) {
             numberConstants.add(n);
-            return null;
+            return empty();
         }
 
         @Override
         public Void visit(StringLiteralASTNode n) {
             stringConstants.add(n);
-            return null;
+            return empty();
+        }
+
+        @Override
+        public Void visit(AssStmtASTNode n) {
+            program.add(n);
+            return empty();
+        }
+
+        @Override
+        public Void visit(ExternalFunctionCallASTNode n) {
+            program.add(n);
+            return empty();
+        }
+
+        @Override
+        public Void visit(ForLoopASTNode n) {
+            program.add(n);
+            return empty();
+        }
+
+        @Override
+        public Void visit(GotoStmtASTNode n) {
+            program.add(n);
+            return empty();
+        }
+
+        @Override
+        public Void visit(IfThenASTNode n) {
+            program.add(n);
+            return empty();
+        }
+
+        @Override
+        public Void visit(WhileLoopASTNode n) {
+            program.add(n);
+            return empty();
+        }
+
+        @Override
+        public Void visit(RoutineCallASTNode n) {
+            program.add(n);
+            return empty();
         }
 
         @Override

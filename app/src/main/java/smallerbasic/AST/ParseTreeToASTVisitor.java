@@ -124,8 +124,6 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
         return new GotoStmtASTNode(label);
     }
 
-
-
     @Override
     public RoutineCallASTNode visitCallRoutine(SBGrammarParser.CallRoutineContext ctx) {
         RoutineNameASTNode name = (RoutineNameASTNode) visit(ctx.functionName());

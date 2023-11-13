@@ -45,6 +45,7 @@ public class ProgramPrinter {
 
     /**
      * A {@link ASTVisitor} that prints the tree in LLVM IR format.
+     * Each method call returns the symbol associated to the node if it has a symbol, {@code null} otherwise.
      */
     private class ProgramPrinterVisitor implements ASTVisitor<String> {
 
@@ -120,7 +121,7 @@ public class ProgramPrinter {
             addLine(newName + " = alloca %struct.Boxed*");
 
             llvmProgram.append("call void @").append(n.getModule()).append(".").append(n.getFunction()).append("(");
-            llvmProgram.append("%struct.Boxed* ").append(newName);
+            llvmProgram.append("%struct.Boxed* ").append(newName);  // return value
             for (String name : names)
                 llvmProgram.append(", %struct.Boxed* ").append(name);
             llvmProgram.append(")\n");
@@ -140,7 +141,7 @@ public class ProgramPrinter {
             addLine("br label %" + label + ".begin");
             addLine(label + ".begin:");
 
-            // VAR < END
+            // VAR <= END
             String end = n.getEnd().accept(this);
             String cond = "%" + gen.newName();
             addLine(cond + " = alloca %struct.Boxed");
@@ -257,27 +258,15 @@ public class ProgramPrinter {
 
         @Override
         public String visit(ProgramASTNode n) {
-            CollectNodes constants = new CollectNodes(n);
-
-            prealloc(constants);
-
-            n.getContents()
-                    .stream()
-                    .filter(x -> x instanceof RoutineDeclASTNode)
-                    .map(x -> (RoutineDeclASTNode) x)
-                    .forEach(x -> x.accept(this));
-
+            CollectNodes nodes = new CollectNodes(n);
+            prealloc(nodes);
+            nodes.getDecls().forEach(x -> x.accept(this));
             addLine("define i32 @main() {");
-            initConstants(constants);
+            initConstants(nodes);
             updateLineNumber(n);
-
-            n.getContents()
-                    .stream()
-                    .filter(x -> x instanceof StatementASTNode)
-                    .map(x -> (StatementASTNode) x)
-                    .forEach(x -> x.accept(this));
-
-            addLine("ret i32 0\n}");
+            nodes.getProgram().forEach(x -> x.accept(this));
+            addLine("ret i32 0");
+            addLine("}");
             return null;
         }
 
@@ -291,7 +280,6 @@ public class ProgramPrinter {
         public String visit(RoutineNameASTNode n) {
             return symbols.getBinding(n);
         }
-
 
         @Override
         public String visit(RoutineCallASTNode n) {
