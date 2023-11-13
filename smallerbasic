@@ -1,24 +1,70 @@
 #!/usr/bin/bash
 
+function help() {
+  echo "smallerbasic <filename> [-c <path-to-compiler-jar>] [-r <path-to-runtime>] [-o <output-dir>]"
+  echo ""
+}
+
+# where is java (>= 16)
 JAVA="/usr/lib/jvm/openjdk17/bin/java"
+# default location of the compiler
 APP="./app/build/libs/app.jar"
-CC=clang
-RUNTIME="./app/src/main/resources/runtime.ll" # TODO: clone it here in resources
+# where is the runtime llvm library
+RUNTIME="./app/src/main/resources/runtime.ll"
+# where all the artifacts will be put
+OUTPUT_DIR="."
+
 BASENAME=$(basename "$1" .sb)
 DIRNAME=$(dirname "$1")
+shift
 
-if [ ! -f $APP ]
+ARGS=$(getopt --options 'c:r:o:h' --longoptions 'compiler:,runtime:,output:,help' -- "${@}") || exit
+eval "set -- ${ARGS}"
+
+while true
+do
+  case "${1}" in
+    -r | --runtime)
+      RUNTIME="${2}"
+      shift 2
+      ;;
+    -c | --compiler)
+      APP="${2}"
+      shift 2
+      ;;
+    -o | --output)
+      OUTPUT_DIR="${2}"
+      shift 2
+      ;;
+    -h | --help)
+      help
+      exit 0
+      ;;
+    *)
+      echo "unrecognized option ${1}"
+      help
+      exit 1
+      ;;
+  esac
+done
+
+if [ ! -f "$APP" ]
 then
   echo "Executable not found, run 'gradle jar'"
   exit 1
 fi
 
-if [ ! -f $RUNTIME ]
+if [ ! -f "$RUNTIME" ]
 then
   echo "Runtime not found"
   exit 1
 fi
 
-$JAVA -jar $APP "$DIRNAME"/"$BASENAME".sb | cat $RUNTIME - > "$BASENAME".ll
-opt -opaque-pointers "$BASENAME".ll | llc -opaque-pointers -o "$BASENAME".s
-$CC "$BASENAME".s -lm -o "$BASENAME"
+if [ ! -d "$OUTPUT_DIR" ]
+then
+  mkdir -p "$OUTPUT_DIR"
+fi
+
+$JAVA -jar "$APP" "$DIRNAME"/"$BASENAME".sb | cat "$RUNTIME" - > "$OUTPUT_DIR"/"$BASENAME".ll
+opt -opaque-pointers "$OUTPUT_DIR"/"$BASENAME".ll | llc -opaque-pointers -o "$OUTPUT_DIR"/"$BASENAME".s
+clang "$OUTPUT_DIR"/"$BASENAME".s -lm -o "$OUTPUT_DIR"/"$BASENAME"
