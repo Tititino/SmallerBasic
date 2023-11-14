@@ -7,10 +7,10 @@ import smallerbasic.AST.nodes.*;
 import java.util.*;
 
 /**
- * This class neatly separates different nodes in the AST that need to be treated differently.
+ * This class neatly separates different {@link ASTNode}s that need to be treated differently.
  * For example string constants need to have a box allocated and also to have the string allocated.
  */
-public class CollectNodes {
+class CollectNodes {
 
     private final @NotNull Set<NumberLiteralASTNode> numberConstants = new HashSet<>();
     private final @NotNull Set<StringLiteralASTNode> stringConstants = new HashSet<>();
@@ -24,8 +24,8 @@ public class CollectNodes {
     private final @NotNull List<StatementASTNode> main = new LinkedList<>();
 
     public CollectNodes(@NotNull ASTNode n) {
-        n.accept(new CollectVisitor());
-        n.accept(new ProgramVisitor());
+        n.accept(new NameAndConstantsCollectorVisitor());
+        n.accept(new ProgramCollectorVisitor());
     }
 
     public @NotNull Set<RoutineDeclASTNode> getDecls() {
@@ -52,7 +52,10 @@ public class CollectNodes {
         return Collections.unmodifiableSet(idents);
     }
 
-    private class CollectVisitor implements ASTMonoidVisitor<Void> {
+    /**
+     * Visits the AST and collect names and constants.
+     */
+    private class NameAndConstantsCollectorVisitor implements ASTMonoidVisitor<Void> {
         @Override
         public Void visit(BoolLiteralASTNode n) {
             boolConstants.add(n);
@@ -83,7 +86,10 @@ public class CollectNodes {
         }
     }
 
-    private class ProgramVisitor implements ASTMonoidVisitor<Void> {
+    /**
+     * Visits the ProgramASTNode and returns builds a list of the statements that compose `main`, and a set of the declared routines.
+     */
+    private class ProgramCollectorVisitor implements ASTMonoidVisitor<Void> {
 
         @Override
         public Void empty() {
@@ -131,6 +137,9 @@ public class CollectNodes {
             return empty();
         }
 
+        /**
+         * Since every other method does not propagate the recursive calls only the first level, the list of statements and declarations that the ProgramASTNode contains, is explored.
+         */
         @Override
         public Void visit(ProgramASTNode n) {
             visitChildren(n.getContents());
