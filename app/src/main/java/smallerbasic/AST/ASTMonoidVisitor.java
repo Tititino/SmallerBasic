@@ -5,8 +5,13 @@ import smallerbasic.AST.nodes.*;
 import java.util.List;
 
 /**
- * This class, given an identity and an associative function to compose results, provides a
- * default implementation of {@link ASTVisitor} that traverses the AST composing the results from left to right.
+ * This class defines a default implementation of a visitor over an AST that, given an identity and a binary function, traverses the AST composing the results from left to right.
+ * Contrary to what the name suggests the binary operation may not be associative and the results are composed in the order one would expect, from left to right.
+ * So for example let's take a for-node
+ * ```
+ * (for-node <var> <start> <end> <step> <stmt0> <stmt1> ... )
+ * ```
+ * the visitor will call `visit(<var>) + (visit(<start>) + (visit(<end>) + (visit(<step>) + ...)))`.
  */
 public interface ASTMonoidVisitor<T> extends ASTVisitor<T> {
 
