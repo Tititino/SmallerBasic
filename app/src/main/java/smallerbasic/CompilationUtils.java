@@ -68,7 +68,7 @@ public class CompilationUtils {
      * @param tree The tree to be checked.
      * @param errors A list of checks that the tree MUST pass.
      * @param warnings A list of checks that the tree may not pass.
-     * @return {@link Optional#empty()} if at least one error check fails.
+     * @return {@link Optional#empty()} if at least one check in {@code errors} fails.
      */
     public static @NotNull Optional<ASTNode> check(@NotNull ASTNode tree,
                                                    @NotNull List<Check> errors,
@@ -84,7 +84,7 @@ public class CompilationUtils {
     }
 
     /**
-     * Given a {@link Compiler} compiler the {@link ASTNode}.
+     * Given a {@link Compiler} compiles the {@link ASTNode}.
      * @param tree The AST to compile.
      * @param c A compiler.
      * @return A string corresponding to the program represented by {@code tree}.

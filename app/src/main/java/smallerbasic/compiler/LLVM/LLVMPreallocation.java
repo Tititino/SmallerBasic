@@ -28,23 +28,38 @@ class LLVMPreallocation implements ASTMonoidVisitor<StringBuilder>, ASTToString 
         return o1.append(o2);
     }
 
+    /**
+     * Preallocate the space to hold the {@code %struct.Boxed} corresponding to this bool literal.
+     * @param n The boolean literal.
+     * @return Outputs LLVM IR code to allocate space for a single bool literal.
+     */
     @Override
     public StringBuilder visit(BoolLiteralASTNode n) {
         return new StringBuilder("@" + symbols.getBinding(n) + " = global " + NULL_VALUE + "\n");
     }
 
+    /**
+     * Preallocate the space to hold the {@code %struct.Boxed} corresponding to global variable.
+     * @param n The gobal variable.
+     * @return Outputs LLVM IR code to allocate space for a single global variable.
+     */
     @Override
     public StringBuilder visit(IdentifierASTNode n) {
         return new StringBuilder("@" + symbols.getBinding(n) + " = global " + NULL_VALUE + "\n");
     }
 
+    /**
+     * Preallocate the space to hold the {@code %struct.Boxed} corresponding to this number literal.
+     * @param n The number literal.
+     * @return Outputs LLVM IR code to allocate space for a single number literal.
+     */
     @Override
     public StringBuilder visit(NumberLiteralASTNode n) {
         return new StringBuilder("@" + symbols.getBinding(n) + " = global " + NULL_VALUE + "\n");
     }
 
     /**
-     * Preallocate the space to hold the box, and the space for the string.
+     * Preallocate the space to hold the {@code %struct.Boxed}, and the space for the string.
      * @param n The string literal.
      * @return The LLVM code to allocate the space for them.
      */

@@ -35,14 +35,10 @@ class LLVMSubRoutinePrinter implements ASTMonoidVisitor<StringBuilder>, ASTToStr
     public StringBuilder visit(RoutineDeclASTNode n) {
         String name = symbols.getBinding(n.getName());
         String signature = "define void @" + name + "() {\n";
-        String body = n.getBody().stream().map(stmt -> {
-                    LLVMMainPrinter stmtPrinter = new LLVMMainPrinter(symbols, gen);
-                    stmt.accept(stmtPrinter);
-                    return stmtPrinter.getOutput();
-                })
+        String body = n.getBody().stream().map(stmt ->
+                    new LLVMMainPrinter(symbols, gen).run(stmt))
                 .reduce("", (acc, x) -> acc + x);
-        String end = "}";
-        return new StringBuilder(signature).append(body).append(end);
+        return new StringBuilder(signature).append(body).append("}\n");
     }
 
     @Override

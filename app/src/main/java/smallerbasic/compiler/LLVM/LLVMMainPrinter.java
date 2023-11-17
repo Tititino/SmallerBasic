@@ -17,10 +17,6 @@ import java.util.Optional;
  */
 class LLVMMainPrinter implements ASTVisitor<String>, ASTToString {
 
-    public @NotNull String getOutput() {
-        return output.toString();
-    }
-
     private final @NotNull StringBuilder output = new StringBuilder();
 
     private void addLine(@NotNull String s) {

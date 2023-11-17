@@ -5,7 +5,7 @@ import smallerbasic.AST.nodes.ASTNode;
 
 /**
  * Compiles an {@link ASTNode} to something.
- * Given a correct tree a {@link Compiler} should return a string representing the program representing that tree.
+ * Given a correct tree a {@link Compiler} should return the code for the program represented by the tree.
  */
 public interface Compiler {
      String compile(@NotNull ASTNode root);
