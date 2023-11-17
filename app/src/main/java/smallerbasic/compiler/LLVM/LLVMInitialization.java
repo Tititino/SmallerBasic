@@ -29,6 +29,11 @@ class LLVMInitialization implements ASTMonoidVisitor<StringBuilder>, ASTToString
     private final static @NotNull String TRUE = "i1 1";
     private final static @NotNull String FALSE = "i1 0";
 
+    /**
+     * Stores the pointer to the string literal in a new variable and sets the box contents with it.
+     * @param n The string literal.
+     * @return The LLVM code to initialize a string literal.
+     */
     @Override
     public StringBuilder visit(StringLiteralASTNode n) {
         String text = n.getValue();

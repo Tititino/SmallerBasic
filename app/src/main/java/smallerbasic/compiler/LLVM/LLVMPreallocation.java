@@ -43,9 +43,16 @@ class LLVMPreallocation implements ASTMonoidVisitor<StringBuilder>, ASTToString 
         return new StringBuilder("@" + symbols.getBinding(n) + " = global " + NULL_VALUE + "\n");
     }
 
+    /**
+     * Preallocate the space to hold the box, and the space for the string.
+     * @param n The string literal.
+     * @return The LLVM code to allocate the space for them.
+     */
     @Override
     public StringBuilder visit(StringLiteralASTNode n) {
-        return new StringBuilder("@" + symbols.getBinding(n) + " = global " + NULL_VALUE + "\n");
+        String text = n.getValue();
+        return new StringBuilder("@" + symbols.getBinding(n) + " = global " + NULL_VALUE + "\n")
+                .append("@" + symbols.getBinding(n) + ".value = constant [" + (text.length() + 1) + " x i8] c\"" + text + "\\00\"\n");
     }
 
     @Override

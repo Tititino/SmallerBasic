@@ -66,9 +66,9 @@ public class CompilationUtils {
     /**
      * Given an {@link ASTNode}, a list of errors and a list of warnings, applies each check to the tree.
      * @param tree The tree to be checked.
-     * @param errors A list of checks that the tree must pass.
+     * @param errors A list of checks that the tree MUST pass.
      * @param warnings A list of checks that the tree may not pass.
-     * @return {@code Optional.empty()} if at least one error check fails.
+     * @return {@link Optional#empty()} if at least one error check fails.
      */
     public static @NotNull Optional<ASTNode> check(@NotNull ASTNode tree,
                                                    @NotNull List<Check> errors,
@@ -83,6 +83,12 @@ public class CompilationUtils {
         return allPass.stream().allMatch(x -> x) ? Optional.of(tree) : Optional.empty();
     }
 
+    /**
+     * Given a {@link Compiler} compiler the {@link ASTNode}.
+     * @param tree The AST to compile.
+     * @param c A compiler.
+     * @return A string corresponding to the program represented by {@code tree}.
+     */
     public static @NotNull String compile(@NotNull ASTNode tree, @NotNull Compiler c) {
         return c.compile(tree);
     }

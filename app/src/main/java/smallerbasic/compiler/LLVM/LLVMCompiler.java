@@ -13,6 +13,25 @@ import smallerbasic.symbolTable.VarNameGenerator;
 public class LLVMCompiler implements Compiler {
     /**
      * Given a {@link ASTNode} the method outputs the corresponding LLVM code.
+     * The compilation to LLVM is split into four phases:
+     * <ul>
+     *   <li> preallocation of variables and literals </li>
+     *   <li> initialization of literals </li>
+     *   <li> every statement not in a routine grouped together in {@code @main} </li>
+     *   <li> every routine </li>
+     * </ul>
+     * And these are composed like
+     * <pre>
+     * {@code
+     * <preallocation>
+     * <routines>
+     * define i32 @main() {
+     *   <initialization>
+     *   <statements>
+     *   ret i32 0
+     * }
+     * }
+     * </pre>
      * @param root An AST.
      * @return The LLVM code corresponding to the tree.
      */
