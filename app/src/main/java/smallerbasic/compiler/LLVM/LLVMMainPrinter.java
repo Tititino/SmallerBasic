@@ -1,9 +1,11 @@
-package smallerbasic.compiler;
+package smallerbasic.compiler.LLVM;
 
 import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import smallerbasic.AST.ASTVisitor;
 import smallerbasic.AST.nodes.*;
+import smallerbasic.compiler.ASTToString;
 import smallerbasic.symbolTable.SymbolTable;
 import smallerbasic.symbolTable.VarNameGenerator;
 
@@ -11,36 +13,27 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * This class takes a {@link ASTNode}, a {@link SymbolTable} and a {@link VarNameGenerator} and returns the
- * corresponding LLVM IR as a String.
+ * Given a {@link ASTNode} it creates the LLVM code for its statements.
  */
-public class ProgramPrinter implements ASTVisitor<String> {
+class LLVMMainPrinter implements ASTVisitor<String>, ASTToString {
 
-    /**
-     * The symbol table.
-     * This is queried to get the name associated with a certain node.
-     */
+    public @NotNull String getOutput() {
+        return output.toString();
+    }
+
+    private final @NotNull StringBuilder output = new StringBuilder();
+
+    private void addLine(@NotNull String s) {
+        output.append(s).append("\n");
+    }
+
     private final @NotNull SymbolTable symbols;
     private final @NotNull VarNameGenerator gen;
 
-    /**
-     * This StringBuilder accumulates the lines of LLVM IR generated.
-     */
-    private final @NotNull StringBuilder llvmProgram;
-
-    public static String compile(@NotNull ASTNode root) {
-        VarNameGenerator gen = new VarNameGenerator();
-        SymbolTable symbols = new SymbolTable(root, gen);
-        return new ProgramPrinter(symbols, gen, root).llvmProgram.toString();
-    }
-
-    private ProgramPrinter(@NotNull SymbolTable symbols,
-                           @NotNull VarNameGenerator gen,
-                           @NotNull ASTNode root) {
+    public LLVMMainPrinter(@NotNull SymbolTable symbols,
+                           @NotNull VarNameGenerator gen) {
         this.symbols = symbols;
         this.gen = gen;
-        llvmProgram = new StringBuilder();
-        root.accept(this);
     }
 
     /**
@@ -48,19 +41,8 @@ public class ProgramPrinter implements ASTVisitor<String> {
      */
     private int lastLine = -1;
     private final static @NotNull String BOOL_GETTER = "@_GET_BOOL_VALUE";
-    private final static @NotNull String NUMBER_SETTER = "@_SET_NUM_VALUE";
-    private final static @NotNull String BOOL_SETTER = "@_SET_BOOL_VALUE";
-    private final static @NotNull String STRING_SETTER = "@_SET_STR_VALUE";
     private final static @NotNull String COPY_FUNC = "@_COPY";
-    private final static @NotNull String NULL_VALUE = "%struct.Boxed { i3 0, i64 0 }";
-
     private final static @NotNull String GET_ARRAY_ELEMENT = "@_GET_ARRAY_ELEMENT";
-    private final static @NotNull String TRUE = "i1 1";
-    private final static @NotNull String FALSE = "i1 0";
-
-    private void addLine(@NotNull String s) {
-        llvmProgram.append(s).append("\n");
-    }
 
     /**
      * Line information is threaded inside the program using a global variable that is updated at each line change.
@@ -78,7 +60,7 @@ public class ProgramPrinter implements ASTVisitor<String> {
     }
 
     @Override
-    public String visit(AssStmtASTNode n) {
+    public @Nullable String visit(@NotNull AssStmtASTNode n) {
         updateLineNumber(n);
         String name = n.getVarName().accept(this);
         String rightSide = n.getValue().accept(this);
@@ -87,7 +69,7 @@ public class ProgramPrinter implements ASTVisitor<String> {
     }
 
     @Override
-    public String visit(BinOpASTNode n) {
+    public @NotNull String visit(@NotNull BinOpASTNode n) {
         updateLineNumber(n);
         String left = n.getLeft().accept(this);
         String right = n.getRight().accept(this);
@@ -102,28 +84,28 @@ public class ProgramPrinter implements ASTVisitor<String> {
     }
 
     @Override
-    public String visit(BoolLiteralASTNode n) {
+    public @NotNull String visit(@NotNull BoolLiteralASTNode n) {
         updateLineNumber(n);
         return "@" + symbols.getBinding(n);
     }
 
     @Override
-    public String visit(ExternalFunctionCallASTNode n) {
+    public @NotNull String visit(@NotNull ExternalFunctionCallASTNode n) {
         updateLineNumber(n);
         List<String> names = n.getArgs().stream().map(x -> x.accept(this)).toList();
         String newName = "%" + gen.newName();
         addLine(newName + " = alloca %struct.Boxed*");
 
-        llvmProgram.append("call void @").append(n.getModule()).append(".").append(n.getFunction()).append("(");
-        llvmProgram.append("%struct.Boxed* ").append(newName);  // return value
+        output.append("call void @").append(n.getModule()).append(".").append(n.getFunction()).append("(");
+        output.append("%struct.Boxed* ").append(newName);  // return value
         for (String name : names)
-            llvmProgram.append(", %struct.Boxed* ").append(name);
-        llvmProgram.append(")\n");
+            output.append(", %struct.Boxed* ").append(name);
+        output.append(")\n");
         return newName;
     }
 
     @Override
-    public String visit(ForLoopASTNode n) {
+    public @Nullable String visit(@NotNull ForLoopASTNode n) {
         updateLineNumber(n);
         String label = gen.newName();
 
@@ -167,7 +149,7 @@ public class ProgramPrinter implements ASTVisitor<String> {
     }
 
     @Override
-    public String visit(GotoStmtASTNode n) {
+    public @Nullable String visit(@NotNull GotoStmtASTNode n) {
         updateLineNumber(n);
         String label = visit(n.getLabel());
         addLine("br label %" + label);
@@ -175,13 +157,13 @@ public class ProgramPrinter implements ASTVisitor<String> {
     }
 
     @Override
-    public String visit(IdentifierASTNode n) {
+    public @NotNull String visit(@NotNull IdentifierASTNode n) {
         updateLineNumber(n);
         return "@" + symbols.getBinding(n);
     }
 
     @Override
-    public String visit(IfThenASTNode n) {
+    public @Nullable String visit(@NotNull IfThenASTNode n) {
         updateLineNumber(n);
         String cond = n.getCondition().accept(this);
         String bool = "%" + gen.newName();
@@ -199,7 +181,7 @@ public class ProgramPrinter implements ASTVisitor<String> {
     }
 
     @Override
-    public String visit(LabelDeclASTNode n) {
+    public @Nullable String visit(@NotNull LabelDeclASTNode n) {
         updateLineNumber(n);
         String label = visit(n.getName());
         addLine("br label %" + label);
@@ -208,106 +190,49 @@ public class ProgramPrinter implements ASTVisitor<String> {
     }
 
     @Override
-    public String visit(NumberLiteralASTNode n) {
+    public @NotNull String visit(@NotNull NumberLiteralASTNode n) {
         updateLineNumber(n);
         return "@" + symbols.getBinding(n);
     }
 
-    /**
-     * Preallocates global variables (constants and variables) and assigns them a value of null.
-     */
-    private void prealloc(CollectNodes c) {
-        for (IdentifierASTNode id : c.getIdents())
-            addLine("@" + symbols.getBinding(id) + " = global " + NULL_VALUE);
-        for (NumberLiteralASTNode num : c.getNumberConstants())
-            addLine("@" + symbols.getBinding(num) + " = global " + NULL_VALUE);
-        for (BoolLiteralASTNode bool : c.getBoolConstants())
-            addLine("@" + symbols.getBinding(bool) + " = global " + NULL_VALUE);
-        for (StringLiteralASTNode str : c.getStringConstants()) {
-            addLine("@" + symbols.getBinding(str) + " = global " + NULL_VALUE);
-            String text = str.getValue();
-            addLine("@" + symbols.getBinding(str)
-                    + ".value = constant [" + (text.length() + 1)
-                    + " x i8] c\"" + text + "\\00\"");
-        }
-    }
-
-    /**
-     * Initializes constants to their value.
-     */
-    private void initConstants(CollectNodes c) {
-        for (StringLiteralASTNode str : c.getStringConstants()) {
-            String text = str.getValue();
-            String arrayType = "[" + (text.length() + 1) + " x i8]";
-            String ptr = "%" + gen.newName();
-            addLine(ptr + " = getelementptr "
-                    + arrayType + ", "
-                    + arrayType + "* @"
-                    + symbols.getBinding(str) + ".value, i32 0, i32 0");
-            addLine("call void " + STRING_SETTER + "(%struct.Boxed* @" + symbols.getBinding(str) + ", i8* " + ptr + ")");
-        }
-        for (NumberLiteralASTNode n : c.getNumberConstants()) {
-            String text = Double.toString(n.getValue());
-            addLine("call void " + NUMBER_SETTER + "(%struct.Boxed* @" + symbols.getBinding(n) + ", double " + text + ")");
-        }
-        for (BoolLiteralASTNode b : c.getBoolConstants()) {
-            addLine("call void " + BOOL_SETTER + "(%struct.Boxed* @" + symbols.getBinding(b)
-                    + ", " + (b.getValue() ? TRUE : FALSE) + ")");
-        }
-    }
-
     @Override
-    public String visit(ProgramASTNode n) {
-        CollectNodes nodes = new CollectNodes(n);
-        addLine("");    // empty line
-        prealloc(nodes);
-        nodes.getDecls().forEach(x -> x.accept(this));
-        addLine("define i32 @main() {");
-        initConstants(nodes);
-        updateLineNumber(n);
-        nodes.getMain().forEach(x -> x.accept(this));
-        addLine("ret i32 0");
-        addLine("}");
+    public @Nullable String visit(@NotNull ProgramASTNode n) {
+        n.getContents().forEach(x -> x.accept(this));
         return null;
     }
 
     @Override
-    public String visit(LabelNameASTNode n) {
+    public @NotNull String visit(@NotNull LabelNameASTNode n) {
         updateLineNumber(n);
         return symbols.getBinding(n);
     }
 
     @Override
-    public String visit(RoutineNameASTNode n) {
-        return symbols.getBinding(n);
+    public @NotNull String visit(@NotNull RoutineNameASTNode n) {
+        return "@" + symbols.getBinding(n);
     }
 
     @Override
-    public String visit(RoutineCallASTNode n) {
+    public @Nullable String visit(@NotNull RoutineCallASTNode n) {
         String name = visit(n.getFunction());
         updateLineNumber(n);
-        addLine("call void @" + name + "()");
+        addLine("call void " + name + "()");
         return null;
     }
 
     @Override
-    public String visit(RoutineDeclASTNode n) {
-        String name = visit(n.getName());
-        addLine("define void @" + name + "() {");
-        updateLineNumber(n);
-        n.getBody().forEach(x -> x.accept(this));
-        addLine("ret void\n}");
+    public @Nullable String visit(@NotNull RoutineDeclASTNode n) {
         return null;
     }
 
     @Override
-    public String visit(StringLiteralASTNode n) {
+    public @NotNull String visit(@NotNull StringLiteralASTNode n) {
         updateLineNumber(n);
         return "@" + symbols.getBinding(n);
     }
 
     @Override
-    public String visit(WhileLoopASTNode n) {
+    public @Nullable String visit(@NotNull WhileLoopASTNode n) {
         updateLineNumber(n);
         String label = gen.newName();
         String bool = "%" + gen.newName();
@@ -325,7 +250,7 @@ public class ProgramPrinter implements ASTVisitor<String> {
     }
 
     @Override
-    public String visit(UnaryMinusASTNode n) {
+    public @Nullable String visit(@NotNull UnaryMinusASTNode n) {
         updateLineNumber(n);
         String expr = n.getExpr().accept(this);
         String res = "%" + gen.newName();
@@ -338,7 +263,7 @@ public class ProgramPrinter implements ASTVisitor<String> {
     }
 
     @Override
-    public String visit(ArrayASTNode n) {
+    public @NotNull String visit(@NotNull ArrayASTNode n) {
         updateLineNumber(n);
         String name = visit(n.getName());
         List<String> indexes = n.getIndexes()
@@ -355,5 +280,11 @@ public class ProgramPrinter implements ASTVisitor<String> {
             prev = res;
         }
         return res;
+    }
+
+    @Override
+    public String run(@NotNull ASTNode n) {
+        n.accept(this);
+        return output.toString();
     }
 }

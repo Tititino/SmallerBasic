@@ -16,17 +16,13 @@ import java.util.Objects;
 public class Scope {
     public static @NotNull Scope TOPLEVEL = new Scope();
     private @Nullable RoutineNameASTNode name = null;
-
     private Scope() {}
-
     public static Scope ofRoutine(@NotNull RoutineNameASTNode name) {
         return new Scope(name);
     }
-
     private Scope(@NotNull RoutineNameASTNode name) {
         this.name = name;
     }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -34,12 +30,10 @@ public class Scope {
         Scope scope = (Scope) o;
         return Objects.equals(name, scope.name);
     }
-
     @Override
     public int hashCode() {
         return Objects.hash(name);
     }
-
     @Override
     public String toString() {
         return (Objects.isNull(name) ? "TOPLEVEL" : name.getText());

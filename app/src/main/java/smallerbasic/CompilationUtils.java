@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ParseTreeToASTVisitorWithTokens;
 import smallerbasic.AST.nodes.ASTNode;
 import smallerbasic.AST.staticChecks.Check;
+import smallerbasic.compiler.Compiler;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -80,5 +81,9 @@ public class CompilationUtils {
         // warnings do not halt compilation
         warnings.forEach(x -> x.check(tree));
         return allPass.stream().allMatch(x -> x) ? Optional.of(tree) : Optional.empty();
+    }
+
+    public static @NotNull String compile(@NotNull ASTNode tree, @NotNull Compiler c) {
+        return c.compile(tree);
     }
 }

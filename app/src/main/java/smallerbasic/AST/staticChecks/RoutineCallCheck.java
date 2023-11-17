@@ -26,32 +26,31 @@ public class RoutineCallCheck extends AbstractCheck {
 
     private record CallsVisitor(@NotNull HashSet<RoutineNameASTNode> declared,
                                 @NotNull HashSet<RoutineNameASTNode> called) implements ASTMonoidVisitor<Void> {
-
-            private CallsVisitor(@NotNull HashSet<RoutineNameASTNode> declared, HashSet<RoutineNameASTNode> called) {
-                this.declared = declared;
-                this.called = called;
-            }
-
-            @Override
-            public Void empty() {
-                return null;
-            }
-
-            @Override
-            public Void compose(Void o1, Void o2) {
-                return null;
-            }
-
-            @Override
-            public Void visit(RoutineCallASTNode n) {
-                called.add(n.getFunction());
-                return null;
-            }
-
-            @Override
-            public Void visit(RoutineDeclASTNode n) {
-                declared.add(n.getName());
-                return null;
-            }
+        private CallsVisitor(@NotNull HashSet<RoutineNameASTNode> declared, HashSet<RoutineNameASTNode> called) {
+            this.declared = declared;
+            this.called = called;
         }
+
+        @Override
+        public Void empty() {
+            return null;
+        }
+
+        @Override
+        public Void compose(Void o1, Void o2) {
+            return null;
+        }
+
+        @Override
+        public Void visit(RoutineCallASTNode n) {
+            called.add(n.getFunction());
+            return null;
+        }
+
+        @Override
+        public Void visit(RoutineDeclASTNode n) {
+            declared.add(n.getName());
+            return null;
+        }
+    }
 }

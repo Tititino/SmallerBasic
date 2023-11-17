@@ -14,6 +14,7 @@ import java.util.*;
 public class UninitializedVariableCheck extends AbstractCheck {
 
     private boolean isOk = true;
+
     @Override
     public boolean check(@NotNull ASTNode n) {
         isOk = true;
@@ -23,12 +24,14 @@ public class UninitializedVariableCheck extends AbstractCheck {
             public Set<RoutineDeclASTNode> empty() {
                 return Collections.emptySet();
             }
+
             @Override
             public Set<RoutineDeclASTNode> compose(Set<RoutineDeclASTNode> o1, Set<RoutineDeclASTNode> o2) {
                 Set<RoutineDeclASTNode> newSet = new HashSet<>(o1);
                 newSet.addAll(o2);
                 return newSet;
             }
+
             @Override
             public Set<RoutineDeclASTNode> visit(RoutineDeclASTNode n) {
                 return Set.of(n);

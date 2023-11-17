@@ -17,7 +17,6 @@ public class ProgramASTNode extends AbstractASTNode implements ASTNode {
     private final @NotNull List<@NotNull DeclOrStmtASTNode> contents;
 
     public ProgramASTNode(@NotNull List<@NotNull DeclOrStmtASTNode> contents) {
-        Objects.requireNonNull(contents);
         this.contents = contents;
     }
 

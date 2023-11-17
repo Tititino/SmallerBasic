@@ -1,10 +1,10 @@
-package smallerbasic;
+package smallerbasic.AST.staticChecks.errors;
 
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.nodes.ASTNode;
-import smallerbasic.AST.staticChecks.ErrorReporter;
+import smallerbasic.PrettyErrorListener;
 
 /**
  * {@link ErrorReporter} that prints error in a similar fashion to {@link PrettyErrorListener}.

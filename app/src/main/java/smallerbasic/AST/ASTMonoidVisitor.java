@@ -6,21 +6,18 @@ import java.util.List;
 
 /**
  * This class defines a default implementation of a visitor over an AST that, given an identity and a binary function, traverses the AST composing the results from left to right.
- * Contrary to what the name suggests the binary operation may not be associative and the results are composed in the order one would expect, from left to right.
- * So for example let's take a for-node
- * ```
- * (for-node <var> <start> <end> <step> <stmt0> <stmt1> ... )
- * ```
- * the visitor will call `visit(<var>) + (visit(<start>) + (visit(<end>) + (visit(<step>) + ...)))`.
+ * The nodes are visited, and composed in the order one would expect, from left to right.
  */
 public interface ASTMonoidVisitor<T> extends ASTVisitor<T> {
 
-     default T visitChildren(List<? extends ASTNode> l) {
+    default T visitChildren(List<? extends ASTNode> l) {
         return l.stream()
                 .map(x -> x.accept(this))
                 .reduce(empty(), this::compose);
     }
+
     T empty();
+
     T compose(T o1, T o2);
 
     @Override
@@ -113,6 +110,7 @@ public interface ASTMonoidVisitor<T> extends ASTVisitor<T> {
     default T visit(RoutineNameASTNode n) {
         return empty();
     }
+
     @Override
     default T visit(LabelNameASTNode n) {
         return empty();

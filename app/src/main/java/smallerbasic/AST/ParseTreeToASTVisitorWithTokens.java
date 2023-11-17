@@ -22,7 +22,6 @@ public class ParseTreeToASTVisitorWithTokens extends ParseTreeToASTVisitor {
         return ast;
     }
 
-
     /**
      * The payload of a {@link ParseTree} may be either a {@link org.antlr.v4.runtime.RuleContext}
      * or a {@link Token} ({@see ParseTree::getPayload()}).

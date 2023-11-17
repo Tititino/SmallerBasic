@@ -23,12 +23,10 @@ public abstract class AbstractASTNode implements ASTNode {
     public void setEndToken(@NotNull Token token) {
         end = token;
     }
-
     @Override
     public @NotNull Optional<@NotNull Token> getStartToken() {
         return Optional.ofNullable(start);
     }
-
     @Override
     public @NotNull Optional<@NotNull Token> getEndToken() {
         return Optional.ofNullable(end);

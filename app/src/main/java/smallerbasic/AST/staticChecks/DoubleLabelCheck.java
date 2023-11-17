@@ -10,7 +10,6 @@ import java.util.*;
  * This check verifies whether a program defines a label more than once in the same scope.
  */
 public class DoubleLabelCheck extends AbstractCheck {
-
     @Override
     public boolean check(@NotNull ASTNode n) {
         boolean isOk = true;
@@ -27,28 +26,23 @@ public class DoubleLabelCheck extends AbstractCheck {
             }
         return isOk;
     }
-
     private static class DoubleLabelVisitor implements ASTMonoidVisitor<Map<LabelNameASTNode, Integer>> {
-
         @Override
         public Map<LabelNameASTNode, Integer> empty() {
             return Collections.emptyMap();
         }
-
         @Override
         public Map<LabelNameASTNode, Integer> compose(Map<LabelNameASTNode, Integer> o1,
-                                                                  Map<LabelNameASTNode, Integer> o2) {
+                                                      Map<LabelNameASTNode, Integer> o2) {
             Map<LabelNameASTNode, Integer> newMap = new HashMap<>(o1);
             for (LabelNameASTNode key : o2.keySet())
                 newMap.merge(key, o2.get(key), Integer::sum);
             return newMap;
         }
-
         @Override
         public Map<LabelNameASTNode, Integer> visit(LabelNameASTNode n) {
             return Map.of(n, 1);
         }
-
         @Override
         public Map<LabelNameASTNode, Integer> visit(GotoStmtASTNode n) {
             return empty();

@@ -6,7 +6,6 @@ import smallerbasic.AST.nodes.*;
  * Visitor over an AST.
  */
 public interface ASTVisitor<T> {
-
     T visit(AssStmtASTNode n);
     T visit(BinOpASTNode n);
     T visit(BoolLiteralASTNode n);

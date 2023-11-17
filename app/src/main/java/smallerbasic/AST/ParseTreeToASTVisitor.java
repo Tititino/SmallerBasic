@@ -23,6 +23,7 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
     /**
      * The current scope being visited: {@code Scope.ofRoutine(<routine name>)} if inside a routine declaration,
      * {@code Scope.TOPLEVEL} otherwise.
+     * This is needed because {@link LabelNameASTNode} are created with a scope.
      */
     private @NotNull Scope currentScope = Scope.TOPLEVEL;
 

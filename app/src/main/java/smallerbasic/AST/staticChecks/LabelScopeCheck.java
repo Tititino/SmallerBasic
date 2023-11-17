@@ -10,8 +10,6 @@ import java.util.*;
  * This check verifies whether in a program each referenced label is also defined in the same scope.
  */
 public class LabelScopeCheck extends AbstractCheck {
-
-
     public boolean check(@NotNull ASTNode n) {
         boolean isOk = true;
         DefAndRefLabels labels = n.accept(new ScopeVisitor());
@@ -56,8 +54,10 @@ public class LabelScopeCheck extends AbstractCheck {
         }
     }
 
-    private record DefAndRefLabels(@NotNull Set<LabelNameASTNode> definedLabels, @NotNull Set<LabelNameASTNode> gotoLabels) {
-
+    private record DefAndRefLabels(
+            @NotNull Set<LabelNameASTNode> definedLabels,
+            @NotNull Set<LabelNameASTNode> gotoLabels
+    ) {
         public static @NotNull DefAndRefLabels empty() {
             return new DefAndRefLabels(Collections.emptySet(), Collections.emptySet());
         }
