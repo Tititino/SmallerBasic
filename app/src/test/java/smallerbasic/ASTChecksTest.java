@@ -68,6 +68,7 @@ public class ASTChecksTest {
                 "c".repeat(41) + " = 0\n")).get());
 
         MaxNameLengthCheck checkDoubles = new MaxNameLengthCheck();
+        checkDoubles.setErrorReporter((n, msg) -> {});
 
         assertThat(checkDoubles.check(tree)).isFalse();
     }
@@ -77,6 +78,7 @@ public class ASTChecksTest {
         ASTNode tree = clean(parse(lex("c".repeat(40) + " = 0\n")).get());
 
         MaxNameLengthCheck checkDoubles = new MaxNameLengthCheck();
+        checkDoubles.setErrorReporter((n, msg) -> {});
 
         assertThat(checkDoubles.check(tree)).isTrue();
     }

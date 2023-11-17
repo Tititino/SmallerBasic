@@ -18,8 +18,7 @@ import static smallerbasic.CompilationUtils.lex;
 public class ParserTest {
 
     /**
-     * Basically halt anc catch fire when it encounters any error.
-     * Could be done in a prettier way with an ANTLRErrorListener.
+     * Basically halt and catch fire when it encounters any error.
      */
     static class ExceptionErrorHandler extends DefaultErrorStrategy {
         @Override

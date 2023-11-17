@@ -4,7 +4,6 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import smallerbasic.AST.ParseTreeToASTVisitor;
 import smallerbasic.AST.Scope;
@@ -33,7 +32,6 @@ public class ASTConversionTest {
     }
 
     @Test
-    @Disabled
     public void stringComparisonTest() {
         SBGrammarLexer lexer = new SBGrammarLexer(CharStreams.fromString("(X + \"ciao\") = \"mondo\""));
         SBGrammarParser parser = new SBGrammarParser(new CommonTokenStream(lexer));
@@ -50,7 +48,7 @@ public class ASTConversionTest {
         );
         ParseTreeToASTVisitor convert = new ParseTreeToASTVisitor();
 
-        // assertThat(convert.(tree)).isEqualTo(expected);
+        assertThat(convert.visit(tree)).isEqualTo(expected);
     }
 
     @Test

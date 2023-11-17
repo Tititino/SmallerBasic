@@ -2,7 +2,6 @@ package smallerbasic;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.Token;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,12 +41,6 @@ public class LexerTest {
         assertThat(lexer.getAllTokens())
                 .extracting(Token::getText)
                 .containsExactly("a", "b", "_c", "C1A0");
-    }
-
-    @Disabled
-    @Test
-    void variableNameMaximumLengthTest() {
-        assertThat(true).isEqualTo(false);
     }
 
 }
