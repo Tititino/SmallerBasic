@@ -51,6 +51,6 @@ public class LLVMCompiler implements Compiler {
                 init +
                 "\n" +
                 body +
-                "\n}\n";
+                "\nret i32 0\n}\n";
     }
 }
