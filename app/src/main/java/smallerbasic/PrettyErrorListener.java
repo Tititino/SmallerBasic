@@ -11,7 +11,7 @@ public class PrettyErrorListener extends BaseErrorListener {
 
     /**
      * Query if any syntaxError has happened during the parsing.
-     * @return {@code true} if {@see syntaxError} was called at least once.
+     * @return {@code true} if {@link #syntaxError} was called at least once.
      */
     public boolean hasFailed() {
         return hasFailed;

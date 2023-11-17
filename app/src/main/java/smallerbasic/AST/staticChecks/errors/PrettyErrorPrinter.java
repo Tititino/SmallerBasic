@@ -17,7 +17,15 @@ public class PrettyErrorPrinter implements ErrorReporter {
     }
 
     /**
-     * Prints an error spanning multiple lines.
+     * Prints an error position spanning multiple lines in the following fashion:
+     * <pre>
+     * {@code
+     *    from line <start> to line <end>
+     * <start line>
+     * ...
+     * <end line>
+     * }
+     * </pre>
      * @param start the start token.
      * @param end the end token.
      */
@@ -32,7 +40,14 @@ public class PrettyErrorPrinter implements ErrorReporter {
     }
 
     /**
-     * Prints an error located on a single line.
+     * Prints an error position located on a single line in the following fashion:
+     * <pre>
+     * {@code
+     *    at line <line>:<start>-<end>
+     * <line>
+     * <underlining>
+     * }
+     * </pre>
      * @param start the start token.
      * @param end the end token.
      */
@@ -46,6 +61,11 @@ public class PrettyErrorPrinter implements ErrorReporter {
         System.err.println();
     }
 
+    /**
+     * Report an error highlighting where in the source code it is located.
+     * @param n The faulty node.
+     * @param msg A description of the error.
+     */
     @Override
     public void reportError(@NotNull ASTNode n, @NotNull String msg) {
         System.err.println(msg);

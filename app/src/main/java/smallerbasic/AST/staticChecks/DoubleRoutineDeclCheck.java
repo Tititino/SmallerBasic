@@ -8,6 +8,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This check controls whether a program defines a routine more than once.
+ */
 public class DoubleRoutineDeclCheck extends AbstractCheck {
     @Override
     public boolean check(@NotNull ASTNode n) {

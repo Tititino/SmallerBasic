@@ -6,6 +6,9 @@ import smallerbasic.AST.nodes.*;
 
 import java.util.HashSet;
 
+/**
+ * Check that each routine called must be also defined.
+ */
 public class RoutineCallCheck extends AbstractCheck {
     public boolean check(@NotNull ASTNode n) {
         boolean isOk = true;

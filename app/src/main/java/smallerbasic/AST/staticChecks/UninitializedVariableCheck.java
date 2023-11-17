@@ -18,7 +18,7 @@ public class UninitializedVariableCheck extends AbstractCheck {
     @Override
     public boolean check(@NotNull ASTNode n) {
         isOk = true;
-        // Creates an anonymous visitor to collect routine declarations.
+        // an anonymous visitor to collect routine declarations.
         ASTMonoidVisitor<Set<RoutineDeclASTNode>> routines = new ASTMonoidVisitor<>() {
             @Override
             public Set<RoutineDeclASTNode> empty() {

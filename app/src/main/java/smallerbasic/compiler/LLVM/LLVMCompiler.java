@@ -8,7 +8,7 @@ import smallerbasic.symbolTable.SymbolTable;
 import smallerbasic.symbolTable.VarNameGenerator;
 
 /**
- * Compiles a tree to LLVM.
+ * Compiles a tree to LLVM IR.
  */
 public class LLVMCompiler implements Compiler {
     /**
