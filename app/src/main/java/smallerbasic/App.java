@@ -1,7 +1,6 @@
 package smallerbasic;
 
 import org.antlr.v4.runtime.TokenStream;
-import smallerbasic.AST.nodes.ASTNode;
 import smallerbasic.AST.staticChecks.*;
 import smallerbasic.AST.staticChecks.errors.PrettyErrorPrinter;
 import smallerbasic.compiler.LLVM.LLVMCompiler;
@@ -37,17 +36,9 @@ public class App {
             errors.forEach(x -> x.setErrorReporter(new PrettyErrorPrinter(tokens)));
             warnings.forEach(x -> x.setErrorReporter(new PrettyErrorPrinter(tokens)));
 
-            ASTNode ast = check(
-                    clean(
-                            parse(tokens).orElseThrow(() -> new CompilationError("Parsing failed"))
-                    ),
-                    errors,
-                    warnings
-            ).orElseThrow(() -> new CompilationError("Static checks failed"));
-
-            String program = compile(ast, new LLVMCompiler());
-
-            System.out.println(program);
+            System.out.println(
+                    compile(check(clean(parse(tokens)), errors, warnings), new LLVMCompiler())
+            );
         } catch (IOException e) {
             System.out.println("Error reading file \"" + args[0] + "\"");
         } catch (CompilationError e) {

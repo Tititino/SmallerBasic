@@ -137,13 +137,13 @@ public class ASTConversionTest {
     @Test
     public void programParsingTest() throws IOException {
         TokenStream lexedSource = lex(Paths.get("src/test/resources/test1.sb"));
-        ParseTree parsedSource = parse(lexedSource).get();
+        ParseTree parsedSource = parse(lexedSource);
         assertThatNoException().isThrownBy(() -> clean(parsedSource));
     }
 
     @Test
     public void routineAndStatementTest() {
-        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nGoto label\n")).get());
+        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nGoto label\n")));
         RoutineNameASTNode name = new RoutineNameASTNode("test");
         ASTNode expected = new ProgramASTNode(List.of(
                 new RoutineDeclASTNode(
@@ -160,7 +160,7 @@ public class ASTConversionTest {
 
     @Test
     public void testTokenPosition() {
-        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nGoto label\n")).get());
+        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nGoto label\n")));
 
         assertThat(tree.getStartToken().get().getText()).isEqualTo("Sub");
         assertThat(tree.getEndToken().get().getText()).isEqualTo("<EOF>");
@@ -168,7 +168,7 @@ public class ASTConversionTest {
 
     @Test
     public void unaryMinusTest() {
-        ASTNode tree = clean(parse(lex("A = -(B + -C)\n")).get());
+        ASTNode tree = clean(parse(lex("A = -(B + -C)\n")));
         assertThat(tree).isEqualTo(
                 new ProgramASTNode(
                         List.of(

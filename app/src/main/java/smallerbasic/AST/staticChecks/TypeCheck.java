@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * This check verifies whether a program is well-typed.
- * Variables and arrays are assigned a type of {@code TYPE.ANY} and no effort is made to try and guess the type of a variable through assignments.
+ * Variables and arrays are assigned a type of {@link TYPE#ANY} and no effort is made to try and guess the type of a variable through assignments.
  */
 public class TypeCheck extends AbstractCheck {
     private boolean isOk = true;
@@ -26,8 +26,8 @@ public class TypeCheck extends AbstractCheck {
     }
 
     /**
-     * Something in a SmallerBasic program may have one of three types: NUMBER, BOOL or STRING.
-     * A statement has type NONE, and a variable has type ANY.
+     * Something in a SmallerBasic program may have one of three types: {@link TYPE#NUMBER}, {@link TYPE#BOOL} or {@link TYPE#STRING}.
+     * A statement has type {@link TYPE#NONE}, and a variable has type {@link TYPE#ANY}.
      */
     public enum TYPE {
         NONE,
@@ -58,18 +58,17 @@ public class TypeCheck extends AbstractCheck {
         public String toString() {
             return switch (this) {
                 case NUMBER -> "Number";
-                case BOOL   -> "Bool";
+                case BOOL -> "Bool";
                 case STRING -> "String";
-                case ANY    -> "Any";
-                case NONE   -> "Void";
+                case ANY -> "Any";
+                case NONE -> "Void";
             };
         }
     }
 
     /**
      * Report an error mismatch if {@code got} is different {@code expected}.
-     * The {@link ASTNode} is needed for positional information.
-     *
+     * The {@link ASTNode} is needed to report the error if one is encountered.
      * @return {@code true} if a mismatch has been reported.
      */
     private boolean reportMismatch(@NotNull ASTNode n, @NotNull TYPE got, @NotNull TYPE expected) {
@@ -84,8 +83,7 @@ public class TypeCheck extends AbstractCheck {
 
     /**
      * Report an error mismatch if {@code got} is not in the {@code expected} list.
-     * The {@link ASTNode} is needed for positional information.
-     *
+     * The {@link ASTNode} is needed to report the error if one is encountered.
      * @return {@code true} if a mismatch has been reported.
      */
     private boolean reportMismatch(@NotNull ASTNode n, @NotNull TYPE got, @NotNull List<TYPE> expected) {
