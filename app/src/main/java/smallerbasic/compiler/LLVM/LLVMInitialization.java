@@ -10,6 +10,9 @@ import smallerbasic.compiler.ASTToString;
 import smallerbasic.symbolTable.SymbolTable;
 import smallerbasic.symbolTable.VarNameGenerator;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Given a {@link ASTNode} it creates the LLVM code needed to initialize all its literals.
  */
@@ -22,6 +25,7 @@ class LLVMInitialization implements ASTMonoidVisitor<StringBuilder>, ASTToString
         this.gen = gen;
     }
 
+    private final @NotNull Set<ASTNode> seen = new HashSet<>();
     private final static @NotNull String NUMBER_SETTER = "@_SET_NUM_VALUE";
     private final static @NotNull String BOOL_SETTER = "@_SET_BOOL_VALUE";
     private final static @NotNull String STRING_SETTER = "@_SET_STR_VALUE";
@@ -36,6 +40,9 @@ class LLVMInitialization implements ASTMonoidVisitor<StringBuilder>, ASTToString
      */
     @Override
     public StringBuilder visit(StringLiteralASTNode n) {
+        if (seen.contains(n))
+            return empty();
+        seen.add(n);
         String text = n.getValue();
         String arrayType = "[" + (text.length() + 1) + " x i8]";
         String ptr = "%" + gen.newName();
@@ -49,6 +56,9 @@ class LLVMInitialization implements ASTMonoidVisitor<StringBuilder>, ASTToString
 
     @Override
     public StringBuilder visit(NumberLiteralASTNode n) {
+        if (seen.contains(n))
+            return empty();
+        seen.add(n);
         String text = Double.toString(n.getValue());
         return new StringBuilder("call void " + NUMBER_SETTER
                 + "(%struct.Boxed* @" + symbols.getBinding(n) + ", double " + text + ")\n");
@@ -66,6 +76,9 @@ class LLVMInitialization implements ASTMonoidVisitor<StringBuilder>, ASTToString
 
     @Override
     public StringBuilder visit(BoolLiteralASTNode n) {
+        if (seen.contains(n))
+            return empty();
+        seen.add(n);
         return new StringBuilder("call void " + BOOL_SETTER + "(%struct.Boxed* @" + symbols.getBinding(n)
                 + ", " + (n.getValue() ? TRUE : FALSE) + ")\n");
     }

@@ -6,6 +6,9 @@ import smallerbasic.AST.nodes.*;
 import smallerbasic.compiler.ASTToString;
 import smallerbasic.symbolTable.SymbolTable;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Given an {@link ASTNode} it creates the LLVM code needed to preallocate all its variables and literals.
  */
@@ -28,6 +31,8 @@ class LLVMPreallocation implements ASTMonoidVisitor<StringBuilder>, ASTToString 
         return o1.append(o2);
     }
 
+    private final @NotNull Set<ASTNode> seen = new HashSet<>();
+
     /**
      * Preallocate the space to hold the {@code %struct.Boxed} corresponding to this bool literal.
      * @param n The boolean literal.
@@ -35,6 +40,9 @@ class LLVMPreallocation implements ASTMonoidVisitor<StringBuilder>, ASTToString 
      */
     @Override
     public StringBuilder visit(BoolLiteralASTNode n) {
+        if (seen.contains(n))
+            return empty();
+        seen.add(n);
         return new StringBuilder("@" + symbols.getBinding(n) + " = global " + NULL_VALUE + "\n");
     }
 
@@ -45,6 +53,9 @@ class LLVMPreallocation implements ASTMonoidVisitor<StringBuilder>, ASTToString 
      */
     @Override
     public StringBuilder visit(IdentifierASTNode n) {
+        if (seen.contains(n))
+            return empty();
+        seen.add(n);
         return new StringBuilder("@" + symbols.getBinding(n) + " = global " + NULL_VALUE + "\n");
     }
 
@@ -55,6 +66,9 @@ class LLVMPreallocation implements ASTMonoidVisitor<StringBuilder>, ASTToString 
      */
     @Override
     public StringBuilder visit(NumberLiteralASTNode n) {
+        if (seen.contains(n))
+            return empty();
+        seen.add(n);
         return new StringBuilder("@" + symbols.getBinding(n) + " = global " + NULL_VALUE + "\n");
     }
 
@@ -65,6 +79,9 @@ class LLVMPreallocation implements ASTMonoidVisitor<StringBuilder>, ASTToString 
      */
     @Override
     public StringBuilder visit(StringLiteralASTNode n) {
+        if (seen.contains(n))
+            return empty();
+        seen.add(n);
         String text = n.getValue();
         return new StringBuilder("@" + symbols.getBinding(n) + " = global " + NULL_VALUE + "\n")
                 .append("@" + symbols.getBinding(n) + ".value = constant [" + (text.length() + 1) + " x i8] c\"" + text + "\\00\"\n");
