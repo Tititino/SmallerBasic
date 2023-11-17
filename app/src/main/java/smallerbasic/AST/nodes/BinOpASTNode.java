@@ -27,6 +27,10 @@ public class BinOpASTNode extends AbstractASTNode implements ExpressionASTNode {
         return v.visit(this);
     }
 
+    /**
+     * The different possible binary operations in a SmallerBasic program.
+     * No concat operation is defined since the choice between addition and concatenation is made at runtime.
+     */
     public enum BinOp {
         PLUS,
         MINUS,

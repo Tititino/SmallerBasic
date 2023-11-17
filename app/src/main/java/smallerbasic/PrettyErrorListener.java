@@ -3,7 +3,7 @@ package smallerbasic;
 import org.antlr.v4.runtime.*;
 
 /**
- * This class prints out the errors with carets underneath the offending characters.
+ * A Listener that listens for errors during parsing and prints them out with carets underneath the offending characters.
  */
 public class PrettyErrorListener extends BaseErrorListener {
 
@@ -11,7 +11,7 @@ public class PrettyErrorListener extends BaseErrorListener {
 
     /**
      * Query if any syntaxError has happened during the parsing.
-     * @return {@code true} if {@see syntaxError} was called at least once.
+     * @return {@code true} if {@link #syntaxError} was called at least once.
      */
     public boolean hasFailed() {
         return hasFailed;

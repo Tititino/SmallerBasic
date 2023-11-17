@@ -6,6 +6,9 @@ import smallerbasic.AST.nodes.*;
 
 import java.util.HashSet;
 
+/**
+ * Check that each routine called must be also defined.
+ */
 public class RoutineCallCheck extends AbstractCheck {
     public boolean check(@NotNull ASTNode n) {
         boolean isOk = true;
@@ -15,7 +18,7 @@ public class RoutineCallCheck extends AbstractCheck {
         for (RoutineNameASTNode l : called)
             if (!declared.contains(l)) {
                 isOk = false;
-                reportError(l, String.format(
+                super.reporter.reportError(l, String.format(
                                 "*** RoutineCallError: routine \"%s\" is called but not defined",
                                 l.getText()
                         )
@@ -26,32 +29,31 @@ public class RoutineCallCheck extends AbstractCheck {
 
     private record CallsVisitor(@NotNull HashSet<RoutineNameASTNode> declared,
                                 @NotNull HashSet<RoutineNameASTNode> called) implements ASTMonoidVisitor<Void> {
-
-            private CallsVisitor(@NotNull HashSet<RoutineNameASTNode> declared, HashSet<RoutineNameASTNode> called) {
-                this.declared = declared;
-                this.called = called;
-            }
-
-            @Override
-            public Void empty() {
-                return null;
-            }
-
-            @Override
-            public Void compose(Void o1, Void o2) {
-                return null;
-            }
-
-            @Override
-            public Void visit(RoutineCallASTNode n) {
-                called.add(n.getFunction());
-                return null;
-            }
-
-            @Override
-            public Void visit(RoutineDeclASTNode n) {
-                declared.add(n.getName());
-                return null;
-            }
+        private CallsVisitor(@NotNull HashSet<RoutineNameASTNode> declared, HashSet<RoutineNameASTNode> called) {
+            this.declared = declared;
+            this.called = called;
         }
+
+        @Override
+        public Void empty() {
+            return null;
+        }
+
+        @Override
+        public Void compose(Void o1, Void o2) {
+            return null;
+        }
+
+        @Override
+        public Void visit(RoutineCallASTNode n) {
+            called.add(n.getFunction());
+            return null;
+        }
+
+        @Override
+        public Void visit(RoutineDeclASTNode n) {
+            declared.add(n.getName());
+            return null;
+        }
+    }
 }

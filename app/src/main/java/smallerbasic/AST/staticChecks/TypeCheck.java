@@ -20,14 +20,13 @@ public class TypeCheck extends AbstractCheck {
         return isOk;
     }
 
-    @Override
-    public void reportError(@NotNull ASTNode n, @NotNull String msg) {
+    private void reportError(@NotNull ASTNode n, @NotNull String msg) {
         isOk = false;
-        super.reportError(n, msg);
+        super.reporter.reportError(n, msg);
     }
 
     /**
-     * Something in a Smaller Basic program may have one of three types: NUMBER, BOOL or STRING.
+     * Something in a SmallerBasic program may have one of three types: NUMBER, BOOL or STRING.
      * A statement has type NONE, and a variable has type ANY.
      */
     public enum TYPE {
@@ -59,10 +58,10 @@ public class TypeCheck extends AbstractCheck {
         public String toString() {
             return switch (this) {
                 case NUMBER -> "Number";
-                case BOOL -> "Bool";
+                case BOOL   -> "Bool";
                 case STRING -> "String";
-                case ANY -> "Any";
-                case NONE -> "Void";
+                case ANY    -> "Any";
+                case NONE   -> "Void";
             };
         }
     }
@@ -70,6 +69,7 @@ public class TypeCheck extends AbstractCheck {
     /**
      * Report an error mismatch if {@code got} is different {@code expected}.
      * The {@link ASTNode} is needed for positional information.
+     *
      * @return {@code true} if a mismatch has been reported.
      */
     private boolean reportMismatch(@NotNull ASTNode n, @NotNull TYPE got, @NotNull TYPE expected) {
@@ -85,6 +85,7 @@ public class TypeCheck extends AbstractCheck {
     /**
      * Report an error mismatch if {@code got} is not in the {@code expected} list.
      * The {@link ASTNode} is needed for positional information.
+     *
      * @return {@code true} if a mismatch has been reported.
      */
     private boolean reportMismatch(@NotNull ASTNode n, @NotNull TYPE got, @NotNull List<TYPE> expected) {
@@ -103,8 +104,8 @@ public class TypeCheck extends AbstractCheck {
     private class TypingVisitor implements ASTVisitor<TYPE> {
 
         private TYPE visitChildren(List<? extends ASTNode> l) {
-             l.forEach(x -> x.accept(this));
-             return TYPE.NONE;
+            l.forEach(x -> x.accept(this));
+            return TYPE.NONE;
         }
 
         @Override
@@ -151,7 +152,7 @@ public class TypeCheck extends AbstractCheck {
                     return left;
                 }
             }
-            return null;
+            return TYPE.ANY;
         }
 
         @Override

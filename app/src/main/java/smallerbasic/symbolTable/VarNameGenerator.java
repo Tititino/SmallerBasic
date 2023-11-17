@@ -3,13 +3,12 @@ package smallerbasic.symbolTable;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * A class to generate unique names.
+ * Class for generating names.
  */
-public class VarNameGenerator {
-    private @NotNull Integer name = 0;
-    public @NotNull String newName() {
-        String newName = name.toString();
-        name++;
-        return "v" + newName;
-    }
+public interface VarNameGenerator {
+    /**
+     * Give me a new name.
+     * @return a name, it is guaranteed that this name has not been returned before.
+     */
+    @NotNull String newName();
 }

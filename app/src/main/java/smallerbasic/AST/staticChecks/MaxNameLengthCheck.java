@@ -11,8 +11,8 @@ import smallerbasic.AST.nodes.RoutineNameASTNode;
  * Check for max identifier length.
  */
 public class MaxNameLengthCheck extends AbstractCheck {
-
     private boolean isOk = true;
+
     @Override
     public boolean check(@NotNull ASTNode n) {
         isOk = true;
@@ -20,14 +20,12 @@ public class MaxNameLengthCheck extends AbstractCheck {
         return isOk;
     }
 
-    @Override
-    public void reportError(@NotNull ASTNode n, @NotNull String msg) {
+    private void reportError(@NotNull ASTNode n, @NotNull String msg) {
         isOk = false;
-        super.reportError(n, msg);
+        super.reporter.reportError(n, msg);
     }
 
     private class NameGatherVisitor implements ASTMonoidVisitor<Void> {
-
         private static final int MAX_LEN = 40;
 
         @Override

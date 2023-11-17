@@ -14,7 +14,8 @@ public class RoutineDeclASTNode extends AbstractASTNode implements DeclOrStmtAST
     private final @NotNull RoutineNameASTNode name;
     private final @NotNull List<@NotNull StatementASTNode> body;
 
-    public RoutineDeclASTNode(@NotNull RoutineNameASTNode name, @NotNull List<@NotNull StatementASTNode> body) {
+    public RoutineDeclASTNode(@NotNull RoutineNameASTNode name,
+                              @NotNull List<@NotNull StatementASTNode> body) {
         this.name = name;
         this.body = body;
     }
