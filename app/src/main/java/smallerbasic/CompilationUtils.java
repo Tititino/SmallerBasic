@@ -1,8 +1,6 @@
 package smallerbasic;
 
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ParseTreeToASTVisitorWithTokens;
@@ -26,7 +24,27 @@ public class CompilationUtils {
      * @throws IOException propagates any exception risen by the file handling.
      */
     public static @NotNull TokenStream lex(@NotNull Path path) throws IOException {
-        return new CommonTokenStream(new SBGrammarLexer(CharStreams.fromFileName(path.toString())));
+        return lex(CharStreams.fromFileName(path.toString()));
+    }
+
+    private static @NotNull TokenStream lex(@NotNull CharStream chars) {
+        SBGrammarLexer lexer = new SBGrammarLexer(chars);
+        lexer.removeErrorListeners();
+        PrettyErrorListener listener = new PrettyErrorListener() {
+            @Override
+            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+                hasFailed = true;
+                System.err.println("*** LexError [" + line + ":"
+                        + charPositionInLine + "]: " + msg);
+                underlineError(recognizer, (Token) offendingSymbol, line, charPositionInLine);
+            }
+        };
+        lexer.addErrorListener(listener);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+        if (listener.hasFailed())
+            throw new CompilationError("Lexing failed");
+        return tokens;
     }
 
     /**
@@ -35,7 +53,7 @@ public class CompilationUtils {
      * @return The corresponding {@link TokenStream}.
      */
     public static @NotNull TokenStream lex(@NotNull String text) {
-        return new CommonTokenStream(new SBGrammarLexer(CharStreams.fromString(text)));
+        return lex(CharStreams.fromString(text));
     }
 
     /**
@@ -43,15 +61,23 @@ public class CompilationUtils {
      * @param tokens The token stream.
      * @return {@code Optional.empty()} if there have been any parsing errors, the {@link ParseTree} otherwise.
      */
-    public static @NotNull Optional<ParseTree> parse(@NotNull TokenStream tokens) {
+    public static @NotNull ParseTree parse(@NotNull TokenStream tokens) {
         SBGrammarParser parser = new SBGrammarParser(tokens);
-        PrettyErrorListener listener = new PrettyErrorListener();
+        PrettyErrorListener listener = new PrettyErrorListener() {
+            @Override
+            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+                hasFailed = true;
+                System.err.println("*** ParseError [" + line + ":"
+                        + charPositionInLine + "]: " + msg);
+                underlineError(recognizer, (Token) offendingSymbol, line, charPositionInLine);
+            }
+        };
         parser.removeErrorListeners();
         parser.addErrorListener(listener);
         ParseTree tree = parser.program();
         if (listener.hasFailed())
-            return Optional.empty();
-        return Optional.of(tree);
+            throw new CompilationError("Parsing failed");
+        return tree;
     }
 
     /**
@@ -70,7 +96,7 @@ public class CompilationUtils {
      * @param warnings A list of checks that the tree may not pass.
      * @return {@link Optional#empty()} if at least one check in {@code errors} fails.
      */
-    public static @NotNull Optional<ASTNode> check(@NotNull ASTNode tree,
+    public static @NotNull ASTNode check(@NotNull ASTNode tree,
                                                    @NotNull List<Check> errors,
                                                    @NotNull List<Check> warnings) {
         // directly using allMatch stops the checks at the first failed one
@@ -80,7 +106,9 @@ public class CompilationUtils {
                 .toList();
         // warnings do not halt compilation
         warnings.forEach(x -> x.check(tree));
-        return allPass.stream().allMatch(x -> x) ? Optional.of(tree) : Optional.empty();
+        if (!allPass.stream().allMatch(x -> x))
+            throw new CompilationError("Static checks failed");
+        return tree;
     }
 
     /**

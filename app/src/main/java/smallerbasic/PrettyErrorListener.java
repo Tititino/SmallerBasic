@@ -5,9 +5,9 @@ import org.antlr.v4.runtime.*;
 /**
  * A Listener that listens for errors during parsing and prints them out with carets underneath the offending characters.
  */
-public class PrettyErrorListener extends BaseErrorListener {
+public abstract class PrettyErrorListener extends BaseErrorListener {
 
-    private boolean hasFailed = false;
+    protected boolean hasFailed = false;
 
     /**
      * Query if any syntaxError has happened during the parsing.
@@ -19,19 +19,14 @@ public class PrettyErrorListener extends BaseErrorListener {
 
     // copied from "the definitive ANTLR 4 reference", pag 156
     @Override
-    public void syntaxError(Recognizer<?, ?> recognizer,
+    public abstract void syntaxError(Recognizer<?, ?> recognizer,
                             Object offendingSymbol,
                             int line,
                             int charPositionInLine,
                             String msg,
-                            RecognitionException e) {
-        hasFailed = true;
-        System.err.println("*** SyntaxError [" + line + ":"
-                    + charPositionInLine + "]: " + msg);
-        underlineError(recognizer, (Token) offendingSymbol, line, charPositionInLine);
-    }
+                            RecognitionException e);
 
-    private void underlineError(Recognizer<?, ?> recognizer,
+    protected void underlineError(Recognizer<?, ?> recognizer,
                                 Token offendingSymbol,
                                 int line,
                                 int charPositionInLine) {
