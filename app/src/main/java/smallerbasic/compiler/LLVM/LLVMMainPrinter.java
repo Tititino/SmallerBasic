@@ -17,10 +17,14 @@ import java.util.Optional;
  */
 class LLVMMainPrinter implements ASTVisitor<String>, ASTToString {
 
-    private final @NotNull StringBuilder output = new StringBuilder();
+    private @NotNull StringBuilder output = new StringBuilder();
 
-    private void addLine(@NotNull String s) {
+    private void appendLine(@NotNull String s) {
         output.append(s).append("\n");
+    }
+
+    private void prependLine(@NotNull String s) {
+        output = new StringBuilder(s).append("\n").append(output);
     }
 
     private final @NotNull SymbolTable symbols;
@@ -51,7 +55,7 @@ class LLVMMainPrinter implements ASTVisitor<String>, ASTToString {
         if (startToken.isPresent() && startToken.get().getLine() != lastLine) {
             int line = startToken.get().getLine();
             lastLine = line;
-            addLine("store i32 " + line + ", ptr @line.number");
+            appendLine("store i32 " + line + ", ptr @line.number");
         }
     }
 
@@ -60,7 +64,7 @@ class LLVMMainPrinter implements ASTVisitor<String>, ASTToString {
         updateLineNumber(n);
         String name = n.getVarName().accept(this);
         String rightSide = n.getValue().accept(this);
-        addLine("call void " + COPY_FUNC + "(%struct.Boxed* " + name + ", %struct.Boxed* " + rightSide + ")");
+        appendLine("call void " + COPY_FUNC + "(%struct.Boxed* " + name + ", %struct.Boxed* " + rightSide + ")");
         return null;
     }
 
@@ -71,8 +75,8 @@ class LLVMMainPrinter implements ASTVisitor<String>, ASTToString {
         String right = n.getRight().accept(this);
 
         String res = "%" + gen.newName();
-        addLine(res + " = alloca %struct.Boxed");
-        addLine("call void @" + n.getOp()
+        prependLine(res + " = alloca %struct.Boxed");
+        appendLine("call void @" + n.getOp()
                 + "(%struct.Boxed* " + res
                 + ", %struct.Boxed* " + left
                 + ", %struct.Boxed* " + right + ")");
@@ -90,7 +94,7 @@ class LLVMMainPrinter implements ASTVisitor<String>, ASTToString {
         updateLineNumber(n);
         List<String> names = n.getArgs().stream().map(x -> x.accept(this)).toList();
         String newName = "%" + gen.newName();
-        addLine(newName + " = alloca %struct.Boxed*");
+        prependLine(newName + " = alloca %struct.Boxed*");
 
         output.append("call void @").append(n.getModule()).append(".").append(n.getFunction()).append("(");
         output.append("%struct.Boxed* ").append(newName);  // return value
@@ -108,38 +112,38 @@ class LLVMMainPrinter implements ASTVisitor<String>, ASTToString {
         // VAR = START
         String var = n.getVarName().accept(this);
         String start = n.getStart().accept(this);
-        addLine("call void " + COPY_FUNC + "(%struct.Boxed* " + var + ", %struct.Boxed* " + start + ")");
+        appendLine("call void " + COPY_FUNC + "(%struct.Boxed* " + var + ", %struct.Boxed* " + start + ")");
 
-        addLine("br label %" + label + ".begin");
-        addLine(label + ".begin:");
+        appendLine("br label %" + label + ".begin");
+        appendLine(label + ".begin:");
 
         // VAR <= END
         String end = n.getEnd().accept(this);
         String cond = "%" + gen.newName();
-        addLine(cond + " = alloca %struct.Boxed");
-        addLine("call void @" + BinOpASTNode.BinOp.LEQ
+        prependLine(cond + " = alloca %struct.Boxed");
+        appendLine("call void @" + BinOpASTNode.BinOp.LEQ
                 + "(%struct.Boxed* " + cond
                 + ", %struct.Boxed* " + var
                 + ", %struct.Boxed* " + end + ")");
         String bool = "%" + gen.newName();
-        addLine(bool + " = call i1 " + BOOL_GETTER + "(%struct.Boxed* " + cond + ")");
-        addLine("br i1 " + bool + ", label %" + label + ".continue, label %" + label + ".end");
-        addLine(label + ".continue:");
+        appendLine(bool + " = call i1 " + BOOL_GETTER + "(%struct.Boxed* " + cond + ")");
+        appendLine("br i1 " + bool + ", label %" + label + ".continue, label %" + label + ".end");
+        appendLine(label + ".continue:");
         n.getBody().forEach(x -> x.accept(this));
 
         // VAR += STEP
         String step = n.getStep().accept(this);
         String rightSide = "%" + gen.newName();
-        addLine(rightSide + " = alloca %struct.Boxed");
-        addLine("call void @" + BinOpASTNode.BinOp.PLUS
+        prependLine(rightSide + " = alloca %struct.Boxed");
+        appendLine("call void @" + BinOpASTNode.BinOp.PLUS
                 + "(%struct.Boxed* " + rightSide
                 + ", %struct.Boxed* " + var
                 + ", %struct.Boxed* " + step + ")");
 
-        addLine("call void " + COPY_FUNC + "(%struct.Boxed* " + var + ", %struct.Boxed* " + rightSide + ")");
+        appendLine("call void " + COPY_FUNC + "(%struct.Boxed* " + var + ", %struct.Boxed* " + rightSide + ")");
 
-        addLine("br label %" + label + ".begin");
-        addLine(label + ".end:");
+        appendLine("br label %" + label + ".begin");
+        appendLine(label + ".end:");
 
         return null;
     }
@@ -148,7 +152,7 @@ class LLVMMainPrinter implements ASTVisitor<String>, ASTToString {
     public @Nullable String visit(@NotNull GotoStmtASTNode n) {
         updateLineNumber(n);
         String label = visit(n.getLabel());
-        addLine("br label %" + label);
+        appendLine("br label %" + label);
         return null;
     }
 
@@ -164,15 +168,15 @@ class LLVMMainPrinter implements ASTVisitor<String>, ASTToString {
         String cond = n.getCondition().accept(this);
         String bool = "%" + gen.newName();
         String label = gen.newName();
-        addLine(bool + " = call i1 " + BOOL_GETTER + "(%struct.Boxed* " + cond + ")");
-        addLine("br i1 " + bool + ", label %" + label + ".true, label %" + label + ".false");
-        addLine(label + ".true:");
+        appendLine(bool + " = call i1 " + BOOL_GETTER + "(%struct.Boxed* " + cond + ")");
+        appendLine("br i1 " + bool + ", label %" + label + ".true, label %" + label + ".false");
+        appendLine(label + ".true:");
         n.getTrueBody().forEach(x -> x.accept(this));
-        addLine("br label %" + label + ".end");
-        addLine(label + ".false:");
+        appendLine("br label %" + label + ".end");
+        appendLine(label + ".false:");
         n.getFalseBody().ifPresent(x -> x.forEach(y -> y.accept(this)));
-        addLine("br label %" + label + ".end");
-        addLine(label + ".end:");
+        appendLine("br label %" + label + ".end");
+        appendLine(label + ".end:");
         return null;
     }
 
@@ -180,8 +184,8 @@ class LLVMMainPrinter implements ASTVisitor<String>, ASTToString {
     public @Nullable String visit(@NotNull LabelDeclASTNode n) {
         updateLineNumber(n);
         String label = visit(n.getName());
-        addLine("br label %" + label);
-        addLine(label + ":");
+        appendLine("br label %" + label);
+        appendLine(label + ":");
         return null;
     }
 
@@ -212,7 +216,7 @@ class LLVMMainPrinter implements ASTVisitor<String>, ASTToString {
     public @Nullable String visit(@NotNull RoutineCallASTNode n) {
         String name = visit(n.getFunction());
         updateLineNumber(n);
-        addLine("call void " + name + "()");
+        appendLine("call void " + name + "()");
         return null;
     }
 
@@ -233,15 +237,15 @@ class LLVMMainPrinter implements ASTVisitor<String>, ASTToString {
         String label = gen.newName();
         String bool = "%" + gen.newName();
 
-        addLine("br label %" + label + ".begin");  // strange llvm magic
-        addLine(label + ".begin:");
+        appendLine("br label %" + label + ".begin");  // strange llvm magic
+        appendLine(label + ".begin:");
         String cond = n.getCondition().accept(this);
-        addLine(bool + " = call i1 " + BOOL_GETTER + "(%struct.Boxed* " + cond + ")");
-        addLine("br i1 " + bool + ", label %" + label + ".continue, label %" + label + ".end");
-        addLine(label + ".continue:");
+        appendLine(bool + " = call i1 " + BOOL_GETTER + "(%struct.Boxed* " + cond + ")");
+        appendLine("br i1 " + bool + ", label %" + label + ".continue, label %" + label + ".end");
+        appendLine(label + ".continue:");
         n.getBody().forEach(x -> x.accept(this));
-        addLine("br label %" + label + ".begin");
-        addLine(label + ".end:");
+        appendLine("br label %" + label + ".begin");
+        appendLine(label + ".end:");
         return null;
     }
 
@@ -251,8 +255,8 @@ class LLVMMainPrinter implements ASTVisitor<String>, ASTToString {
         String expr = n.getExpr().accept(this);
         String res = "%" + gen.newName();
 
-        addLine(res + " = alloca %struct.Boxed");
-        addLine("call void @UNARY_MINUS(%struct.Boxed* " + res
+        appendLine(res + " = alloca %struct.Boxed");
+        appendLine("call void @UNARY_MINUS(%struct.Boxed* " + res
                 + ", %struct.Boxed* " + expr
                 + ")");
         return res;
@@ -270,7 +274,7 @@ class LLVMMainPrinter implements ASTVisitor<String>, ASTToString {
         String prev = name;
         for (String index : indexes) {
             res = "%" + gen.newName();
-            addLine(res + " = call %struct.Boxed* "
+            appendLine(res + " = call %struct.Boxed* "
                     + GET_ARRAY_ELEMENT + "(%struct.Boxed* " + prev
                     + ", %struct.Boxed* " + index + ")");
             prev = res;
