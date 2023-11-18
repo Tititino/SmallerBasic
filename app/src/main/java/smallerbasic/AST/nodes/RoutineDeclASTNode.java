@@ -13,7 +13,6 @@ import java.util.Objects;
 public class RoutineDeclASTNode extends AbstractASTNode implements DeclOrStmtASTNode {
     private final @NotNull RoutineNameASTNode name;
     private final @NotNull List<@NotNull StatementASTNode> body;
-
     public RoutineDeclASTNode(@NotNull RoutineNameASTNode name,
                               @NotNull List<@NotNull StatementASTNode> body) {
         this.name = name;

@@ -7,7 +7,7 @@ import java.util.Objects;
 
 /**
  * An {@link ASTNode} representing a number literal.
- * A number is SmallerBasic is a double.
+ * A number in SmallerBasic is a double.
  */
 public class NumberLiteralASTNode extends AbstractASTNode implements LiteralASTNode {
     private final double value;

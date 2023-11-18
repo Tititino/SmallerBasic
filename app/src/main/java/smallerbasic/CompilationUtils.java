@@ -31,7 +31,7 @@ public class CompilationUtils {
     private static @NotNull TokenStream lex(@NotNull CharStream chars) {
         SBGrammarLexer lexer = new SBGrammarLexer(chars);
         lexer.removeErrorListeners();
-        BaseErrorListener listener = new BaseErrorListener() {
+        lexer.addErrorListener(new BaseErrorListener() {
             @Override
             public void syntaxError(Recognizer<?, ?> recognizer,
                                     Object offendingSymbol,
@@ -42,8 +42,7 @@ public class CompilationUtils {
                 System.err.println("*** LexError [" + line + ":"
                         + charPositionInLine + "]: " + msg);
             }
-        };
-        lexer.addErrorListener(listener);
+        });
         return new CommonTokenStream(lexer);
     }
 
