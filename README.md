@@ -12,7 +12,7 @@ $ java -jar <path to jar> <path to file>
 
 The repository also comes with a small bash script, called `smallerbasic`, which simplifies the compilation process.
 Once the path to the jar and the runtime are specified the script will take as an argument a file: let `<dir>/<file>` be the path to it, the generated artifacts are:
-  - `./<file>.ll` the LLVM IR file of the file appended to the runtime
+  - `./<file>.ll` the LLVM IR of the file appended to the runtime
   - `./<file>.s` the assembly code generated
   - `./<file>` the executable
 
@@ -29,6 +29,26 @@ All variables are global and not typed and can contain one of three kinds of val
 
 The user may also define arrays, indexed by numbers.
 The arrays can be multidimensional.
+Uninitialized variables contain a `null` value, these may be coerced into a default value in some instances, for example in
+```
+Y = 3 - X
+```
+`X` will be considered as 0.0.
+The default values are:
+  - 0.0 for numbers
+  - `false` for booleans
+  - `""` for strings
+  - an empty array for arrays
+
+Coercion cannot happen in every occasion, overloaded functions will sometimes try to guess the type of the `null` value if another operator is present, for example:
+```
+Y = X + "ciao"
+```
+should work fine.
+
+In other cases where inference is not possible the program will throw an exception.
+A common example is trying to print an uninitialized variable. 
+
 
 ### Subroutines and functions
 It is not possible to define functions that take arguments per se, but the user may instead define "subroutines" that modify the global state, or use a set of predefined external functions.
@@ -74,5 +94,11 @@ Alternatively the single files can be found at [this repository](https://github.
   X[0][1] = 2
   Y = X
   ```
+  and
+  ```
+  X[0][1] = 2
+  IO.WriteLine(X)
+  ```
   will throw a runtime exception.
+  - There is not an easy and convenient way to compile a program, other than the primitive script `smallerbasic` 
   
