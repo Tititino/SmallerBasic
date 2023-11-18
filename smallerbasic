@@ -81,4 +81,7 @@ then
   cat "$RUNTIME" "$COMPILED" > "$OUTPUT_DIR"/"$BASENAME".ll
   ASSEMBLY=$(opt -opaque-pointers "$OUTPUT_DIR"/"$BASENAME".ll | llc -opaque-pointers)
   clang "$ASSEMBLY" -lm -o "$OUTPUT_DIR"/"$BASENAME"
+  exit 0
+else
+  exit 1
 fi
