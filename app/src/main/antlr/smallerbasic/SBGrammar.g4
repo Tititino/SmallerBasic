@@ -91,13 +91,14 @@ gotoStmt  : 'Goto' lbl=labelName
 fragment DIGIT : [0-9] ;
 fragment PRINTABLE : ~["] ;
 
+
 Bool   : 'true' | 'false' ;
 Equal  : '=' ;
 Relop  : ('<='|'<>'|'<'|'>'|'>=') ;
 Boolop : ('And'|'Or') ;
-// The number token regex does not accept a preceding minus, since unary minus is already accounted for by
+// The Number regex does not accept a preceding minus, since unary minus is already accounted for by
 // the expression rule.
-// Permitting it in the regex would make something like '--1' legal.
+// Permitting it would make something like '--1' legal.
 Number : '+'?(DIGIT+('.'DIGIT*)?|'.'DIGIT+)([eE][-+]?DIGIT+)? ;
 String : '"'PRINTABLE*'"' ;
 ExternalFunctionName : Ident'.'Ident ;

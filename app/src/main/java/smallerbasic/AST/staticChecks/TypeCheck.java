@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * This check verifies whether a program is well-typed.
- * Variables and arrays are assigned a type of {@code TYPE.ANY} and no effort is made to try and guess the type of a variable through assignments.
+ * Variables and arrays are assigned a type of {@link TYPE#ANY} and no effort is made to try and guess the type of a variable through assignments.
  */
 public class TypeCheck extends AbstractCheck {
     private boolean isOk = true;
@@ -20,15 +20,14 @@ public class TypeCheck extends AbstractCheck {
         return isOk;
     }
 
-    @Override
-    public void reportError(@NotNull ASTNode n, @NotNull String msg) {
+    private void reportError(@NotNull ASTNode n, @NotNull String msg) {
         isOk = false;
-        super.reportError(n, msg);
+        super.reporter.reportError(n, msg);
     }
 
     /**
-     * Something in a Smaller Basic program may have one of three types: NUMBER, BOOL or STRING.
-     * A statement has type NONE, and a variable has type ANY.
+     * Something in a SmallerBasic program may have one of three types: {@link TYPE#NUMBER}, {@link TYPE#BOOL} or {@link TYPE#STRING}.
+     * A statement has type {@link TYPE#NONE}, and a variable has type {@link TYPE#ANY}.
      */
     public enum TYPE {
         NONE,
@@ -69,7 +68,7 @@ public class TypeCheck extends AbstractCheck {
 
     /**
      * Report an error mismatch if {@code got} is different {@code expected}.
-     * The {@link ASTNode} is needed for positional information.
+     * The {@link ASTNode} is needed to report the error if one is encountered.
      * @return {@code true} if a mismatch has been reported.
      */
     private boolean reportMismatch(@NotNull ASTNode n, @NotNull TYPE got, @NotNull TYPE expected) {
@@ -84,7 +83,7 @@ public class TypeCheck extends AbstractCheck {
 
     /**
      * Report an error mismatch if {@code got} is not in the {@code expected} list.
-     * The {@link ASTNode} is needed for positional information.
+     * The {@link ASTNode} is needed to report the error if one is encountered.
      * @return {@code true} if a mismatch has been reported.
      */
     private boolean reportMismatch(@NotNull ASTNode n, @NotNull TYPE got, @NotNull List<TYPE> expected) {
@@ -103,8 +102,8 @@ public class TypeCheck extends AbstractCheck {
     private class TypingVisitor implements ASTVisitor<TYPE> {
 
         private TYPE visitChildren(List<? extends ASTNode> l) {
-             l.forEach(x -> x.accept(this));
-             return TYPE.NONE;
+            l.forEach(x -> x.accept(this));
+            return TYPE.NONE;
         }
 
         @Override
@@ -151,7 +150,7 @@ public class TypeCheck extends AbstractCheck {
                     return left;
                 }
             }
-            return null;
+            return TYPE.ANY;
         }
 
         @Override

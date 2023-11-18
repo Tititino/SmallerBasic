@@ -8,6 +8,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This check controls whether a program defines a routine more than once.
+ */
 public class DoubleRoutineDeclCheck extends AbstractCheck {
     @Override
     public boolean check(@NotNull ASTNode n) {
@@ -16,7 +19,7 @@ public class DoubleRoutineDeclCheck extends AbstractCheck {
         for (RoutineNameASTNode s : labels.keySet())
             if (labels.get(s) > 1) {
                 isOk = false;
-                reportError(s, String.format(
+                super.reporter.reportError(s, String.format(
                                 "*** DoubleRoutineDeclError: routine \"%s\" is redefined",
                                 s.getText()
                         )
@@ -26,12 +29,10 @@ public class DoubleRoutineDeclCheck extends AbstractCheck {
     }
 
     private static class DoubleRoutineNameVisitor implements ASTMonoidVisitor<Map<RoutineNameASTNode, Integer>> {
-
         @Override
         public Map<RoutineNameASTNode, Integer> empty() {
             return Collections.emptyMap();
         }
-
         @Override
         public Map<RoutineNameASTNode, Integer> compose(Map<RoutineNameASTNode, Integer> o1,
                                                       Map<RoutineNameASTNode, Integer> o2) {
@@ -40,12 +41,10 @@ public class DoubleRoutineDeclCheck extends AbstractCheck {
                 newMap.merge(key, o2.get(key), Integer::sum);
             return newMap;
         }
-
         @Override
         public Map<RoutineNameASTNode, Integer> visit(RoutineNameASTNode n) {
             return Map.of(n, 1);
         }
-
         @Override
         public Map<RoutineNameASTNode, Integer> visit(RoutineCallASTNode n) {
             return empty();

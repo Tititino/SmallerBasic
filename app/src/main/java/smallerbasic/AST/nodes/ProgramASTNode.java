@@ -9,15 +9,13 @@ import java.util.Objects;
 
 /**
  * An {@link ASTNode} representing a program.
- * A program is made out of either routine declarations
- * ({@link RoutineDeclASTNode}) or statements ({@link StatementASTNode}).
+ * A program is made out of either routine declarations ({@link RoutineDeclASTNode}) or statements ({@link StatementASTNode}).
  */
 public class ProgramASTNode extends AbstractASTNode implements ASTNode {
 
     private final @NotNull List<@NotNull DeclOrStmtASTNode> contents;
 
     public ProgramASTNode(@NotNull List<@NotNull DeclOrStmtASTNode> contents) {
-        Objects.requireNonNull(contents);
         this.contents = contents;
     }
 

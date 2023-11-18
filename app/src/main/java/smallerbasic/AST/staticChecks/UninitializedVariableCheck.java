@@ -14,21 +14,24 @@ import java.util.*;
 public class UninitializedVariableCheck extends AbstractCheck {
 
     private boolean isOk = true;
+
     @Override
     public boolean check(@NotNull ASTNode n) {
         isOk = true;
-        // Creates an anonymous visitor to collect routine declarations.
+        // an anonymous visitor to collect routine declarations.
         ASTMonoidVisitor<Set<RoutineDeclASTNode>> routines = new ASTMonoidVisitor<>() {
             @Override
             public Set<RoutineDeclASTNode> empty() {
                 return Collections.emptySet();
             }
+
             @Override
             public Set<RoutineDeclASTNode> compose(Set<RoutineDeclASTNode> o1, Set<RoutineDeclASTNode> o2) {
                 Set<RoutineDeclASTNode> newSet = new HashSet<>(o1);
                 newSet.addAll(o2);
                 return newSet;
             }
+
             @Override
             public Set<RoutineDeclASTNode> visit(RoutineDeclASTNode n) {
                 return Set.of(n);
@@ -39,10 +42,9 @@ public class UninitializedVariableCheck extends AbstractCheck {
         return isOk;
     }
 
-    @Override
-    public void reportError(@NotNull ASTNode n, @NotNull String msg) {
+    private void reportError(@NotNull ASTNode n, @NotNull String msg) {
         isOk = false;
-        super.reportError(n, msg);
+        super.reporter.reportError(n, msg);
     }
 
     /**

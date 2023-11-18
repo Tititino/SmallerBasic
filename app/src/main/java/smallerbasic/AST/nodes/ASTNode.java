@@ -30,7 +30,7 @@ public interface ASTNode extends ASTVisitable {
     /**
      * Retrieve the last token associated with this node.
      * @return {@code Optional.empty()} if no token are associated with this node, otherwise the token.
-     * If the node is a terminal one (e.g. {@link IdentifierASTNode}) the last should be the same as the start one.
+     * If the node is a terminal one (e.g. {@link IdentifierASTNode}) the end token should be the same as the start one.
      */
     @NotNull Optional<@NotNull Token> getEndToken();
 

@@ -21,11 +21,17 @@ import java.util.stream.IntStream;
 public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
 
     /**
-     * The current scope being visited: {@code Scope.ofRoutine(<routine name>)} if inside a routine declaration,
-     * {@code Scope.TOPLEVEL} otherwise.
+     * The current scope being visited: {@link Scope#ofRoutine(RoutineNameASTNode)} if inside a routine declaration,
+     * {@link Scope#TOPLEVEL} otherwise.
+     * This is needed because {@link LabelNameASTNode} are created with a scope.
      */
     private @NotNull Scope currentScope = Scope.TOPLEVEL;
 
+    /**
+     * Helper function to visit a list of {@link smallerbasic.SBGrammarParser.StatementContext}s.
+     * @param ctxs The list of contexts.
+     * @return The corresponding list of {@link StatementASTNode}.
+     */
     private @NotNull List<StatementASTNode> childrenToAST(@NotNull List<SBGrammarParser.StatementContext> ctxs) {
         return ctxs.stream()
                 .map(x -> (StatementASTNode) visit(x))
@@ -34,7 +40,7 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
 
     @Override
     public ProgramASTNode visitProgram(SBGrammarParser.ProgramContext ctx) {
-        List<DeclOrStmtASTNode> body = IntStream.range(0, ctx.getChildCount() - 1)
+        List<DeclOrStmtASTNode> body = IntStream.range(0, ctx.getChildCount() - 1)  // the last leaf is <EOF>
                 .mapToObj(i ->
                         (DeclOrStmtASTNode) visit(ctx.getChild(i))
                 ).toList();
@@ -123,8 +129,6 @@ public class ParseTreeToASTVisitor implements SBGrammarVisitor<ASTNode> {
         LabelNameASTNode label = (LabelNameASTNode) visit(ctx.labelName());
         return new GotoStmtASTNode(label);
     }
-
-
 
     @Override
     public RoutineCallASTNode visitCallRoutine(SBGrammarParser.CallRoutineContext ctx) {

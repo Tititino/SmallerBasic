@@ -4,7 +4,6 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import smallerbasic.AST.ParseTreeToASTVisitor;
 import smallerbasic.AST.Scope;
@@ -33,7 +32,6 @@ public class ASTConversionTest {
     }
 
     @Test
-    @Disabled
     public void stringComparisonTest() {
         SBGrammarLexer lexer = new SBGrammarLexer(CharStreams.fromString("(X + \"ciao\") = \"mondo\""));
         SBGrammarParser parser = new SBGrammarParser(new CommonTokenStream(lexer));
@@ -50,7 +48,7 @@ public class ASTConversionTest {
         );
         ParseTreeToASTVisitor convert = new ParseTreeToASTVisitor();
 
-        // assertThat(convert.(tree)).isEqualTo(expected);
+        assertThat(convert.visit(tree)).isEqualTo(expected);
     }
 
     @Test
@@ -139,13 +137,13 @@ public class ASTConversionTest {
     @Test
     public void programParsingTest() throws IOException {
         TokenStream lexedSource = lex(Paths.get("src/test/resources/test1.sb"));
-        ParseTree parsedSource = parse(lexedSource).get();
+        ParseTree parsedSource = parse(lexedSource);
         assertThatNoException().isThrownBy(() -> clean(parsedSource));
     }
 
     @Test
     public void routineAndStatementTest() {
-        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nGoto label\n")).get());
+        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nGoto label\n")));
         RoutineNameASTNode name = new RoutineNameASTNode("test");
         ASTNode expected = new ProgramASTNode(List.of(
                 new RoutineDeclASTNode(
@@ -162,7 +160,7 @@ public class ASTConversionTest {
 
     @Test
     public void testTokenPosition() {
-        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nGoto label\n")).get());
+        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nGoto label\n")));
 
         assertThat(tree.getStartToken().get().getText()).isEqualTo("Sub");
         assertThat(tree.getEndToken().get().getText()).isEqualTo("<EOF>");
@@ -170,7 +168,7 @@ public class ASTConversionTest {
 
     @Test
     public void unaryMinusTest() {
-        ASTNode tree = clean(parse(lex("A = -(B + -C)\n")).get());
+        ASTNode tree = clean(parse(lex("A = -(B + -C)\n")));
         assertThat(tree).isEqualTo(
                 new ProgramASTNode(
                         List.of(

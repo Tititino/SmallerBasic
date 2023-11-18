@@ -12,7 +12,7 @@ import static smallerbasic.CompilationUtils.*;
 public class ASTChecksTest {
     @Test
     public void labelScopeCheckingTest() {
-        ASTNode tree = clean(parse(lex("Goto label\nlabel:\n")).get());
+        ASTNode tree = clean(parse(lex("Goto label\nlabel:\n")));
         LabelScopeCheck checkScope = new LabelScopeCheck();
         checkScope.setErrorReporter((x, y) -> {throw new RuntimeException();});
 
@@ -22,7 +22,7 @@ public class ASTChecksTest {
 
     @Test
     public void fromGlobalToRoutineTest() {
-        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nGoto label\n")).get());
+        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nGoto label\n")));
 
         LabelScopeCheck checkScope = new LabelScopeCheck();
         checkScope.setErrorReporter((x, y) -> {throw new RuntimeException();});
@@ -33,7 +33,7 @@ public class ASTChecksTest {
 
     @Test
     public void fromRoutineToGlobalTest() {
-        ASTNode tree = clean(parse(lex("Sub test\nGoto label1\nEndSub\nlabel1:\n")).get());
+        ASTNode tree = clean(parse(lex("Sub test\nGoto label1\nEndSub\nlabel1:\n")));
 
         LabelScopeCheck checkScope = new LabelScopeCheck();
         checkScope.setErrorReporter((x, y) -> {throw new RuntimeException();});
@@ -44,7 +44,7 @@ public class ASTChecksTest {
 
     @Test
     public void doubleLabelTest() {
-        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nlabel:\nEndSub\n")).get());
+        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nlabel:\nEndSub\n")));
 
         DoubleLabelCheck checkDoubles = new DoubleLabelCheck();
         checkDoubles.setErrorReporter((n, msg) -> {});
@@ -54,7 +54,7 @@ public class ASTChecksTest {
 
     @Test
     public void doubleLabelDifferentScopeTest() {
-        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nlabel:\n")).get());
+        ASTNode tree = clean(parse(lex("Sub test\nlabel:\nEndSub\nlabel:\n")));
 
         DoubleLabelCheck checkDoubles = new DoubleLabelCheck();
 
@@ -65,18 +65,20 @@ public class ASTChecksTest {
     public void maxNameLengthTest() {
         ASTNode tree = clean(parse(lex("Sub " + "a".repeat(41) + "\n" +
                 "b".repeat(41) + ":\nEndSub\n" +
-                "c".repeat(41) + " = 0\n")).get());
+                "c".repeat(41) + " = 0\n")));
 
         MaxNameLengthCheck checkDoubles = new MaxNameLengthCheck();
+        checkDoubles.setErrorReporter((n, msg) -> {});
 
         assertThat(checkDoubles.check(tree)).isFalse();
     }
 
     @Test
     public void maxNameLengthLimitTest() {
-        ASTNode tree = clean(parse(lex("c".repeat(40) + " = 0\n")).get());
+        ASTNode tree = clean(parse(lex("c".repeat(40) + " = 0\n")));
 
         MaxNameLengthCheck checkDoubles = new MaxNameLengthCheck();
+        checkDoubles.setErrorReporter((n, msg) -> {});
 
         assertThat(checkDoubles.check(tree)).isTrue();
     }

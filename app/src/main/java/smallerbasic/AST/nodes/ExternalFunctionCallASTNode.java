@@ -13,7 +13,6 @@ import java.util.Objects;
  * (e.g. {@code X = IO.ReadLine()}).
  */
 public class ExternalFunctionCallASTNode extends AbstractASTNode implements StatementASTNode, ExpressionASTNode {
-
     private final @NotNull String module;
     private final @NotNull String function;
     private final @NotNull List<@NotNull ExpressionASTNode> args;

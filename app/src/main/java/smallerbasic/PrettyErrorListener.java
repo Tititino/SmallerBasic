@@ -3,15 +3,16 @@ package smallerbasic;
 import org.antlr.v4.runtime.*;
 
 /**
- * This class prints out the errors with carets underneath the offending characters.
+ * A Listener that listens for errors during parsing and prints them out with carets underneath the offending characters.
  */
 public class PrettyErrorListener extends BaseErrorListener {
 
-    private boolean hasFailed = false;
+    protected boolean hasFailed = false;
 
     /**
      * Query if any syntaxError has happened during the parsing.
-     * @return {@code true} if {@see syntaxError} was called at least once.
+     *
+     * @return {@code true} if {@link #syntaxError} was called at least once.
      */
     public boolean hasFailed() {
         return hasFailed;
@@ -26,15 +27,15 @@ public class PrettyErrorListener extends BaseErrorListener {
                             String msg,
                             RecognitionException e) {
         hasFailed = true;
-        System.err.println("*** SyntaxError [" + line + ":"
-                    + charPositionInLine + "]: " + msg);
+        System.err.println("*** ParseError [" + line + ":"
+                + charPositionInLine + "]: " + msg);
         underlineError(recognizer, (Token) offendingSymbol, line, charPositionInLine);
     }
 
-    private void underlineError(Recognizer<?, ?> recognizer,
-                                Token offendingSymbol,
-                                int line,
-                                int charPositionInLine) {
+    protected void underlineError(Recognizer<?, ?> recognizer,
+                                  Token offendingSymbol,
+                                  int line,
+                                  int charPositionInLine) {
         CommonTokenStream tokens = (CommonTokenStream) recognizer.getInputStream();
         String input = tokens.getTokenSource().getInputStream().toString();
         String[] lines = input.split("\n");

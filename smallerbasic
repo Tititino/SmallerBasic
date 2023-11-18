@@ -1,24 +1,87 @@
-#!/usr/bin/bash
+#!/usr/bin/sh
 
-JAVA="/usr/lib/jvm/openjdk17/bin/java"
+help() {
+  echo "usage:"
+  echo "  smallerbasic <filename> [-c <path-to-compiler-jar>] [-r <path-to-runtime>] [-o <output-dir>]"
+  echo "  smallerbasic -h"
+  echo ""
+  echo "options:"
+  echo "-c|--compiler"
+  echo "  compiler location, overrides default ('APP')"
+  echo "-r|--runtime"
+  echo "  runtime location, overrides default ('RUNTIME')"
+  echo "-o|--output"
+  echo "  output directory without trailing slash, overrides default ('.')"
+  echo "-h|--help"
+  echo "  print this message"
+  echo ""
+}
+
+# java bin (>= 16)
+JAVA="java"
+# default location of the compiler
 APP="./app/build/libs/app.jar"
-CC=clang
-RUNTIME="./app/src/main/resources/runtime.ll" # TODO: clone it here in resources
+# where is the runtime llvm library
+RUNTIME="./app/src/main/resources/runtime.ll"
+# where all the artifacts will be put
+OUTPUT_DIR="."
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]
+then
+	help
+	exit 0
+fi
+
 BASENAME=$(basename "$1" .sb)
 DIRNAME=$(dirname "$1")
+shift
 
-if [ ! -f $APP ]
+while true
+do
+  case "${1}" in
+    -r | --runtime)
+      RUNTIME="${2}"
+      shift 2
+      ;;
+    -c | --compiler)
+      APP="${2}"
+      shift 2
+      ;;
+    -o | --output)
+      OUTPUT_DIR="${2}"
+      shift 2
+      ;;
+    --|'')
+      break
+      ;;
+    *)
+      echo "unrecognized option '${1}'"
+      help
+      exit 1
+      ;;
+  esac
+done
+
+if [ ! -f "$APP" ]
 then
   echo "Executable not found, run 'gradle jar'"
   exit 1
 fi
 
-if [ ! -f $RUNTIME ]
+if [ ! -f "$RUNTIME" ]
 then
   echo "Runtime not found"
   exit 1
 fi
 
-$JAVA -jar $APP "$DIRNAME"/"$BASENAME".sb | cat $RUNTIME - > "$BASENAME".ll
-opt -opaque-pointers "$BASENAME".ll | llc -opaque-pointers -o "$BASENAME".s
-$CC "$BASENAME".s -lm -o "$BASENAME"
+COMPILED=$($JAVA -jar "$APP" "$DIRNAME"/"$BASENAME".sb)
+if [ $? -eq 0 ]
+then
+  mkdir -p "$OUTPUT_DIR"
+  cat "$RUNTIME" "$COMPILED" > "$OUTPUT_DIR"/"$BASENAME".ll
+  ASSEMBLY=$(opt -opaque-pointers "$OUTPUT_DIR"/"$BASENAME".ll | llc -opaque-pointers)
+  clang "$ASSEMBLY" -lm -o "$OUTPUT_DIR"/"$BASENAME"
+  exit 0
+else
+  exit 1
+fi
