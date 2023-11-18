@@ -9,8 +9,7 @@ import java.util.Objects;
 
 /**
  * An {@link ASTNode} representing a program.
- * A program is made out of either routine declarations
- * ({@link RoutineDeclASTNode}) or statements ({@link StatementASTNode}).
+ * A program is made out of either routine declarations ({@link RoutineDeclASTNode}) or statements ({@link StatementASTNode}).
  */
 public class ProgramASTNode extends AbstractASTNode implements ASTNode {
 

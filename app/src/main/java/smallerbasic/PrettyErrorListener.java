@@ -5,12 +5,13 @@ import org.antlr.v4.runtime.*;
 /**
  * A Listener that listens for errors during parsing and prints them out with carets underneath the offending characters.
  */
-public abstract class PrettyErrorListener extends BaseErrorListener {
+public class PrettyErrorListener extends BaseErrorListener {
 
     protected boolean hasFailed = false;
 
     /**
      * Query if any syntaxError has happened during the parsing.
+     *
      * @return {@code true} if {@link #syntaxError} was called at least once.
      */
     public boolean hasFailed() {
@@ -19,17 +20,22 @@ public abstract class PrettyErrorListener extends BaseErrorListener {
 
     // copied from "the definitive ANTLR 4 reference", pag 156
     @Override
-    public abstract void syntaxError(Recognizer<?, ?> recognizer,
+    public void syntaxError(Recognizer<?, ?> recognizer,
                             Object offendingSymbol,
                             int line,
                             int charPositionInLine,
                             String msg,
-                            RecognitionException e);
+                            RecognitionException e) {
+        hasFailed = true;
+        System.err.println("*** ParseError [" + line + ":"
+                + charPositionInLine + "]: " + msg);
+        underlineError(recognizer, (Token) offendingSymbol, line, charPositionInLine);
+    }
 
     protected void underlineError(Recognizer<?, ?> recognizer,
-                                Token offendingSymbol,
-                                int line,
-                                int charPositionInLine) {
+                                  Token offendingSymbol,
+                                  int line,
+                                  int charPositionInLine) {
         CommonTokenStream tokens = (CommonTokenStream) recognizer.getInputStream();
         String input = tokens.getTokenSource().getInputStream().toString();
         String[] lines = input.split("\n");

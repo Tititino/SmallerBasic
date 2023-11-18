@@ -68,14 +68,6 @@ Alternatively the single files can be found at [this repository](https://github.
 
 ## Bugs and problems
   - The main problem as of right now is that the runtime makes use of dynamic allocation, without any kind of garbage collection.
-  - A program like
-  ```
-  While (true)
-    IO.WriteLine("Hello, world!")
-  EndWhile
-  ```
-  will segfault after around 500.000 prints.
-  This is not due to the previous problem with dynamic allocation, but is because the stack is filled since all calls to external functions allocate a value on the stack to hold the result, even if that particular function doesn't return any value.
   - error reporting doesn't really like tabs
   - copy between arrays and array printing are not supported, so something like 
   ```

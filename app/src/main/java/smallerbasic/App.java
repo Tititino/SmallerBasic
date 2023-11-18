@@ -27,22 +27,22 @@ public class App {
 
     public static void main(String[] args) {
         if (args.length != 1) {
-            System.out.println("No file provided");
-            return;
+            System.err.println("No file provided");
+            System.exit(1);
         }
-
         try {
             TokenStream tokens = lex(Paths.get(args[0]));
             errors.forEach(x -> x.setErrorReporter(new PrettyErrorPrinter(tokens)));
             warnings.forEach(x -> x.setErrorReporter(new PrettyErrorPrinter(tokens)));
-
             System.out.println(
                     compile(check(clean(parse(tokens)), errors, warnings), new LLVMCompiler())
             );
         } catch (IOException e) {
-            System.out.println("Error reading file \"" + args[0] + "\"");
+            System.err.println("Error reading file \"" + args[0] + "\"");
+            System.exit(1);
         } catch (CompilationError e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
+            System.exit(1);
         }
     }
 }

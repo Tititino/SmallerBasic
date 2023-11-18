@@ -1,5 +1,4 @@
 #!/usr/bin/sh
-# should be POSIX compliant
 
 help() {
   echo "usage:"
@@ -75,11 +74,11 @@ then
   exit 1
 fi
 
-if [ ! -d "$OUTPUT_DIR" ]
+COMPILED=$($JAVA -jar "$APP" "$DIRNAME"/"$BASENAME".sb)
+if [ $? -eq 0 ]
 then
   mkdir -p "$OUTPUT_DIR"
+  cat "$RUNTIME" "$COMPILED" > "$OUTPUT_DIR"/"$BASENAME".ll
+  ASSEMBLY=$(opt -opaque-pointers "$OUTPUT_DIR"/"$BASENAME".ll | llc -opaque-pointers)
+  clang "$ASSEMBLY" -lm -o "$OUTPUT_DIR"/"$BASENAME"
 fi
-
-$JAVA -jar "$APP" "$DIRNAME"/"$BASENAME".sb | cat "$RUNTIME" - > "$OUTPUT_DIR"/"$BASENAME".ll
-opt -opaque-pointers "$OUTPUT_DIR"/"$BASENAME".ll | llc -opaque-pointers -o "$OUTPUT_DIR"/"$BASENAME".s
-clang "$OUTPUT_DIR"/"$BASENAME".s -lm -o "$OUTPUT_DIR"/"$BASENAME"
