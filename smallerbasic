@@ -25,6 +25,8 @@ APP="./app/build/libs/app.jar"
 RUNTIME="./app/src/main/resources/runtime.ll"
 # where all the artifacts will be put
 OUTPUT_DIR="."
+# LLVM optimizations
+OPT="--mem2reg"
 
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]
 then
@@ -74,14 +76,20 @@ then
   exit 1
 fi
 
-COMPILED=$($JAVA -jar "$APP" "$DIRNAME"/"$BASENAME".sb)
-if [ $? -eq 0 ]
+mkdir -p "$OUTPUT_DIR"
+
+TEMP=$(mktemp --tmpdir="$OUTPUT_DIR" --suffix=".ll")
+if $JAVA -jar "$APP" "$DIRNAME"/"$BASENAME".sb > "$TEMP"
 then
-  mkdir -p "$OUTPUT_DIR"
-  cat "$RUNTIME" "$COMPILED" > "$OUTPUT_DIR"/"$BASENAME".ll
-  ASSEMBLY=$(opt -opaque-pointers "$OUTPUT_DIR"/"$BASENAME".ll | llc -opaque-pointers)
-  clang "$ASSEMBLY" -lm -o "$OUTPUT_DIR"/"$BASENAME"
+  cat "$RUNTIME" "$TEMP" > "$OUTPUT_DIR"/"$BASENAME".ll
+  rm "$TEMP"
+
+  TEMP=$(mktemp --tmpdir="$OUTPUT_DIR" --suffix=".s")
+  opt -opaque-pointers $OPT "$OUTPUT_DIR"/"$BASENAME".ll | llc -opaque-pointers > "$TEMP"
+  clang "$TEMP" -lm -o "$OUTPUT_DIR"/"$BASENAME"
+  rm "$TEMP"
   exit 0
 else
+  rm "$TEMP"
   exit 1
 fi

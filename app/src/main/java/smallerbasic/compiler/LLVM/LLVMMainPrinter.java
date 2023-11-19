@@ -91,7 +91,7 @@ class LLVMMainPrinter implements ASTVisitor<String> {
         updateLineNumber(n);
         List<String> names = n.getArgs().stream().map(x -> x.accept(this)).toList();
         String newName = "%" + gen.newName();
-        prependLine(newName + " = alloca %struct.Boxed*");
+        prependLine(newName + " = alloca %struct.Boxed");
 
         output.append("call void @").append(n.getModule()).append(".").append(n.getFunction()).append("(");
         output.append("%struct.Boxed* ").append(newName);  // return value
@@ -252,7 +252,7 @@ class LLVMMainPrinter implements ASTVisitor<String> {
         String expr = n.getExpr().accept(this);
         String res = "%" + gen.newName();
 
-        appendLine(res + " = alloca %struct.Boxed");
+        prependLine(res + " = alloca %struct.Boxed");
         appendLine("call void @UNARY_MINUS(%struct.Boxed* " + res
                 + ", %struct.Boxed* " + expr
                 + ")");

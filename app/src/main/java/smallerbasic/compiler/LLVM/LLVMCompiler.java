@@ -29,6 +29,7 @@ public class LLVMCompiler implements Compiler {
      * }
      * }
      * </pre>
+     *
      * @param root An AST.
      * @return The LLVM code corresponding to the tree.
      */
@@ -41,7 +42,8 @@ public class LLVMCompiler implements Compiler {
         String routines = new LLVMSubRoutinePrinter(symbolTable, gen).run(root);
         String body     = new LLVMMainPrinter(symbolTable, gen).run(root);
 
-        return prealloc +
+        return "\n" +
+                prealloc +
                 "\n" +
                 routines +
                 "\ndefine i32 @main() {\n" +
