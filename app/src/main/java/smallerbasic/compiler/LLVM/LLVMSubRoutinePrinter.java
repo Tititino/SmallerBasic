@@ -8,7 +8,7 @@ import smallerbasic.AST.nodes.RoutineDeclASTNode;
 /**
  * Given a {@link ASTNode} it creates the LLVM code for all its subroutines.
  */
-class LLVMSubRoutinePrinter implements ASTMonoidVisitor<StringBuilder>, ASTToString {
+class LLVMSubRoutinePrinter implements ASTMonoidVisitor<StringBuilder> {
 
     private final @NotNull SymbolTable symbols;
     private final @NotNull VarNameGenerator gen;
@@ -40,7 +40,6 @@ class LLVMSubRoutinePrinter implements ASTMonoidVisitor<StringBuilder>, ASTToStr
         return new StringBuilder(signature).append(body).append(end);
     }
 
-    @Override
     public String run(@NotNull ASTNode n) {
         return n.accept(this).toString();
     }

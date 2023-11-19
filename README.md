@@ -13,7 +13,6 @@ $ java -jar <path to jar> <path to file>
 The repository also comes with a small bash script, called `smallerbasic`, which simplifies the compilation process.
 Once the path to the jar and the runtime are specified the script will take as an argument a file: let `<dir>/<file>` be the path to it, the generated artifacts are:
   - `./<file>.ll` the LLVM IR of the file appended to the runtime
-  - `./<file>.s` the assembly code generated
   - `./<file>` the executable
 
 ## Features
@@ -64,17 +63,17 @@ As of now the available external functions are:
 src/
 |___main/
     |___antlr/smallerbasic/ <- This directory holds the grammar
-    |   | SBGrammar.g4
+    |   |___SBGrammar.g4
     |___java/smallerbasic/
         |___AST/
         |   |___nodes/ <- AST nodes definitions
         |   |___staticChecks/ <- static checks on the AST (e.g. type checking)
-        |   | ParseTreeToASTVisitor.java <- converer from a parse tree to an AST
+        |   |___ParseTreeToASTVisitor.java <- converer from a parse tree to an AST
         |   | ...
-        |___compiler/ <- everything related to printing an AST to LLVM IR
-        |___symbolTable/ <- everything related to associating names to the entities of the AST
-        | App.java <- the main class
-        | CompilationUtils.java <- utilities to lex, parse, and compile
+        |___compiler/LLVM/ <- everything related to printing an AST to LLVM IR
+        |   |___LLVMCompiler.java <- LLVM IR compiler
+        |___App.java <- the main class
+        |___CompilationUtils.java <- utilities to lex, parse, and compile
         | ... 
 ```
 These are the main classes of the project.

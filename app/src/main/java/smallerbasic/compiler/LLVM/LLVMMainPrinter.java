@@ -12,7 +12,7 @@ import java.util.Optional;
 /**
  * Given a {@link ASTNode} it creates the LLVM code for its statements.
  */
-class LLVMMainPrinter implements ASTVisitor<String>, ASTToString {
+class LLVMMainPrinter implements ASTVisitor<String> {
 
     private @NotNull StringBuilder output = new StringBuilder();
 
@@ -279,7 +279,6 @@ class LLVMMainPrinter implements ASTVisitor<String>, ASTToString {
         return res;
     }
 
-    @Override
     public String run(@NotNull ASTNode n) {
         n.accept(this);
         return output.toString();

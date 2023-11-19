@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * Given a {@link ASTNode} it creates the LLVM code needed to initialize all its literals.
  */
-class LLVMInitialization implements ASTMonoidVisitor<StringBuilder>, ASTToString {
+class LLVMInitialization implements ASTMonoidVisitor<StringBuilder> {
     private final @NotNull SymbolTable symbols;
     private final @NotNull VarNameGenerator gen;
 
@@ -80,7 +80,6 @@ class LLVMInitialization implements ASTMonoidVisitor<StringBuilder>, ASTToString
                 + ", " + (n.getValue() ? TRUE : FALSE) + ")\n");
     }
 
-    @Override
     public String run(@NotNull ASTNode n) {
         return n.accept(this).toString();
     }
