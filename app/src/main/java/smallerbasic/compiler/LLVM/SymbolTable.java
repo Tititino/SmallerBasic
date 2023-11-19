@@ -10,8 +10,8 @@ import java.util.*;
 /**
  * The symbol table is a map associating entities in the AST to unique names.
  * Since the nodes are more or less immutable, the nodes themselves are put into the symbol table as keys.
- * Each label, function and variable is given a new name to avoid clashes.
- * Literals are also assigned names that refers to the global variable that contains them.
+ * Each label, function name and variable is given a new name to avoid clashes.
+ * Literals are also assigned names that refer to the global variable that contains them.
  */
 class SymbolTable {
     private final @NotNull VarNameGenerator gen;
