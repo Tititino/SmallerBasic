@@ -4,9 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTMonoidVisitor;
 import smallerbasic.AST.nodes.ASTNode;
 import smallerbasic.AST.nodes.RoutineDeclASTNode;
-import smallerbasic.compiler.ASTToString;
-import smallerbasic.symbolTable.SymbolTable;
-import smallerbasic.symbolTable.VarNameGenerator;
 
 /**
  * Given a {@link ASTNode} it creates the LLVM code for all its subroutines.

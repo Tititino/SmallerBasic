@@ -5,9 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import smallerbasic.AST.ASTVisitor;
 import smallerbasic.AST.nodes.*;
-import smallerbasic.compiler.ASTToString;
-import smallerbasic.symbolTable.SymbolTable;
-import smallerbasic.symbolTable.VarNameGenerator;
 
 import java.util.List;
 import java.util.Optional;

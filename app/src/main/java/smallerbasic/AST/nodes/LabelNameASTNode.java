@@ -3,13 +3,12 @@ package smallerbasic.AST.nodes;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTVisitor;
 import smallerbasic.AST.Scope;
-import smallerbasic.symbolTable.HasSymbol;
 
 import java.util.Objects;
 /**
  * An {@link ASTNode} representing a name of a label.
  */
-public class LabelNameASTNode extends AbstractASTNode implements ASTNode, HasSymbol {
+public class LabelNameASTNode extends AbstractASTNode implements ASTNode {
 
     private final @NotNull String text;
 

@@ -3,8 +3,6 @@ package smallerbasic.compiler.LLVM;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTMonoidVisitor;
 import smallerbasic.AST.nodes.*;
-import smallerbasic.compiler.ASTToString;
-import smallerbasic.symbolTable.SymbolTable;
 
 import java.util.HashSet;
 import java.util.Set;

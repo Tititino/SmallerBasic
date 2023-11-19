@@ -6,9 +6,6 @@ import smallerbasic.AST.nodes.ASTNode;
 import smallerbasic.AST.nodes.BoolLiteralASTNode;
 import smallerbasic.AST.nodes.NumberLiteralASTNode;
 import smallerbasic.AST.nodes.StringLiteralASTNode;
-import smallerbasic.compiler.ASTToString;
-import smallerbasic.symbolTable.SymbolTable;
-import smallerbasic.symbolTable.VarNameGenerator;
 
 import java.util.HashSet;
 import java.util.Set;

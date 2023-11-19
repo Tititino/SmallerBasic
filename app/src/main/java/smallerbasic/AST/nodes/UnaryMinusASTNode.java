@@ -2,14 +2,13 @@ package smallerbasic.AST.nodes;
 
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTVisitor;
-import smallerbasic.symbolTable.HasSymbol;
 
 import java.util.Objects;
 
 /**
  * An {@link ASTNode} representing a unary minus.
  */
-public class UnaryMinusASTNode extends AbstractASTNode implements ExpressionASTNode, HasSymbol {
+public class UnaryMinusASTNode extends AbstractASTNode implements ExpressionASTNode {
 
     private final @NotNull ExpressionASTNode expr;
 
