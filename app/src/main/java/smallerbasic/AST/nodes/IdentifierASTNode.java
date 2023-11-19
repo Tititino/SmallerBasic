@@ -2,14 +2,13 @@ package smallerbasic.AST.nodes;
 
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTVisitor;
-import smallerbasic.symbolTable.HasSymbol;
 
 import java.util.Objects;
 
 /**
  * An {@link ASTNode} representing an identifier.
  */
-public class IdentifierASTNode extends AbstractASTNode implements ExpressionASTNode, VariableASTNode, HasSymbol {
+public class IdentifierASTNode extends AbstractASTNode implements ExpressionASTNode, VariableASTNode {
     private final @NotNull String name;
 
     public IdentifierASTNode(@NotNull String name) {

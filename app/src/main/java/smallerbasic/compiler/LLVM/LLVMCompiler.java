@@ -3,9 +3,6 @@ package smallerbasic.compiler.LLVM;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.nodes.ASTNode;
 import smallerbasic.compiler.Compiler;
-import smallerbasic.symbolTable.LLVMVarNameGenerator;
-import smallerbasic.symbolTable.SymbolTable;
-import smallerbasic.symbolTable.VarNameGenerator;
 
 /**
  * Compiles a tree to LLVM IR.
@@ -37,7 +34,7 @@ public class LLVMCompiler implements Compiler {
      */
     @Override
     public String compile(@NotNull ASTNode root) {
-        VarNameGenerator gen = new LLVMVarNameGenerator();
+        VarNameGenerator gen = new VarNameGenerator();
         SymbolTable symbolTable = new SymbolTable(root, gen);
         String prealloc = new LLVMPreallocation(symbolTable).run(root);
         String init     = new LLVMInitialization(symbolTable, gen).run(root);

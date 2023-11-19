@@ -6,7 +6,6 @@ import java.util.List;
 
 /**
  * This class defines a default implementation of a visitor over an AST that, given an identity and a binary function, traverses the AST composing the results from left to right.
- * The nodes are visited, and composed in the order one would expect, from left to right.
  */
 public interface ASTMonoidVisitor<T> extends ASTVisitor<T> {
 

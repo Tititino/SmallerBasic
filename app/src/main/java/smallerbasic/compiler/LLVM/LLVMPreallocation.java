@@ -3,8 +3,6 @@ package smallerbasic.compiler.LLVM;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTMonoidVisitor;
 import smallerbasic.AST.nodes.*;
-import smallerbasic.compiler.ASTToString;
-import smallerbasic.symbolTable.SymbolTable;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -12,7 +10,7 @@ import java.util.Set;
 /**
  * Given an {@link ASTNode} it creates the LLVM code needed to preallocate all its variables and literals.
  */
-class LLVMPreallocation implements ASTMonoidVisitor<StringBuilder>, ASTToString {
+class LLVMPreallocation implements ASTMonoidVisitor<StringBuilder> {
     private final @NotNull SymbolTable symbols;
 
     public LLVMPreallocation(@NotNull SymbolTable symbols) {
@@ -87,7 +85,6 @@ class LLVMPreallocation implements ASTMonoidVisitor<StringBuilder>, ASTToString 
                 .append("@" + symbols.getBinding(n) + ".value = constant [" + (text.length() + 1) + " x i8] c\"" + text + "\\00\"\n");
     }
 
-    @Override
     public String run(@NotNull ASTNode n) {
         return n.accept(this).toString();
     }
