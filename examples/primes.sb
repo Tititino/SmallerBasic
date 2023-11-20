@@ -1,18 +1,18 @@
 Max = 1000
-Num = 2
+Num = 0
 
 Sub init
   If (Num > Max) Then
     Goto fine
   EndIf
-  Numbers[Num - 2] = Num
+  Numbers[Num] = Num
   Num = Num + 1
   init()
   fine:
 EndSub
 
 Sub filter
-  For X = 1 To Max
+  For X = 0 To Max
     For Y = 0 To (Math.Sqrt(Numbers[X]))
       If ((Numbers[Y] <> -1) And (Numbers[X] / Numbers[Y] = Math.Floor(Numbers[X] / Numbers[Y]))) Then
         Numbers[X] = -1
@@ -24,6 +24,8 @@ Sub filter
 EndSub
 
 init()
+Numbers[0] = -1
+Numbers[1] = -1
 
 filter()
 

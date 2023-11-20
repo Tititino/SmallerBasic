@@ -4,14 +4,11 @@ import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTMonoidVisitor;
 import smallerbasic.AST.nodes.ASTNode;
 import smallerbasic.AST.nodes.RoutineDeclASTNode;
-import smallerbasic.compiler.ASTToString;
-import smallerbasic.symbolTable.SymbolTable;
-import smallerbasic.symbolTable.VarNameGenerator;
 
 /**
  * Given a {@link ASTNode} it creates the LLVM code for all its subroutines.
  */
-class LLVMSubRoutinePrinter implements ASTMonoidVisitor<StringBuilder>, ASTToString {
+class LLVMSubRoutinePrinter implements ASTMonoidVisitor<StringBuilder> {
 
     private final @NotNull SymbolTable symbols;
     private final @NotNull VarNameGenerator gen;
@@ -43,7 +40,6 @@ class LLVMSubRoutinePrinter implements ASTMonoidVisitor<StringBuilder>, ASTToStr
         return new StringBuilder(signature).append(body).append(end);
     }
 
-    @Override
     public String run(@NotNull ASTNode n) {
         return n.accept(this).toString();
     }

@@ -1,15 +1,26 @@
-Sub Atoi_col
-  If (ColStr = "0") Then Col = 0 EndIf
-  If (ColStr = "1") Then Col = 1 EndIf
-  If (ColStr = "2") Then Col = 2 EndIf
+Sub Get_col
+  IO.WriteLine("col:")
+  ColStr = IO.ReadLine()
+  If (ColStr = "0" Or ColStr = "1" Or ColStr = "2") Then
+    If (ColStr = "0") Then Col = 0 EndIf
+    If (ColStr = "1") Then Col = 1 EndIf
+    If (ColStr = "2") Then Col = 2 EndIf
+  Else
+    Get_col()
+  EndIf
 EndSub
 
-Sub Atoi_row
-  If (RowStr = "0") Then Row = 0 EndIf
-  If (RowStr = "1") Then Row = 1 EndIf
-  If (RowStr = "2") Then Row = 2 EndIf
+Sub Get_row
+  IO.WriteLine("row:")
+  RowStr = IO.ReadLine()
+  If (RowStr = "0" Or RowStr = "1" Or RowStr = "2") Then
+    If (RowStr = "0") Then Row = 0 EndIf
+    If (RowStr = "1") Then Row = 1 EndIf
+    If (RowStr = "2") Then Row = 2 EndIf
+  Else
+    Get_row()
+  EndIf
 EndSub
-
 
 For X = 0 To 2
   For Y = 0 To 2
@@ -29,24 +40,16 @@ EndSub
 
 While (true)
   IO.WriteLine("=P1===")
-  IO.WriteLine("row:")
-  RowStr = IO.ReadLine()
-  IO.WriteLine("column:")
-  ColStr = IO.ReadLine()
-  Atoi_row()
-  Atoi_col()
+  Get_row()
+  Get_col()
 
   Board[Row][Col] = "X"
 
   Print_game()
 
   IO.WriteLine("=P2===")
-  IO.WriteLine("row:")
-  RowStr = IO.ReadLine()
-  IO.WriteLine("column:")
-  ColStr = IO.ReadLine()
-  Atoi_row()
-  Atoi_col()
+  Get_row()
+  Get_col()
 
   Board[Row][Col] = "O"
 

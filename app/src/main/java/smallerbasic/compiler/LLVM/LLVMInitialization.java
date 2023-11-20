@@ -6,9 +6,6 @@ import smallerbasic.AST.nodes.ASTNode;
 import smallerbasic.AST.nodes.BoolLiteralASTNode;
 import smallerbasic.AST.nodes.NumberLiteralASTNode;
 import smallerbasic.AST.nodes.StringLiteralASTNode;
-import smallerbasic.compiler.ASTToString;
-import smallerbasic.symbolTable.SymbolTable;
-import smallerbasic.symbolTable.VarNameGenerator;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,7 +13,7 @@ import java.util.Set;
 /**
  * Given a {@link ASTNode} it creates the LLVM code needed to initialize all its literals.
  */
-class LLVMInitialization implements ASTMonoidVisitor<StringBuilder>, ASTToString {
+class LLVMInitialization implements ASTMonoidVisitor<StringBuilder> {
     private final @NotNull SymbolTable symbols;
     private final @NotNull VarNameGenerator gen;
 
@@ -83,7 +80,6 @@ class LLVMInitialization implements ASTMonoidVisitor<StringBuilder>, ASTToString
                 + ", " + (n.getValue() ? TRUE : FALSE) + ")\n");
     }
 
-    @Override
     public String run(@NotNull ASTNode n) {
         return n.accept(this).toString();
     }
