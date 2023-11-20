@@ -3,6 +3,7 @@ package smallerbasic.AST.nodes;
 import org.jetbrains.annotations.NotNull;
 import smallerbasic.AST.ASTVisitor;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,7 +29,7 @@ public class WhileLoopASTNode extends AbstractASTNode implements StatementASTNod
     }
 
     public @NotNull List<@NotNull StatementASTNode> getBody() {
-        return body;
+        return Collections.unmodifiableList(body);
     }
 
     @Override
